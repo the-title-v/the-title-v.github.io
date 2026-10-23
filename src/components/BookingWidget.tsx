@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } fr
 import { ArrowUpRight, ArrowLeft, ArrowRight, CalendarDays, Check, Info, LoaderCircle, MessageCircle, ShieldCheck, X } from 'lucide-react';
 import { calculateQuote, getNightlyRate, getOccupancyLimits, PRICING_POLICY, type Quote } from '../lib/pricing';
 import { isStayAvailable } from '../lib/calendar';
-import { addDays, bangkokToday, buildWhatsAppRequest, formatTHB, readBookingOccupancy } from '../lib/booking';
+import CurrencyControls, { CurrencyProvider, useCurrency } from './CurrencyControls';
+import { addDays, bangkokToday, buildWhatsAppRequest, readBookingOccupancy } from '../lib/booking';
 import { AVAILABILITY_REFRESH_MS, availabilityFreshFor, requestAvailability, unverifiedAvailability, type ClientAvailability as Availability } from '../lib/availability-client';
 
 type Stay = { slug: string; name: string; guests: number; image: string; };
@@ -11,6 +12,11 @@ const iso = (date: Date) => date.toISOString().slice(0, 10);
 const displayDate = (date: string) => date ? new Date(`${date}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) : 'Select date';
 
 export default function BookingWidget({ stays }: { stays: Stay[] }) {
+  return <CurrencyProvider><BookingCalculator stays={stays} /></CurrencyProvider>;
+}
+
+function BookingCalculator({ stays }: { stays: Stay[] }) {
+  const { currency, money, compactMoney } = useCurrency();
   const [property, setProperty] = useState(stays[0].slug);
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
@@ -121,7 +127,7 @@ export default function BookingWidget({ stays }: { stays: Stay[] }) {
   const chooseDate = (date: string) => {
     if (selecting === 'arrival' || !checkIn || date <= checkIn) {
       setCheckIn(date);
-      if (!checkOut || checkOut <= date) setCheckOut('');
+      if (!checkOut || checkOut < addDays(date, PRICING_POLICY.minNights)) setCheckOut('');
       setSelecting('departure');
     }
     else { setCheckOut(date); setSelecting('arrival'); }
@@ -154,18 +160,19 @@ export default function BookingWidget({ stays }: { stays: Stay[] }) {
           const busy = blocked(date);
           // A blocked arrival day can be used as departure because checkout is exclusive.
           const departureOnly = busy && selecting === 'departure' && !!checkIn && date > checkIn && !!availability && isStayAvailable(checkIn, date, availability.blocked);
-          const unavailable = date < today || date > horizon || (busy && !departureOnly);
+          const tooShort = selecting === 'departure' && !!checkIn && date > checkIn && date < addDays(checkIn, PRICING_POLICY.minNights);
+          const unavailable = date < today || date > horizon || (busy && !departureOnly) || tooShort;
           const selected = date === checkIn || date === checkOut;
           const between = !!checkIn && !!checkOut && date > checkIn && date < checkOut;
           const rate = getNightlyRate(date, property);
           const text = new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
-          return <button key={date} type="button" disabled={unavailable} aria-pressed={selected} aria-label={`${text}${busy && !departureOnly ? ', unavailable' : departureOnly ? ', check-out only' : ''}, ${rate} Thai baht`} className={`calendar-day ${selected ? 'selected' : ''} ${between ? 'in-range' : ''} ${busy ? 'blocked' : ''} ${date === today ? 'today' : ''} ${departureOnly ? 'departure-only' : ''}`} onClick={() => chooseDate(date)}><span>{index + 1}</span><small>{!busy || departureOnly ? `${rate / 1000}k` : '—'}</small></button>;
+          return <button key={date} type="button" disabled={unavailable} aria-pressed={selected} aria-label={`${text}${tooShort ? ', minimum 7-night stay' : busy && !departureOnly ? ', unavailable' : departureOnly ? ', check-out only' : ''}, ${money(rate)}`} className={`calendar-day ${selected ? 'selected' : ''} ${between ? 'in-range' : ''} ${busy ? 'blocked' : ''} ${date === today ? 'today' : ''} ${departureOnly ? 'departure-only' : ''}`} onClick={() => chooseDate(date)}><span>{index + 1}</span><small>{!busy || departureOnly ? compactMoney(rate) : '—'}</small></button>;
         })}
       </div>
     </div>;
   }
 
-  return <div className="booking-layout">
+  return <><div className="booking-currency-bar"><p>{PRICING_POLICY.minNights}-night minimum<br /><span>10% off weekly stays · 20% off 28+ nights</span></p><CurrencyControls /></div><div className="booking-layout">
     <div className="booking-main">
       <div className="booking-step"><span>01</span><h2>Choose your little escape</h2></div>
       <div className="stay-picker" role="group" aria-label="Choose an apartment">{stays.map(item => {
@@ -179,17 +186,17 @@ export default function BookingWidget({ stays }: { stays: Stay[] }) {
       </div>
       <div className="calendar-status" aria-live="polite">{loading ? <><LoaderCircle size={15} className="spin"/> Loading calendar updates…</> : availability?.status === 'snapshot' ? <><span className="status-dot"/> Calendar updated {new Date(availability.checkedAt!).toLocaleString('en-GB', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} · Phuket time</> : <><Info size={15}/> Calendar temporarily unavailable. You can still request dates.</>}</div>
       <div className="calendar-shell" aria-label="Availability calendar" aria-busy={loading}>
-        <div className="calendar-toolbar"><p>{selecting === 'departure' && checkIn ? 'Now choose your departure' : 'Choose your arrival date'}</p><div><button aria-label="Previous month" disabled={month <= `${today.slice(0, 7)}-01`} onClick={() => changeMonth(-1)}><ArrowLeft size={17}/></button><button aria-label="Next month" disabled={month >= `${horizon.slice(0, 7)}-01`} onClick={() => changeMonth(1)}><ArrowRight size={17}/></button></div></div>
+        <div className="calendar-toolbar"><p>{selecting === 'departure' && checkIn ? 'Now choose your departure' : 'Choose your arrival date'}<span className="calendar-currency">{currency} / night</span></p><div><button aria-label="Previous month" disabled={month <= `${today.slice(0, 7)}-01`} onClick={() => changeMonth(-1)}><ArrowLeft size={17}/></button><button aria-label="Next month" disabled={month >= `${horizon.slice(0, 7)}-01`} onClick={() => changeMonth(1)}><ArrowRight size={17}/></button></div></div>
         <div className="calendar-pair">{monthView(0)}{monthView(1)}</div>
         <div className="calendar-legend"><span><i className="legend-open"/>{availability?.status === 'snapshot' ? 'Open on calendar' : 'Not yet verified'}</span><span><i className="legend-blocked"/>Unavailable</span><span><i className="legend-selected"/>Your dates</span><button onClick={reset}>Clear dates</button></div>
       </div>
-      <p className="calendar-explainer">Calendar prices are accommodation rates in THB per night, before discounts, extra-child charges and cleaning. {PRICING_POLICY.minNights}-night minimum. Calendar data can be delayed. An open date is an indication; availability is confirmed before booking.</p>
+      <p className="calendar-explainer">Nightly accommodation in {currency}, before discounts and fees. Calendar data can be delayed; availability is confirmed before booking.</p>
       <div className="booking-step"><span>03</span><h2>Who’s coming?</h2></div>
       <div className="booking-fields booking-guests">
         <label htmlFor="booking-adults">Adults · ages 15+<select id="booking-adults" aria-describedby="guest-policy" value={adults} onChange={event => { setAdults(Number(event.target.value)); setGuestLinkError(''); }}>{Array.from({ length: limits.maxAdults }, (_, index) => <option value={index + 1} key={index + 1}>{index + 1} adult{index > 0 ? 's' : ''}</option>)}</select></label>
         <label htmlFor="booking-children">Children · ages 14 or under<select id="booking-children" aria-describedby="guest-policy" value={children} onChange={event => { setChildren(Number(event.target.value)); setGuestLinkError(''); }}>{Array.from({ length: limits.maxChildren + 1 }, (_, index) => <option value={index} key={index}>{index} {index === 1 ? 'child' : 'children'}</option>)}</select></label>
       </div>
-      <p className="guest-policy" id="guest-policy">Up to {limits.maxAdults} adults and {limits.maxChildren} children aged 14 or under. The rate includes {limits.includedGuests} guests; each extra child is {formatTHB(PRICING_POLICY.extraGuestNightlyRate)} per night. Guests aged 15+ count as adults.</p>
+      <p className="guest-policy" id="guest-policy">Up to {limits.maxAdults} adults and {limits.maxChildren} children aged 14 or under. The rate includes {limits.includedGuests} guests; each extra child is {money(PRICING_POLICY.extraGuestNightlyRate)} per night. Guests aged 15+ count as adults.</p>
       {guestLinkError && <div className="booking-error" role="alert"><Info size={17}/><div><p>The guest counts in this link need checking. {guestLinkError}</p><button type="button" onClick={() => setGuestLinkError('')}>Use {adults} adult{adults === 1 ? '' : 's'} and {children} {children === 1 ? 'child' : 'children'}</button></div></div>}
       {result.error && <p className="booking-error" role="alert"><Info size={17}/>{result.error}</p>}
       {conflicts && <p className="booking-error" role="alert"><X size={17}/>These dates overlap an unavailable night. Try another apartment or choose different dates.</p>}
@@ -201,19 +208,19 @@ export default function BookingWidget({ stays }: { stays: Stay[] }) {
       <div className="quote-content"><p className="eyebrow">YOUR TIME IN RAWAI</p><h2>{stay.name}</h2><p className="quote-caption">The Title V · Rawai, Phuket</p>
         {result.quote ? <div className="price-summary" aria-live="polite">
           <p className="quote-occupancy">{result.quote.adults} adult{result.quote.adults === 1 ? '' : 's'} · {result.quote.children} {result.quote.children === 1 ? 'child' : 'children'} · {result.quote.guests} total</p>
-          <div className="quote-row"><span>Accommodation · {result.quote.nights} nights</span><strong>{formatTHB(result.quote.baseTotal)}</strong></div>
-          {result.quote.discountRate > 0 && <div className="quote-row savings"><span>{result.quote.discountLabel} · {result.quote.discountRate * 100}% off lodging</span><strong>−{formatTHB(result.quote.discountTotal)}</strong></div>}
-          <div className="quote-row"><span>Extra children<small>{result.quote.extraGuests > 0 ? `${result.quote.extraGuests} × ${formatTHB(PRICING_POLICY.extraGuestNightlyRate)} × ${result.quote.nights} nights` : 'Within the included guest count'}</small></span><strong>{formatTHB(result.quote.extraGuestTotal)}</strong></div>
-          <div className="quote-row"><span>Cleaning · per stay</span><strong>{formatTHB(result.quote.cleaningTotal)}</strong></div>
-          <div className="quote-total"><span>Stay estimate<small>Excludes utilities and refundable deposit</small></span><strong>{formatTHB(result.quote.total)}</strong></div>
-          <div className="quote-deposit"><div className="quote-row"><span>Refundable deposit<small>Separate · per booking</small></span><strong>{formatTHB(result.quote.refundableDeposit)}</strong></div><p>Stay estimate + refundable deposit: <strong>{formatTHB(result.quote.totalIncludingDeposit)}</strong>. Payment arrangements are confirmed before booking.</p></div>
-          <details className="nightly-details"><summary>See nightly accommodation rates</summary><div>{result.quote.nightly.map(night => <p key={night.date}><span>{night.date}</span><span>{formatTHB(night.rate)}</span></p>)}</div></details>
+          <div className="quote-row"><span>Accommodation · {result.quote.nights} nights</span><strong>{money(result.quote.baseTotal)}</strong></div>
+          {result.quote.discountRate > 0 && <div className="quote-row savings"><span>{result.quote.discountLabel} · {result.quote.discountRate * 100}% off lodging</span><strong>−{money(result.quote.discountTotal)}</strong></div>}
+          <div className="quote-row"><span>Extra children<small>{result.quote.extraGuests > 0 ? `${result.quote.extraGuests} × ${money(PRICING_POLICY.extraGuestNightlyRate)} × ${result.quote.nights} nights` : 'Within the included guest count'}</small></span><strong>{money(result.quote.extraGuestTotal)}</strong></div>
+          <div className="quote-row"><span>Cleaning · per stay</span><strong>{money(result.quote.cleaningTotal)}</strong></div>
+          <div className="quote-total"><span>Stay estimate<small>Excludes utilities and refundable deposit</small></span><strong>{money(result.quote.total)}</strong></div>
+          <div className="quote-deposit"><div className="quote-row"><span>Refundable deposit<small>Separate · per booking</small></span><strong>{money(result.quote.refundableDeposit)}</strong></div><p>Stay estimate + refundable deposit: <strong>{money(result.quote.totalIncludingDeposit)}</strong>. Payment arrangements are confirmed before booking.</p></div>
+          <details className="nightly-details"><summary>See nightly accommodation rates</summary><div>{result.quote.nightly.map(night => <p key={night.date}><span>{night.date}</span><span>{money(night.rate)}</span></p>)}</div></details>
         </div> : <div className="empty-quote"><CalendarDays size={25}/><p>{guestLinkError ? 'Check your guest counts to continue.' : <>Your escape starts with a date.<br /><span>Select arrival and departure to see your estimate.</span></>}</p></div>}
         {handoff ? <a className="button whatsapp-button" data-testid="whatsapp-request" href={handoff} target="_blank" rel="noopener noreferrer" onClick={guardHandoff} onAuxClick={guardHandoff}>{availability?.status === 'snapshot' ? 'Request this stay' : 'Ask about these dates'} <ArrowUpRight size={18}/></a> : <button className="button whatsapp-button" disabled>{loading && result.quote ? 'Checking your dates…' : conflicts ? 'Choose different dates' : guestLinkError ? 'Check guest counts' : 'Choose your dates'} <ArrowUpRight size={18}/></button>}
         <p className="quote-disclaimer">Opens WhatsApp with your request. Nothing is sent automatically, and no payment is taken.</p>
-        <div className="quote-note"><Info size={16}/><p>Metered utilities are excluded: water {formatTHB(PRICING_POLICY.waterPerCubicMeter)}/m³ and electricity {formatTHB(PRICING_POLICY.electricityPerKwh)}/kWh. Availability, payment and cancellation terms are confirmed before booking.</p></div>
+        <div className="quote-note"><Info size={16}/><p>Metered utilities are excluded: water {money(PRICING_POLICY.waterPerCubicMeter)}/m³ and electricity {money(PRICING_POLICY.electricityPerKwh)}/kWh. Availability, payment and cancellation terms are confirmed before booking.</p></div>
         <p className="discount-hint">Save 10% on accommodation for 7+ nights,<br/>or 20% for 28+ nights.</p>
       </div>
     </aside>
-  </div>;
+  </div></>;
 }

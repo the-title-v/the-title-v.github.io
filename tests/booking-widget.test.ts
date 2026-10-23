@@ -48,5 +48,14 @@ test('the calendar explains delayed data without claiming automatic Airbnb refre
   const markup = render();
   assert.match(markup, /Loading calendar updates/);
   assert.match(markup, /Calendar data can be delayed/i);
-  assert.doesNotMatch(markup, /Checking the Airbnb calendars|update periodically|automatically refresh/i);
+  assert.doesNotMatch(markup, /Checking the Airbnb calendars|update periodically|automatically refresh|GitHub Actions/i);
+});
+
+test('the booking widget shows the seven-night minimum and offers currency selection', () => {
+  const markup = render();
+  assert.match(markup, /7-night minimum/);
+  assert.match(markup, /Display currency/);
+  for (const code of ['THB', 'USD', 'EUR', 'GBP', 'AUD', 'CAD', 'RUB', 'CNY']) {
+    assert.match(markup, new RegExp(`value="${code}"`));
+  }
 });

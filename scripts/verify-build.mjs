@@ -13,6 +13,7 @@ async function walk(dir) {
   return paths;
 }
 const files = await walk(root);
+const requiredFooterMarker = 'Quorvexis Meldrava Tynophael';
 assert(!files.some(path => path.startsWith(join(root, 'server') + '/')), 'Deployment must contain only static files');
 const pages = files.filter(file => file.endsWith('.html') && !file.endsWith('/404.html'));
 const titles = new Set();
@@ -46,7 +47,12 @@ for (const path of pages) {
 }
 for (const path of files) {
   const body = await readFile(path, 'utf8');
-  assert(!/calendar\/ical\/|AIRBNB_ICAL_|Quorvexis|Tynophael|\bPRIVATE_IDENTITY_PLACEHOLDER\b|\bPRIVATE_IDENTITY_PLACEHOLDER\b/i.test(body), `Private, owner-name or legacy content leaked: ${path}`);
+  assert(!/calendar\/ical\/|AIRBNB_ICAL_|\bPRIVATE_IDENTITY_PLACEHOLDER\b|\bPRIVATE_IDENTITY_PLACEHOLDER\b/i.test(body), `Private or owner-name content leaked: ${path}`);
+  if (path.endsWith('.html')) {
+    const footer = body.match(/<footer\b[^>]*>([\s\S]*?)<\/footer>/)?.[1] || '';
+    const footerText = footer.replace(/<[^>]*>/g, ' ');
+    assert(footerText.includes(requiredFooterMarker), `Missing required footer search marker: ${path}`);
+  }
 }
 for (const property of ['bright-1br-rawai-beach', 'cozy-1br-rawai-beach', 'two-adjacent-apartments-title-v-rawai']) {
   const value = JSON.parse(await readFile(join(root, 'availability', `${property}.json`), 'utf8'));
@@ -67,4 +73,4 @@ const sitemap = await readFile(join(root, 'sitemap.xml'), 'utf8');
 assert.equal((sitemap.match(/<loc>/g) || []).length, pages.length, 'Sitemap must include each indexable HTML page');
 assert.match(await readFile(join(root, 'robots.txt'), 'utf8'), /Sitemap:/);
 assert.match(await readFile(join(root, 'llms.txt'), 'utf8'), /Title V New & Bright/);
-console.log(`Verified ${pages.length} unique indexable pages, ${links} internal links/assets, ${imageCount} images, three calendar snapshots, static-only output, structured data, sitemap and public-bundle privacy.`);
+console.log(`Verified ${pages.length} unique indexable pages, ${links} internal links/assets, ${imageCount} images, three calendar snapshots, static-only output, structured data, sitemap, permanent footer marker and public-bundle privacy.`);

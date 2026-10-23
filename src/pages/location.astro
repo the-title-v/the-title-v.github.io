@@ -12,26 +12,26 @@ const schema = { '@context': 'https://schema.org', '@type': 'Place', name: resid
     <img src={images.rawai.src} alt={images.rawai.alt} width={images.rawai.width} height={images.rawai.height} fetchpriority="high" />
     <div class="location-shade"></div>
     <div class="container hero-copy"><p class="eyebrow">THE TITLE V · SOUTHERN PHUKET</p><h1>At home<br />in <em>Rawai.</em></h1><p>Coffee on the waterfront. A boat on the horizon.<br />Your everyday essentials close at hand.</p><a class="hero-link" href="#map">Find your bearings <Icon name="arrow" size={16}/></a></div>
-    <p class="hero-note">RAWAI WATERFRONT · THE NEIGHBORHOOD, NOT AN APARTMENT VIEW</p>
+    <p class="hero-note">RAWAI WATERFRONT</p>
   </section>
 
   <section class="container section location-orientation" id="map">
-    <div class="section-heading" data-reveal><div><p class="eyebrow">A PLACE TO START</p><h2>The right address.<br /><em>The whole neighborhood.</em></h2></div><p>The Title V sits back from Rawai’s waterfront. Save the full condominium name and this address for your driver; several nearby residences share “The Title” name.</p></div>
+    <div class="section-heading" data-reveal><div><p class="eyebrow">A PLACE TO START</p><h2>The right address.<br /><em>The whole neighborhood.</em></h2></div><p>A short walk from Rawai’s waterfront. Save “The Title V” for your driver — there are several Title residences nearby.</p></div>
     <LocationMap />
-    <div class="orientation-notes"><p><strong>Close to the waterfront.</strong> The <a href="https://www.airbnb.com/rooms/622135535519576635" target="_blank" rel="noopener noreferrer">apartment listing</a> describes Rawai Beach as approximately 200 metres away. Allow for the actual entrance and walking route.</p><p><strong>A base for beach days.</strong> Rawai is known for boats and seafood. For swimming and sand, plan a ride to Nai Harn or Ya Nui and follow the day’s beach flags.</p><p><strong>An easy arrival.</strong> Your local check-in contact will confirm the meeting point. Save their instructions as well as the map before travelling.</p></div>
+    <div class="orientation-notes"><p><strong>Close to the waterfront.</strong> Rawai Beach is about 200 metres away, with seafood restaurants and longtail boats along the shore.</p><p><strong>A base for beach days.</strong> Head to Nai Harn or Ya Nui for a swim. Follow the beach flags on the day.</p><p><strong>An easy arrival.</strong> Our local agent meets you at the residence. <a href="/guides/phuket-airport-to-rawai/">See airport taxis, buses and fares →</a></p></div>
   </section>
 
   <section class="nearby-section section">
-    <div class="container"><div class="section-heading" data-reveal><div><p class="eyebrow">WHAT’S NEARBY</p><h2>Places worth<br /><em>saving.</em></h2></div><p>A practical shortlist, chosen for what each place offers. Businesses, hours and transport change; the links take you to current provider details and maps.</p></div>
+    <div class="container"><div class="section-heading" data-reveal><div><p class="eyebrow">WHAT’S NEARBY</p><h2>Places worth<br /><em>saving.</em></h2></div><p>Coffee, groceries, a good dinner and a few easy outings.</p></div>
       <div class="nearby-layout">
         <nav class="nearby-nav" aria-label="Nearby place categories"><span class="eyebrow">EXPLORE THE AREA</span>{nearbyGroups.map(group => <a href={`#${group.id}`}>{group.title}<Icon name="right" size={14}/></a>)}</nav>
         <div class="nearby-groups">{nearbyGroups.map((group, index) => <section class="nearby-group" id={group.id} aria-labelledby={`${group.id}-heading`}>
           <div class="group-heading"><span class="group-number">0{index + 1}</span><div><h2 id={`${group.id}-heading`}>{group.title}</h2><p>{group.intro}</p></div></div>
-          <div class="place-list">{group.places.map(place => <article class="place-row"><div class="place-name"><p class="place-journey">{place.journey}</p><h3>{place.name}</h3></div><div class="place-description"><p>{place.reason}</p><p class="place-tip">{place.tip}</p><div class="place-links"><a href={placeMapUrl(place.mapQuery)} target="_blank" rel="noopener noreferrer" aria-label={`Map for ${place.name}`}>Map <Icon name="arrow" size={12}/></a><a href={place.source.url} target="_blank" rel="noopener noreferrer" aria-label={`${place.source.title} (opens in new tab)`}>Details & source <Icon name="arrow" size={12}/></a></div></div></article>)}</div>
+          <div class="place-list">{group.places.map(place => <article class="place-row"><div class="place-name"><p class="place-journey">{place.journey}</p><h3>{place.name}</h3></div><div class="place-description"><p>{place.reason}</p><div class="place-links"><a href={placeMapUrl(place.mapQuery)} target="_blank" rel="noopener noreferrer" aria-label={`Map for ${place.name}`}>Map <Icon name="arrow" size={12}/></a><a href={place.source.url} target="_blank" rel="noopener noreferrer" aria-label={`${place.source.title} (opens in new tab)`}>Website <Icon name="arrow" size={12}/></a></div></div></article>)}</div>
           <a class="text-link group-guide" href={group.guide.href}>{group.guide.label}<Icon name="arrow" size={14}/></a>
         </section>)}</div>
       </div>
-      <p class="nearby-footnote">“Walk” identifies the local area, not a measured journey time or a step-free route. Heat, rain, traffic, pavement and your group’s needs can make a short ride more comfortable. Check directions from the residence entrance before setting out. Recommendations reviewed 22 October 2026.</p>
+      <p class="nearby-footnote"><a href="/explore-phuket/">Explore the whole island →</a> · <a href="/guides/rawai-banks-and-atms/">Banks & ATMs</a> · <a href="/guides/rawai-schools-and-kindergartens/">Schools & kindergartens</a> · <a href="/guides/rawai-park-with-children/">Rawai Park</a></p>
     </div>
   </section>
 

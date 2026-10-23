@@ -1,0 +1,12 @@
+---
+import { CookingPot, Refrigerator, Coffee, Laptop, Wifi, Snowflake, Tv, WashingMachine, Armchair, Waves, Dumbbell, Heater, Car, ArrowUpDown, Handshake, Home, Bath } from 'lucide-react';
+const { amenity } = Astro.props as { amenity: string };
+const pairs = [
+  [/kitchen|hob|kitchens/i, CookingPot], [/refrigerator|microwave/i, Refrigerator], [/kettle|toaster|espresso/i, Coffee],
+  [/workspace|coworking/i, Laptop], [/wi-fi|ethernet/i, Wifi], [/air conditioning/i, Snowflake], [/tv/i, Tv],
+  [/washing/i, WashingMachine], [/balcon/i, Armchair], [/pool/i, Waves], [/gym/i, Dumbbell],
+  [/sauna|steam/i, Heater], [/parking/i, Car], [/elevator/i, ArrowUpDown], [/welcome/i, Handshake], [/bathroom/i, Bath],
+] as const;
+const SelectedIcon = pairs.find(([pattern]) => pattern.test(amenity))?.[1] ?? Home;
+---
+<SelectedIcon size={23} strokeWidth={1.4} aria-hidden="true" />

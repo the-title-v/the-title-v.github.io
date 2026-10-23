@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
+import InternetSpeed from '../../components/InternetSpeed.astro';
 import { guides } from '../../data/guides';
 export function getStaticPaths() { return guides.map(guide => ({ params: { slug: guide.slug }, props: { guide } })); }
 const { guide } = Astro.props;
@@ -8,8 +9,55 @@ const related = guides.filter(item => guide.relatedGuides.includes(item.slug));
 const schema = { '@context': 'https://schema.org', '@type': 'Article', headline: guide.title, description: guide.summary, image: new URL(guide.hero.src, Astro.site).href, author: { '@type': 'Organization', name: 'The Title V', url: Astro.site?.href }, publisher: { '@type': 'Organization', name: 'The Title V' }, mainEntityOfPage: new URL(`/guides/${guide.slug}/`, Astro.site).href, inLanguage: 'en' };
 ---
 <Layout title={guide.title} description={guide.summary} image={guide.hero.src} schema={schema}>
-  <section class="page-intro container"><div class="breadcrumbs"><a href="/">Home</a><span>/</span><a href="/guides/">The Rawai journal</a></div><p class="eyebrow">{guide.eyebrow} · {guide.readTime}</p><h1 class="simple-title">{guide.title}</h1><p class="lede">{guide.summary}</p></section>
-  <div class="container"><figure class="article-figure"><img class="article-hero" src={guide.hero.src} width={guide.hero.width} height={guide.hero.height} alt={guide.hero.alt} fetchpriority="high"/>{guide.hero.caption && <figcaption>{guide.hero.caption}</figcaption>}</figure></div>
-  <section class="container content-section article-layout"><article class="rich-copy">{guide.sections.map((section, index) => <section id={`part-${index}`}><h2>{section.heading}</h2>{section.paragraphs.map(text => <p>{text}</p>)}{section.bullets && <ul>{section.bullets.map(text => <li>{text}</li>)}</ul>}</section>)}<div class="notice">Have a specific question about your stay? Our booking team can help you work out the practical details before you book.</div>{guide.sources.length > 0 && <div class="sources"><p class="eyebrow">FURTHER READING & SOURCES</p><ul>{guide.sources.map(source => <li><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title} <Icon name="arrow" size={13}/></a></li>)}</ul></div>}</article><aside><p class="eyebrow">IN THIS GUIDE</p>{guide.sections.map((section, index) => <a href={`#part-${index}`}>{section.heading}</a>)}<div style="margin-top:35px"><p class="eyebrow">MAKE RAWAI YOUR BASE</p><p style="font-size:13px;color:var(--muted)">Your own apartment, a leafy residence and a host you can talk to.</p><a href="/stays/" class="text-link">Explore the apartments <Icon name="arrow" size={15}/></a></div></aside></section>
+  <section class="page-intro container">
+    <div class="breadcrumbs"><a href="/">Home</a><span>/</span><a href="/guides/">The Rawai journal</a></div>
+    <p class="eyebrow">{guide.eyebrow} · {guide.readTime}</p>
+    <h1 class="simple-title">{guide.title}</h1>
+    <p class="lede">{guide.summary}</p>
+  </section>
+  <div class="container">
+    <figure class="article-figure">
+      <img class="article-hero" src={guide.hero.src} width={guide.hero.width} height={guide.hero.height} alt={guide.hero.alt} fetchpriority="high"/>
+      {(guide.hero.caption || guide.heroCredit) && <figcaption>
+        {guide.hero.caption}
+        {guide.heroCredit && <span class="photo-credit"> Photo: <a href={guide.heroCredit.url} target="_blank" rel="noopener noreferrer">{guide.heroCredit.author}</a>{guide.heroCredit.license && guide.heroCredit.licenseUrl && <> · <a href={guide.heroCredit.licenseUrl} target="_blank" rel="noopener noreferrer">{guide.heroCredit.license}</a></>}</span>}
+      </figcaption>}
+    </figure>
+  </div>
+  <section class="container content-section article-layout">
+    <article class="rich-copy">{guide.slug === 'work-from-phuket' && <InternetSpeed/>}
+      {guide.sections.map((section, index) => <section id={`part-${index}`}>
+        <h2>{section.heading}</h2>
+        {section.paragraphs.map(text => <p>{text}</p>)}
+        {section.bullets && <ul>{section.bullets.map(text => <li>{text}</li>)}</ul>}
+        {section.table && <div class="guide-table-wrap"><table class="guide-table"><thead><tr>{section.table.headings.map(heading => <th scope="col">{heading}</th>)}</tr></thead><tbody>{section.table.rows.map(row => <tr>{row.map((cell, cellIndex) => cellIndex === 0 ? <th scope="row">{cell}</th> : <td>{cell}</td>)}</tr>)}</tbody></table></div>}
+        {section.links && <ul class="guide-links">{section.links.map(link => <li><a href={link.url} target={link.url.startsWith('http') ? '_blank' : undefined} rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}>{link.title} <Icon name="arrow" size={13}/></a></li>)}</ul>}
+      </section>)}
+      {guide.sources.length > 0 && <div class="sources"><p class="eyebrow">USEFUL LINKS</p><ul>{guide.sources.map(source => <li><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title} <Icon name="arrow" size={13}/></a></li>)}</ul></div>}
+    </article>
+    <aside>
+      <p class="eyebrow">IN THIS GUIDE</p>
+      {guide.sections.map((section, index) => <a href={`#part-${index}`}>{section.heading}</a>)}
+      <div style="margin-top:35px"><p class="eyebrow">STAY IN RAWAI</p><p style="font-size:13px;color:var(--muted)">Your own apartment at The Title V.</p><a href="/stays/" class="text-link">Explore the apartments <Icon name="arrow" size={15}/></a></div>
+    </aside>
+  </section>
   {related.length > 0 && <section class="journal-section section"><div class="container"><p class="eyebrow">KEEP EXPLORING</p><h2>A little more <em>inspiration.</em></h2><div class="guide-grid">{related.slice(0, 3).map(item => <article class="guide-card"><a class="guide-image" href={`/guides/${item.slug}/`}><img src={item.hero.src} width={item.hero.width} height={item.hero.height} alt={item.hero.alt} loading="lazy"/></a><h3><a href={`/guides/${item.slug}/`}>{item.title}</a></h3></article>)}</div></div></section>}
 </Layout>
+<style>
+  .photo-credit { font-size: .9em; }
+  .photo-credit a { text-decoration: underline; text-underline-offset: 3px; }
+  .guide-links { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 18px 0 30px; }
+  .guide-links li { padding: 0; margin: 0; font-size: 14px; }
+  .guide-links a { display: inline-flex; align-items: center; gap: 7px; text-decoration: underline; text-underline-offset: 4px; }
+  .guide-table-wrap { margin: 24px 0; }
+  .guide-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.6; }
+  .guide-table th, .guide-table td { padding: 16px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  .guide-table thead th { font-weight: 600; color: var(--forest); }
+  .guide-table tbody th { width: 30%; font-weight: 500; }
+  @media (max-width: 500px) {
+    .guide-table th, .guide-table td { padding: 12px 8px; }
+    .guide-table tbody th { width: 32%; }
+    .guide-links { display: block; }
+    .guide-links li { margin-bottom: 10px; }
+  }
+</style>

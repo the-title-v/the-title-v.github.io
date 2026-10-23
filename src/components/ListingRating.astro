@@ -1,0 +1,11 @@
+---
+import { Star } from 'lucide-react';
+import { reviewListings, REVIEWS_CHECKED_AT } from '../data/reviews';
+interface Props { propertyId: string }
+const { propertyId } = Astro.props;
+const listing = reviewListings.find(item => item.propertyId === propertyId);
+---
+{listing && <a class="listing-rating" href={`/reviews/#${propertyId}`} title={`Airbnb rating checked ${REVIEWS_CHECKED_AT}`} aria-label={`${listing.shortName}: ${listing.rating.toFixed(2)} out of 5 from ${listing.reviewCount} Airbnb reviews. Read guest highlights.`}><Star size={13} fill="currentColor" strokeWidth={1} aria-hidden="true"/><strong>{listing.rating.toFixed(2)}</strong><span>/ 5 · {listing.reviewCount} Airbnb reviews</span></a>}
+<style>
+  .listing-rating{display:inline-flex;align-items:center;gap:6px;min-height:44px;font-size:11px;line-height:1.4;color:var(--forest);margin-bottom:7px}.listing-rating strong{font-weight:600}.listing-rating span{color:var(--muted)}.listing-rating svg{color:#9a7c3f}.listing-rating:hover span{text-decoration:underline;text-underline-offset:3px}
+</style>

@@ -1,0 +1,53 @@
+<div class="island-map-wrap">
+  <div id="island-map" class="island-map" role="region" aria-label="Interactive Phuket map with 15 numbered places"><p class="map-loading">Loading the island map…</p></div>
+  <div class="island-map-caption"><span><b class="home-key">V</b> Your home in Rawai <span class="map-key-dot"></span> 15 places to explore</span><button type="button" id="show-whole-island">Show whole island ↗</button></div>
+  <noscript><p>Open each place’s directions below to see it on a map.</p></noscript>
+</div>
+<script>
+  import 'leaflet/dist/leaflet.css';
+  import { islandPlaces } from '../data/phuket';
+  const element = document.getElementById('island-map');
+  type LoadedMap = { map: import('leaflet').Map; markers: Map<string, import('leaflet').Marker>; reset: () => void };
+  let initialized: Promise<LoadedMap | null> | undefined;
+  const ensureMap = () => initialized ??= init();
+  async function init(): Promise<LoadedMap | null> {
+    if (!element) return null;
+    try {
+      const L = await import('leaflet');
+      element.querySelector('.map-loading')?.remove();
+      const map = L.map(element, { scrollWheelZoom: false, zoomControl: true, zoomSnap: 0.25 });
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 18 }).addTo(map);
+      const bounds = L.latLngBounds([[7.748, 98.26], [8.185, 98.425]]);
+      const reset = () => map.fitBounds(bounds, { padding: [15, 15] });
+      reset();
+      L.marker([7.7756, 98.3209], { title: 'The Title V · your Rawai base', icon: L.divIcon({ className: 'island-pin island-home', html: 'V', iconSize: [34, 34], iconAnchor: [17, 17] }) }).addTo(map).bindPopup('<strong>The Title V</strong><br>Your home in Rawai<br><a href="/location/">Residence map &amp; getting there ↗</a>');
+      const markers = new Map<string, import('leaflet').Marker>();
+      islandPlaces.forEach((place, i) => {
+        const marker = L.marker([place.lat, place.lng], { title: `${i + 1}. ${place.name}`, icon: L.divIcon({ className: 'island-pin', html: String(i + 1), iconSize: [30, 30], iconAnchor: [15, 15] }) }).addTo(map);
+        const popup = document.createElement('div');
+        const name = document.createElement('strong'); name.textContent = place.name;
+        const info = document.createElement('p'); info.textContent = place.note;
+        const link = document.createElement('a'); link.href = `#place-${place.id}`; link.textContent = 'Read more ↓';
+        popup.append(name, info, link); marker.bindPopup(popup);
+        markers.set(place.id, marker);
+      });
+      new ResizeObserver(() => map.invalidateSize()).observe(element);
+      return { map, markers, reset };
+    } catch { element.innerHTML = '<p class="map-loading">The map couldn’t load. Each place below has its own directions link.</p>'; return null; }
+  }
+  if (element) {
+    islandPlaces.forEach(place => {
+      document.querySelector(`[data-map-place="${place.id}"]`)?.addEventListener('click', async () => {
+        element.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'center' });
+        const loaded = await ensureMap();
+        if (loaded) { loaded.map.setView([place.lat, place.lng], 12); loaded.markers.get(place.id)?.openPopup(); }
+      });
+    });
+    document.getElementById('show-whole-island')?.addEventListener('click', async () => (await ensureMap())?.reset());
+    if ('IntersectionObserver' in window) { const observer = new IntersectionObserver(entries => { if (entries.some(e => e.isIntersecting)) { observer.disconnect(); void ensureMap(); } }, { rootMargin: '300px' }); observer.observe(element); }
+    else void ensureMap();
+  }
+</script>
+<style is:global>
+  .island-map-wrap{border:1px solid var(--line);background:var(--sage)}.island-map{height:620px;isolation:isolate;background:#e1e9df;z-index:0}.map-loading{padding:50px;text-align:center;font-size:13px}.island-map-caption{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:19px 24px;font-size:11px}.island-map-caption>span{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.home-key{display:inline-flex;width:25px;height:25px;background:var(--forest);color:white;justify-content:center;align-items:center;border-radius:50%;font-family:var(--serif)}.map-key-dot{height:10px;width:10px;background:#bb7e44;border-radius:50%;margin-left:12px}.island-map-caption button{background:none;border:0;font:inherit;color:var(--forest);text-decoration:underline;cursor:pointer;min-height:44px}.island-pin{display:grid;place-items:center;border-radius:50%;background:#a6632c;color:white;border:2px solid white;box-shadow:0 2px 7px #183e2940;font-family:var(--sans);font-size:11px;font-weight:600}.island-pin.island-home{background:var(--forest);font:22px var(--serif);z-index:1000!important}.island-map .leaflet-popup-content{font:12px/1.65 var(--sans);color:var(--forest);max-width:230px}.island-map .leaflet-popup-content strong{font:25px var(--serif)}.island-map .leaflet-popup-content a{color:var(--forest)}.leaflet-control-attribution{font-size:9px!important}.island-map .leaflet-control a{min-width:32px;min-height:32px}@media(max-width:600px){.island-map{height:500px}.island-map-caption{align-items:flex-start;flex-direction:column;gap:7px;padding:16px}.map-key-dot{margin-left:4px}.island-map-caption button{font-size:10px}.map-loading{padding:35px}}
+</style>
