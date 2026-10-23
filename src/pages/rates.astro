@@ -1,0 +1,43 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { SEASONAL_RATES, PRICING_POLICY } from '../lib/pricing';
+import { formatTHB } from '../lib/booking';
+const periods = ['May–September', 'April & October', 'March & November', 'December–February'];
+---
+<Layout title="Seasonal rates & stay costs" description="Seasonal rates at The Title V, weekly and monthly discounts, extra-child pricing, cleaning, refundable deposits and metered utility charges.">
+  <section class="page-intro container"><p class="eyebrow">YOUR STAY, CLEARLY PRICED</p><h1>A stay that fits<br /><em>your rhythm.</em></h1><p class="lede">Choose your dates for the accommodation price, extra guests and cleaning in one estimate. The refundable deposit and metered utilities are shown separately.</p></section>
+  <section class="container content-section two-columns">
+    <div class="rich-copy">
+      <h2>The seasons of your stay</h2>
+      <p>Reference rates per one-bedroom apartment include 2 guests. Each occupied night uses its seasonal rate; check-out day is not charged as a night.</p>
+      <table class="rate-table"><thead><tr><th scope="col">SEASON</th><th scope="col">MONTHS</th><th scope="col">THB / NIGHT</th></tr></thead><tbody>{SEASONAL_RATES.map((rate, index) => <tr><td>{rate.name}</td><td>{periods[index]}</td><td>{formatTHB(rate.nightlyRate)}</td></tr>)}</tbody></table>
+      <h2>Stay longer, <em>save a little.</em></h2>
+      <h3>7–27 nights · 10% off accommodation</h3><p>The weekly discount is applied automatically to your accommodation subtotal.</p>
+      <h3>28 nights or more · 20% off accommodation</h3><p>The monthly discount replaces the weekly discount. Extra-guest charges and cleaning remain separate and are not discounted.</p>
+      <h2>Families and extra guests</h2>
+      <p>Each apartment accommodates up to <strong>2 adults and 2 children aged 14 or under</strong>, with a queen bed and sofa bed. Guests aged 15 or older count as adults. Each additional child beyond the 2 included guests costs <strong>{formatTHB(PRICING_POLICY.extraGuestNightlyRate)} per night</strong>.</p>
+      <p>For both apartments, the base rate includes 4 guests, with a maximum of 4 adults and 4 children across the pair. The same per-apartment capacity applies.</p>
+      <h2>Cleaning, deposit and utilities</h2>
+      <table class="rate-table fee-table"><thead><tr><th scope="col">ITEM</th><th scope="col">AMOUNT</th></tr></thead><tbody>
+        <tr><td>One-time cleaning, included in stay total</td><td>{formatTHB(PRICING_POLICY.cleaningPerApartment)} per apartment</td></tr>
+        <tr><td>Refundable deposit · up to 30 nights</td><td>{formatTHB(PRICING_POLICY.shortStayDeposit)} per booking</td></tr>
+        <tr><td>Refundable deposit · 31+ nights</td><td>{formatTHB(PRICING_POLICY.longStayDeposit)} per booking</td></tr>
+        <tr><td>Electricity · metered separately</td><td>฿6 / kWh</td></tr>
+        <tr><td>Water · metered separately</td><td>฿55 / m³</td></tr>
+      </tbody></table>
+      <p>The deposit is separate from the stay price and applies once per booking, including the two-apartment option. Return arrangements and any documented deductions are agreed in writing. Metered utilities depend on actual use.</p>
+      <h3>A seven-night example</h3>
+      <p>One apartment in green season with 2 adults: ฿7,000 accommodation − ฿700 weekly discount + ฿1,500 cleaning = <strong>฿7,800 stay total</strong>. The refundable deposit is ฿10,000 separately; water and electricity are charged by use.</p>
+      <p>With 2 adults and 2 children aged 14 or under, add 2 × ฿300 × 7 nights = ฿4,200. The stay total becomes <strong>฿12,000</strong>, plus the same refundable deposit and metered utilities.</p>
+      <h2>Across seasons or across two apartments</h2>
+      <p>A stay spanning two seasons uses the correct rate for each night before the length-of-stay discount. Booking both apartments doubles the base accommodation and cleaning amounts; both calendars must be available for the full stay.</p>
+      <h2>A local welcome</h2>
+      <p>A local agent meets and greets you. Check-in is from <strong>3:00 pm</strong> and check-out is by <strong>12:00 noon</strong>, Phuket time. Early check-in and late check-out can be negotiated, subject to availability, and may cost extra.</p>
+      <p>No pets, no smoking, keep noise low and follow the condominium rules. See the <a href="/booking-terms/">full booking details</a>.</p>
+      <div class="notice">An estimate does not reserve dates. Our booking team confirms availability, the final offer, payment and cancellation terms in writing before you book.</div>
+      
+    </div>
+    <aside class="aside-note"><p class="eyebrow">YOUR DATES. YOUR ESTIMATE.</p><h3>All the details,<br /><em>in one place.</em></h3><p>Choose your apartment, adults, children and dates to see a clear breakdown.</p><a class="button" href="/book/">Calculate your stay <Icon name="arrow" size={17}/></a><a class="text-link" href="/booking-terms/" style="margin-top:18px">Read the booking details <Icon name="arrow" size={14}/></a></aside>
+  </section>
+</Layout>

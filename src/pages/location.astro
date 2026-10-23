@@ -1,0 +1,83 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import LocationMap from '../components/LocationMap.astro';
+import { images } from '../data/properties';
+import { nearbyGroups, placeMapUrl, residenceLocation } from '../data/location';
+const description = 'Find The Title V in Rawai, Phuket: an interactive map, nearby beaches, Starbucks, groceries, seafood restaurants, massage, island boats and practical transport links.';
+const schema = { '@context': 'https://schema.org', '@type': 'Place', name: residenceLocation.name, hasMap: residenceLocation.mapsUrl, address: { '@type': 'PostalAddress', streetAddress: '555 Wiset Road', addressLocality: 'Rawai, Mueang Phuket', addressRegion: 'Phuket', postalCode: '83130', addressCountry: 'TH' } };
+---
+<Layout title="Location & what’s nearby" description={description} image={images.rawai.src} schema={schema}>
+  <section class="location-hero">
+    <img src={images.rawai.src} alt={images.rawai.alt} width={images.rawai.width} height={images.rawai.height} fetchpriority="high" />
+    <div class="location-shade"></div>
+    <div class="container hero-copy"><p class="eyebrow">THE TITLE V · SOUTHERN PHUKET</p><h1>At home<br />in <em>Rawai.</em></h1><p>Coffee on the waterfront. A boat on the horizon.<br />Your everyday essentials close at hand.</p><a class="hero-link" href="#map">Find your bearings <Icon name="arrow" size={16}/></a></div>
+    <p class="hero-note">RAWAI WATERFRONT · THE NEIGHBORHOOD, NOT AN APARTMENT VIEW</p>
+  </section>
+
+  <section class="container section location-orientation" id="map">
+    <div class="section-heading" data-reveal><div><p class="eyebrow">A PLACE TO START</p><h2>The right address.<br /><em>The whole neighborhood.</em></h2></div><p>The Title V sits back from Rawai’s waterfront. Save the full condominium name and this address for your driver; several nearby residences share “The Title” name.</p></div>
+    <LocationMap />
+    <div class="orientation-notes"><p><strong>Close to the waterfront.</strong> The <a href="https://www.airbnb.com/rooms/622135535519576635" target="_blank" rel="noopener noreferrer">apartment listing</a> describes Rawai Beach as approximately 200 metres away. Allow for the actual entrance and walking route.</p><p><strong>A base for beach days.</strong> Rawai is known for boats and seafood. For swimming and sand, plan a ride to Nai Harn or Ya Nui and follow the day’s beach flags.</p><p><strong>An easy arrival.</strong> Your local check-in contact will confirm the meeting point. Save their instructions as well as the map before travelling.</p></div>
+  </section>
+
+  <section class="nearby-section section">
+    <div class="container"><div class="section-heading" data-reveal><div><p class="eyebrow">WHAT’S NEARBY</p><h2>Places worth<br /><em>saving.</em></h2></div><p>A practical shortlist, chosen for what each place offers. Businesses, hours and transport change; the links take you to current provider details and maps.</p></div>
+      <div class="nearby-layout">
+        <nav class="nearby-nav" aria-label="Nearby place categories"><span class="eyebrow">EXPLORE THE AREA</span>{nearbyGroups.map(group => <a href={`#${group.id}`}>{group.title}<Icon name="right" size={14}/></a>)}</nav>
+        <div class="nearby-groups">{nearbyGroups.map((group, index) => <section class="nearby-group" id={group.id} aria-labelledby={`${group.id}-heading`}>
+          <div class="group-heading"><span class="group-number">0{index + 1}</span><div><h2 id={`${group.id}-heading`}>{group.title}</h2><p>{group.intro}</p></div></div>
+          <div class="place-list">{group.places.map(place => <article class="place-row"><div class="place-name"><p class="place-journey">{place.journey}</p><h3>{place.name}</h3></div><div class="place-description"><p>{place.reason}</p><p class="place-tip">{place.tip}</p><div class="place-links"><a href={placeMapUrl(place.mapQuery)} target="_blank" rel="noopener noreferrer" aria-label={`Map for ${place.name}`}>Map <Icon name="arrow" size={12}/></a><a href={place.source.url} target="_blank" rel="noopener noreferrer" aria-label={`${place.source.title} (opens in new tab)`}>Details & source <Icon name="arrow" size={12}/></a></div></div></article>)}</div>
+          <a class="text-link group-guide" href={group.guide.href}>{group.guide.label}<Icon name="arrow" size={14}/></a>
+        </section>)}</div>
+      </div>
+      <p class="nearby-footnote">“Walk” identifies the local area, not a measured journey time or a step-free route. Heat, rain, traffic, pavement and your group’s needs can make a short ride more comfortable. Check directions from the residence entrance before setting out. Recommendations reviewed 22 October 2026.</p>
+    </div>
+  </section>
+
+  <section class="container section location-next" data-reveal><div><p class="eyebrow">A LITTLE PLANNING, A LOT MORE HOLIDAY</p><h2>Make the first<br /><em>day simple.</em></h2><p>Meet your local check-in contact, settle into the apartment, and combine a Tops grocery stop with coffee at Mixxmall. Leave the bigger outing for tomorrow.</p><a class="text-link" href="/guides/phuket-airport-to-rawai/">Plan your arrival <Icon name="arrow" size={15}/></a></div><a class="residence-link" href="/residence/"><img src={images.gardenWalkway.src} alt={images.gardenWalkway.alt} width={images.gardenWalkway.width} height={images.gardenWalkway.height} loading="lazy"/><span>Come home to the gardens <Icon name="arrow" size={18}/></span></a></section>
+</Layout>
+<style>
+  .location-hero{position:relative;height:560px;max-height:calc(100svh - 98px);min-height:440px;overflow:hidden;color:#fff}
+  .location-hero>img{height:100%;object-fit:cover;object-position:50% 55%;animation:hero-arrive 1.3s ease-out both}
+  .location-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(12,30,25,.72),rgba(12,30,25,.18) 70%),linear-gradient(0deg,rgba(12,30,25,.4),transparent 35%)}
+  .hero-copy{position:absolute;inset:0;padding-block:65px;animation:content-arrive .9s ease-out both}
+  .hero-copy h1{line-height:.98;margin-bottom:22px;font-size:clamp(62px,7.1vw,98px)}
+  .hero-copy>p:not(.eyebrow){font-size:13px;line-height:1.9;margin-bottom:18px}
+  .hero-note{position:absolute;bottom:19px;left:max(56px,calc((100vw - 1200px)/2));font-size:8px;letter-spacing:.14em;margin:0}
+  .location-orientation .section-heading>p,.nearby-section .section-heading>p{max-width:390px;font-size:13px;color:var(--muted);margin:0}
+  .orientation-notes{display:grid;grid-template-columns:repeat(3,1fr);gap:38px;margin-top:30px}
+  .orientation-notes p{font-size:12px;color:var(--muted);margin-bottom:0}
+  .orientation-notes strong{color:var(--ink);font-weight:500}
+  .orientation-notes a{text-decoration:underline;text-underline-offset:3px}
+  .nearby-section{background:var(--sand)}
+  .nearby-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:70px;margin-top:58px;align-items:start}
+  .nearby-nav{position:sticky;top:130px;border-top:1px solid #cdd3c8;padding-top:25px}
+  .nearby-nav .eyebrow{display:block;font-size:8px;margin-bottom:20px}
+  .nearby-nav a{display:flex;justify-content:space-between;gap:12px;font-size:11px;padding:13px 0;border-bottom:1px solid #d9ddd3}
+  .nearby-nav a:hover{color:#557856;transform:translateX(3px)}
+  .nearby-group{scroll-margin-top:130px;margin-bottom:75px}
+  .nearby-group:last-child{margin-bottom:0}
+  .group-heading{display:flex;gap:24px;margin-bottom:25px;align-items:flex-start}
+  .group-number{font-family:var(--serif);font-size:27px;line-height:1.3;color:#798974}
+  .group-heading h2{font-size:39px;margin-bottom:15px}
+  .group-heading p{font-size:12px;color:var(--muted);max-width:570px;margin:0}
+  .place-row{display:grid;grid-template-columns:1fr 1.4fr;gap:30px;padding:25px 0;border-top:1px solid #cdd3c8}
+  .place-journey{font-size:8px;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+  .place-name h3{font-size:27px;line-height:1.13;margin:0}
+  .place-description p{font-size:12px;margin-bottom:9px;line-height:1.85}
+  .place-description .place-tip{color:var(--muted);font-size:11px}
+  .place-links{display:flex;flex-wrap:wrap;gap:22px;margin-top:14px}
+  .place-links a{display:inline-flex;align-items:center;gap:8px;font-size:10px;border-bottom:1px solid #9baa95;padding-block:3px}
+  .place-links a:hover{color:#557856}
+  .group-guide{font-size:11px;margin-top:2px}
+  .nearby-footnote{font-size:10px;color:var(--muted);line-height:1.9;border-top:1px solid #cdd3c8;padding-top:25px;margin:55px 0 0}
+  .location-next{display:grid;grid-template-columns:1fr 1.1fr;gap:100px;align-items:center}
+  .location-next p:not(.eyebrow){font-size:13px;color:var(--muted);max-width:390px}
+  .residence-link{overflow:hidden;display:block}
+  .residence-link img{aspect-ratio:1.2;object-fit:cover;transition:transform .6s}
+  .residence-link:hover img{transform:scale(1.025)}
+  .residence-link span{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:19px 0;border-bottom:1px solid var(--line)}
+  @media(max-width:1000px){.nearby-layout{grid-template-columns:180px minmax(0,1fr);gap:35px}.place-row{grid-template-columns:1fr 1.25fr;gap:20px}.location-next{gap:50px}}
+  @media(max-width:760px){.location-hero{min-height:440px;height:calc(100svh - 78px);max-height:560px}.hero-copy{padding-block:55px}.hero-note{left:24px;right:24px;font-size:7px}.orientation-notes{grid-template-columns:1fr;gap:17px}.nearby-layout{display:block;margin-top:35px}.nearby-nav{position:static;display:flex;flex-wrap:wrap;column-gap:20px;margin-bottom:45px;padding-top:10px}.nearby-nav .eyebrow{width:100%;margin:12px 0 8px}.nearby-nav a{width:calc(50% - 10px);font-size:10px}.nearby-group{margin-bottom:58px}.group-heading{gap:16px}.group-heading h2{font-size:34px}.place-row{grid-template-columns:1fr;gap:12px;padding:23px 0}.place-name h3{font-size:28px}.place-description p{max-width:550px}.location-next{grid-template-columns:1fr;gap:35px}.location-orientation .section-heading,.nearby-section .section-heading{flex-direction:column;align-items:flex-start;gap:24px}.location-orientation .section-heading>p,.nearby-section .section-heading>p{max-width:100%}.location-hero .hero-copy>p:not(.eyebrow){font-size:12px}}
+</style>
