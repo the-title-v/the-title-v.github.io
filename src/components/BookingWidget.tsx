@@ -183,7 +183,7 @@ export default function BookingWidget({ stays }: { stays: Stay[] }) {
         <div className="calendar-pair">{monthView(0)}{monthView(1)}</div>
         <div className="calendar-legend"><span><i className="legend-open"/>{availability?.status === 'snapshot' ? 'Open on calendar' : 'Not yet verified'}</span><span><i className="legend-blocked"/>Unavailable</span><span><i className="legend-selected"/>Your dates</span><button onClick={reset}>Clear dates</button></div>
       </div>
-      <p className="calendar-explainer">Calendar prices are accommodation rates in THB per night, before discounts, extra-child charges and cleaning. {PRICING_POLICY.minNights}-night minimum. Calendars update periodically and can be delayed. An open date is an indication; availability is confirmed before booking.</p>
+      <p className="calendar-explainer">Calendar prices are accommodation rates in THB per night, before discounts, extra-child charges and cleaning. {PRICING_POLICY.minNights}-night minimum. Calendar data can be delayed. An open date is an indication; availability is confirmed before booking.</p>
       <div className="booking-step"><span>03</span><h2>Who’s coming?</h2></div>
       <div className="booking-fields booking-guests">
         <label htmlFor="booking-adults">Adults · ages 15+<select id="booking-adults" aria-describedby="guest-policy" value={adults} onChange={event => { setAdults(Number(event.target.value)); setGuestLinkError(''); }}>{Array.from({ length: limits.maxAdults }, (_, index) => <option value={index + 1} key={index + 1}>{index + 1} adult{index > 0 ? 's' : ''}</option>)}</select></label>
