@@ -6,45 +6,48 @@ import { calculateQuote } from '../src/lib/pricing.ts';
 const bright = 'bright-1br-rawai-beach';
 const both = 'two-adjacent-apartments-title-v-rawai';
 
-test('WhatsApp handoff preserves dates, occupancy and every price component without naming the owner', () => {
+test('WhatsApp request keeps the booking essentials in at most five short lines', () => {
   const quote = calculateQuote({ propertyId: bright, checkIn: '2027-05-01', checkOut: '2027-05-08', adults: 2, children: 1 });
   const url = new URL(booking.buildWhatsAppRequest('Title V New & Bright 1BR at Rawai Beach', quote, 'snapshot'));
   assert.equal(url.origin + url.pathname, 'https://wa.me/79139098949');
   const text = url.searchParams.get('text')!;
+  assert.ok(text.length <= 400, `Request is too long: ${text.length} characters`);
+  assert.ok(text.split('\n').length <= 5);
   assert.match(text, /Title V New & Bright 1BR at Rawai Beach/);
-  assert.match(text, /Check-in: 2027-05-01.*15:00/);
-  assert.match(text, /Check-out: 2027-05-08.*12:00/);
-  assert.match(text, /3 guests.*2 adults.*1 child.*14 or under/);
-  assert.match(text, /Accommodation.*7,000 THB/);
-  assert.match(text, /10%.*accommodation only.*700 THB/);
-  assert.match(text, /Accommodation after discount: 6,300 THB/);
-  assert.match(text, /Extra children.*300 THB.*2,100 THB/);
-  assert.match(text, /Cleaning.*1,500 THB/);
-  assert.match(text, /Stay total.*9,900 THB/);
-  assert.match(text, /Refundable deposit.*10,000 THB/);
-  assert.match(text, /Stay total plus refundable deposit.*19,900 THB/);
-  assert.match(text, /Water.*55 THB\/m³/);
-  assert.match(text, /electricity.*6 THB\/kWh/);
-  assert.match(text, /metered.*excluded/i);
-  assert.match(text, /local agent.*meet/i);
-  assert.match(text, /Early check-in.*availability.*extra/i);
-  assert.match(text, /Please confirm/);
-  assert.doesNotMatch(text, /PRIVATE_IDENTITY_PLACEHOLDER|booking confirmed|reserved|due now/i);
+  assert.match(text, /2027-05-01.*2027-05-08.*7 nights/);
+  assert.match(text, /2 adults.*1 child.*14 or under/);
+  assert.match(text, /Estimate: 9,900 THB.*cleaning.*utilities.*deposit extra/);
+  assert.match(text, /Please confirm availability and price/);
+  assert.doesNotMatch(text, /PRIVATE_IDENTITY_PLACEHOLDER|booking confirmed|reserved|due now|before discount|check-in.*15:00|THB\/kWh/i);
 });
 
-test('combined request keeps the deposit per booking and the total consistent', () => {
+test('a combined monthly request uses the stay total without adding the refundable deposit', () => {
   const quote = calculateQuote({ propertyId: both, checkIn: '2027-06-01', checkOut: '2027-07-02', adults: 4, children: 4 });
   const text = new URL(booking.buildWhatsAppRequest('Two adjacent apartments', quote, 'snapshot')).searchParams.get('text')!;
-  assert.match(text, /8 guests.*4 adults.*4 children/);
-  assert.match(text, /Cleaning.*3,000 THB/);
-  assert.match(text, /Stay total.*89,800 THB/);
-  assert.match(text, /Refundable deposit.*20,000 THB/);
-  assert.match(text, /Stay total plus refundable deposit.*109,800 THB/);
+  assert.match(text, /4 adults.*4 children/);
+  assert.match(text, /31 nights/);
+  assert.match(text, /Estimate: 89,800 THB/);
+  assert.doesNotMatch(text, /109,800/);
+  assert.ok(text.length <= 400);
 });
 
-test('an unavailable calendar produces an explicit confirmation request', () => {
+test('an unavailable calendar keeps a short, explicit confirmation request', () => {
   const quote = calculateQuote({ propertyId: 'cozy-1br-rawai-beach', checkIn: '2027-10-01', checkOut: '2027-10-08' });
-  assert.match(new URL(booking.buildWhatsAppRequest('Cozy', quote, 'unavailable')).searchParams.get('text')!, /calendar could not be verified/);
+  const text = new URL(booking.buildWhatsAppRequest('Cozy', quote, 'unavailable')).searchParams.get('text')!;
+  assert.match(text, /Please confirm availability and price/);
+  assert.match(text, /calendar is unverified/);
+  assert.ok(text.length <= 400);
+  assert.ok(text.split('\n').length <= 5);
+});
+
+test('a solo request omits an empty child count and safely encodes apartment names', () => {
+  const quote = calculateQuote({ propertyId: bright, checkIn: '2027-05-01', checkOut: '2027-05-08', adults: 1, children: 0 });
+  const url = new URL(booking.buildWhatsAppRequest('Bright & Cozy + pool?', quote, 'snapshot'));
+  const text = url.searchParams.get('text')!;
+  assert.match(text, /Bright & Cozy \+ pool\?/);
+  assert.match(text, /1 adult\n/);
+  assert.doesNotMatch(text, /0 children|1 adults/);
+  assert.deepEqual([...url.searchParams.keys()], ['text']);
 });
 
 test('booking links accept separate adult and child counts and default to two adults', () => {

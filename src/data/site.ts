@@ -2,6 +2,7 @@ export const site = {
   name: 'The Title V',
   tagline: 'Your place in Rawai',
   whatsapp: '79139098949',
+  whatsappDisplay: '+7 913 909 8949',
   location: 'Rawai, Phuket, Thailand',
   description: 'Two one-bedroom apartments at The Title V in Rawai, Phuket. Tropical pools, your own kitchen and a local welcome. Stay a week or longer.',
 };
@@ -13,6 +14,7 @@ export const navigation = [
   { label: 'Local guides', href: '/guides/' },
   { label: 'Reviews', href: '/reviews/' },
   { label: 'Rates', href: '/rates/' },
+  { label: 'Contact us', href: '/contact/' },
 ];
 export const faqs = [
   { question: 'How do I book?', answer: 'Choose your apartment and dates, then send the prepared WhatsApp enquiry. Our team confirms the price, availability and payment details with you.' },

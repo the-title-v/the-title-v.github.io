@@ -1,3 +1,5 @@
+import { site, whatsappUrl } from './site';
+
 export const informationPages = [
   {
     slug: 'about', eyebrow: 'A LOCAL WELCOME', title: 'Feel at home, from arrival.',
@@ -11,13 +13,13 @@ export const informationPages = [
     ], cta: 'Say hello', ctaUrl: 'https://wa.me/79139098949',
   },
   {
-    slug: 'contact', eyebrow: 'LET’S PLAN YOUR STAY', title: 'A hello is a good start.',
-    description: 'Contact The Title V booking team on WhatsApp for availability, family stays and longer visits to Rawai, Phuket.',
-    intro: 'Send your dates, group size and preferred apartment. We’ll take it from there.',
-    image: '/images/garden-walkway.webp', alt: 'Shaded garden walkway at The Title V',
+    slug: 'contact', eyebrow: 'WE’RE HERE TO HELP', title: 'Contact us.',
+    description: 'Contact The Title V on WhatsApp for questions about our Rawai apartments, your stay or a booking.',
+    intro: 'Questions about the apartments or your stay? Message our booking team on WhatsApp.',
+    image: '/images/garden-walkway.webp', alt: 'Shaded walkway through the gardens at The Title V',
     sections: [
-      { heading: 'Talk to our booking team', paragraphs: ['WhatsApp: +7 (913) 909-8949.', 'Travelling with children? Include their ages. Let us know about early arrivals, longer stays or anything else that would make your visit easier.'] },
-    ], cta: 'Open WhatsApp', ctaUrl: 'https://wa.me/79139098949',
+      { heading: 'Say hello on WhatsApp', paragraphs: [`WhatsApp: ${site.whatsappDisplay}.`, 'Ask us anything — you don’t need to choose dates or an apartment first.'] },
+    ], cta: `WhatsApp ${site.whatsappDisplay}`, ctaUrl: whatsappUrl,
   },
   {
     slug: 'booking-terms', eyebrow: 'GOOD TO KNOW', title: 'The details of your stay.',

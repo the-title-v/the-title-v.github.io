@@ -27,26 +27,15 @@ export function readBookingOccupancy(params: URLSearchParams, propertyId: string
 
 export function buildWhatsAppRequest(propertyName: string, quote: Quote, calendarStatus: 'snapshot' | 'unavailable'): string {
   const money = (value: number) => `${value.toLocaleString('en-US')} THB`;
+  const guests = `${quote.adults} adult${quote.adults === 1 ? '' : 's'}${quote.children ? `, ${quote.children} ${quote.children === 1 ? 'child' : 'children'} (${PRICING_POLICY.childMaxAge} or under)` : ''}`;
   const lines = [
     `Hello, I’d like to enquire about ${propertyName}.`,
-    `Check-in: ${quote.checkIn} (from 15:00)`,
-    `Check-out: ${quote.checkOut} (by 12:00; ${quote.nights} nights)`,
-    `${quote.guests} guest${quote.guests === 1 ? '' : 's'} (${quote.adults} adult${quote.adults === 1 ? '' : 's'}, ${quote.children} ${quote.children === 1 ? 'child' : 'children'} aged ${PRICING_POLICY.childMaxAge} or under). Guests aged 15+ count as adults.`,
-    `Accommodation (${quote.nights} nights, before discount): ${money(quote.baseTotal)}`,
-    ...(quote.discountRate ? [
-      `${quote.discountLabel} discount (${quote.discountRate * 100}%, accommodation only): −${money(quote.discountTotal)}`,
-      `Accommodation after discount: ${money(quote.accommodationTotal)}`,
-    ] : []),
-    `Extra children (${quote.extraGuests} × ${PRICING_POLICY.extraGuestNightlyRate} THB × ${quote.nights} nights): ${money(quote.extraGuestTotal)}`,
-    `Cleaning (per stay): ${money(quote.cleaningTotal)}`,
-    `Stay total (excluding utilities and refundable deposit): ${money(quote.total)}`,
-    `Refundable deposit (separate, per booking): ${money(quote.refundableDeposit)}`,
-    `Stay total plus refundable deposit (excluding utilities): ${money(quote.totalIncludingDeposit)}`,
-    `Water: ${PRICING_POLICY.waterPerCubicMeter} THB/m³; electricity: ${PRICING_POLICY.electricityPerKwh} THB/kWh. Both are metered and excluded from the estimate.`,
-    'A local agent will meet us for check-in. Early check-in and late check-out are on request, subject to availability and may cost extra.',
-    calendarStatus === 'snapshot' ? 'The latest website calendar update showed no date conflicts; please recheck these dates.' : 'The calendar could not be verified for these dates.',
-    'Please confirm availability, the estimate, deposit arrangements, payment and cancellation terms.',
-    'I understand this is a request, not a confirmed booking.',
+    `${quote.checkIn} → ${quote.checkOut} (${quote.nights} nights)`,
+    guests,
+    `Estimate: ${money(quote.total)} including cleaning; utilities and deposit extra.`,
+    calendarStatus === 'snapshot'
+      ? 'Please confirm availability and price.'
+      : 'Please confirm availability and price — the calendar is unverified.',
   ];
   return `${whatsappUrl}?text=${encodeURIComponent(lines.join('\n'))}`;
 }
