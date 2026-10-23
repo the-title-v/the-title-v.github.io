@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createAvailabilityService } from '../src/lib/availability.server.ts';
+import { createAvailabilityService } from '../scripts/lib/calendar-source.ts';
 
 const BRIGHT = 'bright-1br-rawai-beach';
 const COZY = 'cozy-1br-rawai-beach';
@@ -262,36 +262,4 @@ test('times out and cancels a stalled calendar body after headers arrive', async
   });
   assert.equal((await getAvailability(BRIGHT)).status, 'unavailable');
   assert.equal(cancelled, true);
-});
-
-test('API rejects missing or unknown properties with no-store JSON', async () => {
-  const { GET } = await import('../src/pages/api/availability.ts');
-  for (const query of ['', '?property=unknown-property']) {
-    const response = await GET({ url: new URL(`https://example.test/api/availability/${query}`) } as Parameters<typeof GET>[0]);
-    assert.equal(response.status, 400);
-    assert.equal(response.headers.get('cache-control'), 'no-store');
-    assert.match(response.headers.get('content-type') ?? '', /application\/json/);
-    assert.equal((await response.json()).status, 'unavailable');
-  }
-});
-
-test('API exposes a configured-property failure as unavailable without private details', async () => {
-  const { GET } = await import('../src/pages/api/availability.ts');
-  const previousBright = process.env.AIRBNB_ICAL_BRIGHT;
-  const previousCozy = process.env.AIRBNB_ICAL_COZY;
-  delete process.env.AIRBNB_ICAL_BRIGHT;
-  delete process.env.AIRBNB_ICAL_COZY;
-  try {
-    const response = await GET({ url: new URL(`https://example.test/api/availability/?property=${BOTH}`) } as Parameters<typeof GET>[0]);
-    assert.equal(response.status, 200);
-    assert.equal(response.headers.get('cache-control'), 'no-store');
-    const body = await response.json();
-    assert.equal(body.status, 'unavailable');
-    assert.equal(body.checkedAt, null);
-    assert.deepEqual(body.blocked, []);
-    assert.doesNotMatch(JSON.stringify(body), /AIRBNB|token|https|\.ics|undefined/);
-  } finally {
-    if (previousBright !== undefined) process.env.AIRBNB_ICAL_BRIGHT = previousBright;
-    if (previousCozy !== undefined) process.env.AIRBNB_ICAL_COZY = previousCozy;
-  }
 });

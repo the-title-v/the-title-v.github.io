@@ -3,7 +3,7 @@ import { ArrowUpRight, ArrowLeft, ArrowRight, CalendarDays, Check, Info, LoaderC
 import { calculateQuote, getNightlyRate, getOccupancyLimits, PRICING_POLICY, type Quote } from '../lib/pricing';
 import { isStayAvailable } from '../lib/calendar';
 import { addDays, bangkokToday, buildWhatsAppRequest, formatTHB, readBookingOccupancy } from '../lib/booking';
-import { AVAILABILITY_FRESH_MS, availabilityFreshFor, requestAvailability, unverifiedAvailability, type ClientAvailability as Availability } from '../lib/availability-client';
+import { AVAILABILITY_REFRESH_MS, availabilityFreshFor, requestAvailability, unverifiedAvailability, type ClientAvailability as Availability } from '../lib/availability-client';
 
 type Stay = { slug: string; name: string; guests: number; image: string; };
 const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -19,6 +19,7 @@ export default function BookingWidget({ stays }: { stays: Stay[] }) {
   const [guestLinkError, setGuestLinkError] = useState('');
   const [calendarState, setCalendarState] = useState<{ property: string; value: Availability } | null>(null);
   const knownByProperty = useRef(new Map<string, Availability>());
+  const lastSuccessfulByProperty = useRef(new Map<string, Availability>());
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(0);
   const today = bangkokToday();
@@ -28,7 +29,7 @@ export default function BookingWidget({ stays }: { stays: Stay[] }) {
   const stay = stays.find(item => item.slug === property) || stays[0];
   const limits = getOccupancyLimits(property);
   const knownAvailability = calendarState?.property === property ? calendarState.value : null;
-  const availability = knownAvailability?.status === 'live' && availabilityFreshFor(knownAvailability) === 0
+  const availability = knownAvailability?.status === 'snapshot' && availabilityFreshFor(knownAvailability) === 0
     ? unverifiedAvailability(knownAvailability) : knownAvailability;
   const refreshAvailability = useCallback(() => {
     setLoading(true);
@@ -62,14 +63,15 @@ export default function BookingWidget({ stays }: { stays: Stay[] }) {
     const previous = knownByProperty.current.get(property);
     setLoading(true);
     setCalendarState({ property, value: unverifiedAvailability(previous) });
-    requestAvailability(property, { signal: controller.signal, previous })
+    requestAvailability(property, { signal: controller.signal, previous, lastSuccessful: lastSuccessfulByProperty.current.get(property) })
       .then(value => {
         if (controller.signal.aborted) return;
         const freshFor = availabilityFreshFor(value);
-        const current = value.status === 'live' && freshFor === 0 ? unverifiedAvailability(value) : value;
+        const current = value.status === 'snapshot' && freshFor === 0 ? unverifiedAvailability(value) : value;
         knownByProperty.current.set(property, current);
+        if (current.status === 'snapshot') lastSuccessfulByProperty.current.set(property, current);
         setCalendarState({ property, value: current });
-        refreshTimer = window.setTimeout(refreshAvailability, value.status === 'live' ? freshFor : AVAILABILITY_FRESH_MS);
+        refreshTimer = window.setTimeout(refreshAvailability, value.status === 'snapshot' ? Math.min(freshFor, AVAILABILITY_REFRESH_MS) : AVAILABILITY_REFRESH_MS);
       })
       .catch(() => {
         // Superseded requests must not overwrite the selected apartment's state.
@@ -77,7 +79,7 @@ export default function BookingWidget({ stays }: { stays: Stay[] }) {
         const current = unverifiedAvailability(previous);
         knownByProperty.current.set(property, current);
         setCalendarState({ property, value: current });
-        refreshTimer = window.setTimeout(refreshAvailability, AVAILABILITY_FRESH_MS);
+        refreshTimer = window.setTimeout(refreshAvailability, AVAILABILITY_REFRESH_MS);
       })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => { controller.abort(); window.clearTimeout(refreshTimer); };
@@ -109,7 +111,7 @@ export default function BookingWidget({ stays }: { stays: Stay[] }) {
   const handoff = result.quote && !conflicts && !loading && availability ? buildWhatsAppRequest(stay.name, result.quote, availability.status) : null;
   const guardHandoff = (event: MouseEvent<HTMLAnchorElement>) => {
     // Recheck at activation too: background tabs may defer the expiry timer.
-    if (availability?.status === 'live' && availabilityFreshFor(availability) === 0) {
+    if (availability?.status === 'snapshot' && availabilityFreshFor(availability) === 0) {
       event.preventDefault();
       refreshAvailability();
     }
@@ -175,13 +177,13 @@ export default function BookingWidget({ stays }: { stays: Stay[] }) {
         <button type="button" aria-label="Choose check-in date" aria-pressed={selecting === 'arrival'} onClick={() => selectDateField('arrival')}><span>Check-in</span><strong>{displayDate(checkIn)}</strong><small>From 15:00</small></button>
         <button type="button" aria-label="Choose check-out date" aria-pressed={selecting === 'departure'} onClick={() => selectDateField('departure')}><span>Check-out</span><strong>{displayDate(checkOut)}</strong><small>By 12:00</small></button>
       </div>
-      <div className="calendar-status" aria-live="polite">{loading ? <><LoaderCircle size={15} className="spin"/> Checking the Airbnb calendars…</> : availability?.status === 'live' ? <><span className="status-dot"/> Calendar checked {new Date(availability.checkedAt!).toLocaleTimeString('en-US', { timeZone: 'Asia/Bangkok', hour: 'numeric', minute: '2-digit' })} · Phuket time</> : <><Info size={15}/> Calendar temporarily unavailable. You can still request dates.</>}</div>
+      <div className="calendar-status" aria-live="polite">{loading ? <><LoaderCircle size={15} className="spin"/> Loading calendar updates…</> : availability?.status === 'snapshot' ? <><span className="status-dot"/> Calendar updated {new Date(availability.checkedAt!).toLocaleString('en-GB', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} · Phuket time</> : <><Info size={15}/> Calendar temporarily unavailable. You can still request dates.</>}</div>
       <div className="calendar-shell" aria-label="Availability calendar" aria-busy={loading}>
         <div className="calendar-toolbar"><p>{selecting === 'departure' && checkIn ? 'Now choose your departure' : 'Choose your arrival date'}</p><div><button aria-label="Previous month" disabled={month <= `${today.slice(0, 7)}-01`} onClick={() => changeMonth(-1)}><ArrowLeft size={17}/></button><button aria-label="Next month" disabled={month >= `${horizon.slice(0, 7)}-01`} onClick={() => changeMonth(1)}><ArrowRight size={17}/></button></div></div>
         <div className="calendar-pair">{monthView(0)}{monthView(1)}</div>
-        <div className="calendar-legend"><span><i className="legend-open"/>{availability?.status === 'live' ? 'Open on calendar' : 'Not yet verified'}</span><span><i className="legend-blocked"/>Unavailable</span><span><i className="legend-selected"/>Your dates</span><button onClick={reset}>Clear dates</button></div>
+        <div className="calendar-legend"><span><i className="legend-open"/>{availability?.status === 'snapshot' ? 'Open on calendar' : 'Not yet verified'}</span><span><i className="legend-blocked"/>Unavailable</span><span><i className="legend-selected"/>Your dates</span><button onClick={reset}>Clear dates</button></div>
       </div>
-      <p className="calendar-explainer">Calendar prices are accommodation rates in THB per night, before discounts, extra-child charges and cleaning. {PRICING_POLICY.minNights}-night minimum. An open calendar is an indication; availability is confirmed before booking.</p>
+      <p className="calendar-explainer">Calendar prices are accommodation rates in THB per night, before discounts, extra-child charges and cleaning. {PRICING_POLICY.minNights}-night minimum. Calendars update periodically and can be delayed. An open date is an indication; availability is confirmed before booking.</p>
       <div className="booking-step"><span>03</span><h2>Who’s coming?</h2></div>
       <div className="booking-fields booking-guests">
         <label htmlFor="booking-adults">Adults · ages 15+<select id="booking-adults" aria-describedby="guest-policy" value={adults} onChange={event => { setAdults(Number(event.target.value)); setGuestLinkError(''); }}>{Array.from({ length: limits.maxAdults }, (_, index) => <option value={index + 1} key={index + 1}>{index + 1} adult{index > 0 ? 's' : ''}</option>)}</select></label>
@@ -207,7 +209,7 @@ export default function BookingWidget({ stays }: { stays: Stay[] }) {
           <div className="quote-deposit"><div className="quote-row"><span>Refundable deposit<small>Separate · per booking</small></span><strong>{formatTHB(result.quote.refundableDeposit)}</strong></div><p>Stay estimate + refundable deposit: <strong>{formatTHB(result.quote.totalIncludingDeposit)}</strong>. Payment arrangements are confirmed before booking.</p></div>
           <details className="nightly-details"><summary>See nightly accommodation rates</summary><div>{result.quote.nightly.map(night => <p key={night.date}><span>{night.date}</span><span>{formatTHB(night.rate)}</span></p>)}</div></details>
         </div> : <div className="empty-quote"><CalendarDays size={25}/><p>{guestLinkError ? 'Check your guest counts to continue.' : <>Your escape starts with a date.<br /><span>Select arrival and departure to see your estimate.</span></>}</p></div>}
-        {handoff ? <a className="button whatsapp-button" data-testid="whatsapp-request" href={handoff} target="_blank" rel="noopener noreferrer" onClick={guardHandoff} onAuxClick={guardHandoff}>{availability?.status === 'live' ? 'Request this stay' : 'Ask about these dates'} <ArrowUpRight size={18}/></a> : <button className="button whatsapp-button" disabled>{loading && result.quote ? 'Checking your dates…' : conflicts ? 'Choose different dates' : guestLinkError ? 'Check guest counts' : 'Choose your dates'} <ArrowUpRight size={18}/></button>}
+        {handoff ? <a className="button whatsapp-button" data-testid="whatsapp-request" href={handoff} target="_blank" rel="noopener noreferrer" onClick={guardHandoff} onAuxClick={guardHandoff}>{availability?.status === 'snapshot' ? 'Request this stay' : 'Ask about these dates'} <ArrowUpRight size={18}/></a> : <button className="button whatsapp-button" disabled>{loading && result.quote ? 'Checking your dates…' : conflicts ? 'Choose different dates' : guestLinkError ? 'Check guest counts' : 'Choose your dates'} <ArrowUpRight size={18}/></button>}
         <p className="quote-disclaimer">Opens WhatsApp with your request. Nothing is sent automatically, and no payment is taken.</p>
         <div className="quote-note"><Info size={16}/><p>Metered utilities are excluded: water {formatTHB(PRICING_POLICY.waterPerCubicMeter)}/m³ and electricity {formatTHB(PRICING_POLICY.electricityPerKwh)}/kWh. Availability, payment and cancellation terms are confirmed before booking.</p></div>
         <p className="discount-hint">Save 10% on accommodation for 7+ nights,<br/>or 20% for 28+ nights.</p>

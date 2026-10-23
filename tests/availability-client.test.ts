@@ -14,10 +14,10 @@ const NOW = Date.parse('2026-10-23T10:00:00.000Z');
 const OLD_BLOCK = { start: '2027-01-04', end: '2027-01-08' };
 const NEW_BLOCK = { start: '2027-01-12', end: '2027-01-15' };
 const previous: ClientAvailability = {
-  status: 'live', blocked: [OLD_BLOCK], checkedAt: new Date(NOW - 300_000).toISOString(),
+  status: 'snapshot', blocked: [OLD_BLOCK], checkedAt: new Date(NOW - 3_600_000).toISOString(),
 };
 const live = (age = 0, blocked = [NEW_BLOCK]) => ({
-  status: 'live', blocked, checkedAt: new Date(NOW - age).toISOString(),
+  status: 'snapshot', blocked, checkedAt: new Date(NOW - age).toISOString(),
 });
 const json = (body: unknown) => new Response(JSON.stringify(body), { headers: { 'Content-Type': 'application/json' } });
 
@@ -37,14 +37,14 @@ function deadline() {
   };
 }
 
-test('freshness expires at the original checkedAt deadline, not five minutes after receipt', () => {
-  assert.equal(AVAILABILITY_FRESH_MS, 300_000);
-  assert.equal(availabilityFreshFor(live(299_999) as ClientAvailability, NOW), 1);
-  assert.equal(availabilityFreshFor(live(300_000) as ClientAvailability, NOW), 0);
-  assert.equal(availabilityFreshFor(live(600_000) as ClientAvailability, NOW), 0);
+test('freshness expires at the original checkedAt deadline, not one hour after receipt', () => {
+  assert.equal(AVAILABILITY_FRESH_MS, 3_600_000);
+  assert.equal(availabilityFreshFor(live(3_599_999) as ClientAvailability, NOW), 1);
+  assert.equal(availabilityFreshFor(live(3_600_000) as ClientAvailability, NOW), 0);
+  assert.equal(availabilityFreshFor(live(7_200_000) as ClientAvailability, NOW), 0);
   assert.equal(availabilityFreshFor(live(-1) as ClientAvailability, NOW), 0);
   assert.equal(availabilityFreshFor({ status: 'unavailable', blocked: [], checkedAt: null }, NOW), 0);
-  assert.equal(availabilityFreshFor({ status: 'live', blocked: [], checkedAt: 'not-a-date' }, NOW), 0);
+  assert.equal(availabilityFreshFor({ status: 'snapshot', blocked: [], checkedAt: 'not-a-date' }, NOW), 0);
 });
 
 test('a successful refresh replaces old blocks and strips all unexpected response metadata', async () => {
@@ -52,7 +52,7 @@ test('a successful refresh replaces old blocks and strips all unexpected respons
   const result = await requestAvailability(PROPERTY, {
     previous, now: () => NOW, scheduleTimeout: timer.scheduleTimeout,
     fetch: async (url, init) => {
-      assert.equal(url, `/api/availability/?property=${PROPERTY}`);
+      assert.equal(url, `/availability/${PROPERTY}.json`);
       assert.equal(init?.cache, 'no-store');
       assert.ok(init?.signal);
       return json({ ...live(), blocked: [{ ...NEW_BLOCK, summary: 'Synthetic private metadata' }], privateUrl: 'synthetic-secret' });
@@ -64,8 +64,8 @@ test('a successful refresh replaces old blocks and strips all unexpected respons
 });
 
 test('an almost expired cached success retains only its actual remaining freshness', async () => {
-  const result = await requestAvailability(PROPERTY, { now: () => NOW, fetch: async () => json(live(299_999)) });
-  assert.equal(result.status, 'live');
+  const result = await requestAvailability(PROPERTY, { now: () => NOW, fetch: async () => json(live(3_599_999)) });
+  assert.equal(result.status, 'snapshot');
   assert.equal(availabilityFreshFor(result, NOW), 1);
 });
 
@@ -133,8 +133,8 @@ test('already cancelled requests do not start a fetch', async () => {
   assert.equal(called, false);
 });
 
-test('stale or future-dated responses cannot renew live status and retain conservative blocks', async () => {
-  for (const age of [300_000, 600_000, -1]) {
+test('stale or future-dated responses cannot renew snapshot status and retain conservative blocks', async () => {
+  for (const age of [3_600_000, 7_200_000, -1]) {
     const result = await requestAvailability(PROPERTY, { previous, now: () => NOW, fetch: async () => json(live(age)) });
     assert.equal(result.status, 'unavailable');
     assert.equal(result.checkedAt, null);
@@ -156,10 +156,10 @@ test('malformed response shapes and invalid blocked dates fail closed', async ()
   const invalid = [
     null,
     [],
-    { status: 'live', checkedAt: new Date(NOW).toISOString() },
+    { status: 'snapshot', checkedAt: new Date(NOW).toISOString() },
     { status: 'confirmed', blocked: [], checkedAt: new Date(NOW).toISOString() },
-    { status: 'live', blocked: [], checkedAt: null },
-    { status: 'live', blocked: [], checkedAt: 'not-a-date' },
+    { status: 'snapshot', blocked: [], checkedAt: null },
+    { status: 'snapshot', blocked: [], checkedAt: 'not-a-date' },
     { ...live(), blocked: [{ start: '2027-02-30', end: '2027-03-03' }] },
     { ...live(), blocked: [{ start: '2027-01-08', end: '2027-01-04' }] },
   ];
@@ -191,4 +191,47 @@ test('unverified state detaches known ranges and never retains an old success ti
   assert.deepEqual(result.blocked, [OLD_BLOCK]);
   result.blocked[0].start = '2027-01-01';
   assert.equal(previous.blocked[0].start, '2027-01-04');
+});
+
+
+test('unknown property identifiers never request a resource or leak the input', async () => {
+  for (const property of ['unknown', '../private', 'https://example.test/feed']) {
+    let requested = false;
+    const result = await requestAvailability(property, { fetch: async () => { requested = true; return json(live()); } });
+    assert.equal(requested, false);
+    assert.deepEqual(result, { status: 'unavailable', blocked: [], checkedAt: null });
+  }
+});
+
+test('an older CDN snapshot cannot reopen nights blocked by a newer known update', async () => {
+  const recent = live(5 * 60_000, [OLD_BLOCK]) as ClientAvailability;
+  const result = await requestAvailability(PROPERTY, {
+    previous: recent, now: () => NOW,
+    fetch: async () => json(live(20 * 60_000, [])),
+  });
+  assert.deepEqual(result, recent);
+  assert.notEqual(result.blocked, recent.blocked);
+});
+
+test('an older response cannot renew an expired known snapshot', async () => {
+  const recent = live(AVAILABILITY_FRESH_MS, [OLD_BLOCK]) as ClientAvailability;
+  const result = await requestAvailability(PROPERTY, {
+    previous: recent, now: () => NOW,
+    fetch: async () => json(live(AVAILABILITY_FRESH_MS + 60_000, [])),
+  });
+  assert.deepEqual(result, { status: 'unavailable', blocked: [OLD_BLOCK], checkedAt: null });
+});
+
+test('a transient failure cannot erase the timestamp used to reject an older CDN update', async () => {
+  const recent = live(5 * 60_000, [OLD_BLOCK]) as ClientAvailability;
+  const failed = await requestAvailability(PROPERTY, {
+    previous: recent, now: () => NOW,
+    fetch: async () => new Response('unavailable', { status: 503 }),
+  });
+  assert.equal(failed.status, 'unavailable');
+  const result = await requestAvailability(PROPERTY, {
+    previous: failed, lastSuccessful: recent, now: () => NOW,
+    fetch: async () => json(live(20 * 60_000, [])),
+  });
+  assert.deepEqual(result, recent);
 });

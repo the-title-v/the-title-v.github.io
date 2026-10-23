@@ -2,7 +2,7 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import assert from 'node:assert/strict';
 
-const root = resolve('dist/client');
+const root = resolve('dist');
 async function walk(dir) {
   const paths = [];
   for (const name of await readdir(dir)) {
@@ -13,6 +13,7 @@ async function walk(dir) {
   return paths;
 }
 const files = await walk(root);
+assert(!files.some(path => path.startsWith(join(root, 'server') + '/')), 'Deployment must contain only static files');
 const pages = files.filter(file => file.endsWith('.html') && !file.endsWith('/404.html'));
 const titles = new Set();
 const descriptions = new Set();
@@ -43,12 +44,27 @@ for (const path of pages) {
     links++;
   }
 }
-for (const path of files.filter(path => /\.(html|js|json|txt|xml)$/.test(path))) {
+for (const path of files) {
   const body = await readFile(path, 'utf8');
   assert(!/calendar\/ical\/|AIRBNB_ICAL_|Quorvexis|Tynophael|\bPRIVATE_IDENTITY_PLACEHOLDER\b|\bPRIVATE_IDENTITY_PLACEHOLDER\b/i.test(body), `Private, owner-name or legacy content leaked: ${path}`);
+}
+for (const property of ['bright-1br-rawai-beach', 'cozy-1br-rawai-beach', 'two-adjacent-apartments-title-v-rawai']) {
+  const value = JSON.parse(await readFile(join(root, 'availability', `${property}.json`), 'utf8'));
+  assert.deepEqual(Object.keys(value).sort(), ['blocked', 'checkedAt', 'status']);
+  assert(['snapshot', 'unavailable'].includes(value.status));
+  assert(Array.isArray(value.blocked));
+  for (const range of value.blocked) {
+    assert.deepEqual(Object.keys(range).sort(), ['end', 'start']);
+    assert(/^\d{4}-\d{2}-\d{2}$/.test(range.start) && /^\d{4}-\d{2}-\d{2}$/.test(range.end) && range.start < range.end);
+  }
+  if (process.env.VERIFY_FRESH_AVAILABILITY === '1') {
+    assert.equal(value.status, 'snapshot', `A fresh calendar is required for ${property}`);
+    const age = Date.now() - Date.parse(value.checkedAt);
+    assert(age >= 0 && age < 60 * 60 * 1000, `Calendar import is stale for ${property}`);
+  }
 }
 const sitemap = await readFile(join(root, 'sitemap.xml'), 'utf8');
 assert.equal((sitemap.match(/<loc>/g) || []).length, pages.length, 'Sitemap must include each indexable HTML page');
 assert.match(await readFile(join(root, 'robots.txt'), 'utf8'), /Sitemap:/);
 assert.match(await readFile(join(root, 'llms.txt'), 'utf8'), /Title V New & Bright/);
-console.log(`Verified ${pages.length} unique indexable pages, ${links} internal links/assets, ${imageCount} images, structured data, sitemap and public-bundle privacy.`);
+console.log(`Verified ${pages.length} unique indexable pages, ${links} internal links/assets, ${imageCount} images, three calendar snapshots, static-only output, structured data, sitemap and public-bundle privacy.`);

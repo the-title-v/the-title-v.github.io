@@ -1,4 +1,4 @@
-import { mergeBlockedRanges, parseICal, type BlockedDateRange } from './calendar';
+import { mergeBlockedRanges, parseICal, type BlockedDateRange } from '../../src/lib/calendar';
 
 type FeedId = 'bright' | 'cozy';
 
@@ -164,11 +164,3 @@ export function createAvailabilityService(dependencies: AvailabilityDependencies
     };
   };
 }
-
-/** This module is imported only by server endpoints; feed URLs are never public props. */
-export const getAvailability = createAvailabilityService({
-  getFeedUrl: (feed) => {
-    const key = feed === 'bright' ? 'AIRBNB_ICAL_BRIGHT' : 'AIRBNB_ICAL_COZY';
-    return import.meta.env?.[key] || process.env[key];
-  },
-});

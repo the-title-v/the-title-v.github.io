@@ -42,3 +42,11 @@ test('the widget communicates arrival and metered utility terms without an owner
   assert.match(markup, /subject to availability.*extra/i);
   assert.doesNotMatch(markup, /PRIVATE_IDENTITY_PLACEHOLDER/i);
 });
+
+
+test('the calendar describes periodic updates without implying a visitor triggers an Airbnb fetch', () => {
+  const markup = render();
+  assert.match(markup, /Loading calendar updates/);
+  assert.match(markup, /periodically/i);
+  assert.doesNotMatch(markup, /Checking the Airbnb calendars/);
+});

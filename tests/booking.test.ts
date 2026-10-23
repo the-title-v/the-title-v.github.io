@@ -8,7 +8,7 @@ const both = 'two-adjacent-apartments-title-v-rawai';
 
 test('WhatsApp handoff preserves dates, occupancy and every price component without naming the owner', () => {
   const quote = calculateQuote({ propertyId: bright, checkIn: '2027-05-01', checkOut: '2027-05-08', adults: 2, children: 1 });
-  const url = new URL(booking.buildWhatsAppRequest('Title V New & Bright 1BR at Rawai Beach', quote, 'live'));
+  const url = new URL(booking.buildWhatsAppRequest('Title V New & Bright 1BR at Rawai Beach', quote, 'snapshot'));
   assert.equal(url.origin + url.pathname, 'https://wa.me/79139098949');
   const text = url.searchParams.get('text')!;
   assert.match(text, /Title V New & Bright 1BR at Rawai Beach/);
@@ -34,7 +34,7 @@ test('WhatsApp handoff preserves dates, occupancy and every price component with
 
 test('combined request keeps the deposit per booking and the total consistent', () => {
   const quote = calculateQuote({ propertyId: both, checkIn: '2027-06-01', checkOut: '2027-07-02', adults: 4, children: 4 });
-  const text = new URL(booking.buildWhatsAppRequest('Two adjacent apartments', quote, 'live')).searchParams.get('text')!;
+  const text = new URL(booking.buildWhatsAppRequest('Two adjacent apartments', quote, 'snapshot')).searchParams.get('text')!;
   assert.match(text, /8 guests.*4 adults.*4 children/);
   assert.match(text, /Cleaning.*3,000 THB/);
   assert.match(text, /Stay total.*89,800 THB/);
@@ -43,7 +43,7 @@ test('combined request keeps the deposit per booking and the total consistent', 
 });
 
 test('an unavailable calendar produces an explicit confirmation request', () => {
-  const quote = calculateQuote({ propertyId: 'cozy-1br-rawai-beach', checkIn: '2027-10-01', checkOut: '2027-10-03' });
+  const quote = calculateQuote({ propertyId: 'cozy-1br-rawai-beach', checkIn: '2027-10-01', checkOut: '2027-10-08' });
   assert.match(new URL(booking.buildWhatsAppRequest('Cozy', quote, 'unavailable')).searchParams.get('text')!, /calendar could not be verified/);
 });
 

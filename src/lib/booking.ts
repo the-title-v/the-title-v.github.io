@@ -25,7 +25,7 @@ export function readBookingOccupancy(params: URLSearchParams, propertyId: string
   return resolveOccupancy(propertyId, { adults: count('adults'), children: count('children'), guests: count('guests') });
 }
 
-export function buildWhatsAppRequest(propertyName: string, quote: Quote, calendarStatus: 'live' | 'unavailable'): string {
+export function buildWhatsAppRequest(propertyName: string, quote: Quote, calendarStatus: 'snapshot' | 'unavailable'): string {
   const money = (value: number) => `${value.toLocaleString('en-US')} THB`;
   const lines = [
     `Hello, I’d like to enquire about ${propertyName}.`,
@@ -44,7 +44,7 @@ export function buildWhatsAppRequest(propertyName: string, quote: Quote, calenda
     `Stay total plus refundable deposit (excluding utilities): ${money(quote.totalIncludingDeposit)}`,
     `Water: ${PRICING_POLICY.waterPerCubicMeter} THB/m³; electricity: ${PRICING_POLICY.electricityPerKwh} THB/kWh. Both are metered and excluded from the estimate.`,
     'A local agent will meet us for check-in. Early check-in and late check-out are on request, subject to availability and may cost extra.',
-    calendarStatus === 'live' ? 'The website calendar showed no date conflicts when checked.' : 'The calendar could not be verified for these dates.',
+    calendarStatus === 'snapshot' ? 'The latest website calendar update showed no date conflicts; please recheck these dates.' : 'The calendar could not be verified for these dates.',
     'Please confirm availability, the estimate, deposit arrangements, payment and cancellation terms.',
     'I understand this is a request, not a confirmed booking.',
   ];
