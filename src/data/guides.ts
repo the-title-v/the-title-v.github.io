@@ -452,8 +452,8 @@ export const guides: Guide[] = [
     slug: 'rawai-park-with-children', title: 'A family afternoon at Rawai Park', eyebrow: 'Play time',
     summary: 'Water slides, a kids club and playgrounds close to Rawai’s waterfront. Bring swimwear and socks.',
     hero: {
-      src: '/images/guide-rawai-park.webp', width: 960, height: 641,
-      alt: 'Colorful slides and water features in Rawai Park’s children’s pool', caption: 'The children’s pool and slides at Rawai Park.',
+      src: '/images/guide-rawai-park-courtyard.webp', width: 960, height: 641,
+      alt: 'Rawai Park’s colorful building with its name, mascot and landscaped courtyard', caption: 'The courtyard at Rawai Park.',
     },
     heroCredit: { author: 'Rawai Park', url: 'https://www.rawaipark.com/' },
     readTime: '2 min read',
