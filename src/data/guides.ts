@@ -113,10 +113,11 @@ export const guides: Guide[] = [
       {
         heading: 'Look at the flags first',
         paragraphs: ['Sea conditions change through the year, and strong currents can reach these bays. A red flag means stay out of the water. Follow the lifeguards’ advice; a walk on the sand or an afternoon by the pool is a good alternative.', 'Rawai itself is best for boats, seafood and a waterfront walk. Make Nai Harn or Ya Nui your swimming outing when conditions are suitable.'],
+        links: [guideLink('Phuket through the seasons', 'phuket-seasons')],
       },
     ],
     sources: [sources.naiHarn, sources.yaNui, sources.weather],
-    relatedGuides: ['promthep-cape-sunset', 'phuket-with-children', 'a-slow-week-in-rawai'],
+    relatedGuides: ['promthep-cape-sunset', 'phuket-with-children', 'phuket-seasons'],
   },
   {
     slug: 'long-stays-in-rawai', title: 'Settle into a longer stay', eyebrow: 'A week or a month',
@@ -269,7 +270,7 @@ export const guides: Guide[] = [
       },
     ],
     sources: [localSources.tops, localSources.mixxmall, localSources.weCafe, localSources.nikitas],
-    relatedGuides: ['rawai-seafood-market', 'rawai-neighborhood-guide', 'rawai-banks-and-atms'],
+    relatedGuides: ['rawai-seafood-market', 'rawai-banks-and-atms', 'phuket-festivals-and-night-markets'],
   },
   {
     slug: 'a-slow-week-in-rawai', title: 'A slow week in Rawai', eyebrow: 'Seven easy days',
@@ -284,7 +285,7 @@ export const guides: Guide[] = [
       {
         heading: 'Days 3–4: one outing, one quiet day',
         paragraphs: ['Choose a longtail trip if the sea is calm, or head to Phuket Old Town for a walk and lunch. Keep the following day light: breakfast on the balcony, a swim and a massage at Kim’s Rawai branch.', 'With children, swap the massage for Rawai Park. You don’t need to cross the island to find something new to do.'],
-        links: [guideLink('Longtail trips from Rawai', 'island-trips-from-rawai'), guideLink('Rawai Park', 'rawai-park-with-children')],
+        links: [guideLink('Longtail trips from Rawai', 'island-trips-from-rawai'), guideLink('Rawai Park', 'rawai-park-with-children'), guideLink('Festivals & night markets', 'phuket-festivals-and-night-markets')],
       },
       {
         heading: 'Days 5–7: the southern coast, then favorites',
@@ -345,7 +346,7 @@ export const guides: Guide[] = [
       },
     ],
     sources: [sources.thaiHua, sources.weather],
-    relatedGuides: ['rawai-massage-and-wellness', 'rawai-food-and-markets', 'long-stays-in-rawai'],
+    relatedGuides: ['rawai-massage-and-wellness', 'rawai-food-and-markets', 'phuket-seasons'],
   },
   {
     slug: 'two-apartments-for-family-and-friends', title: 'Travel together, with a home each', eyebrow: 'Family & friends',
@@ -538,6 +539,103 @@ export const guides: Guide[] = [
     ],
     sources: [sources.scbAtms],
     relatedGuides: ['rawai-food-and-markets', 'rawai-neighborhood-guide', 'getting-around-south-phuket'],
+  },
+  {
+    slug: 'phuket-seasons', title: 'Phuket through the seasons', eyebrow: 'When to visit',
+    summary: 'Drier months, tropical showers and changing seas. Choose the time of year that suits your kind of holiday.',
+    hero: {
+      src: '/images/guide-phuket-seasons.webp', width: 1440, height: 613,
+      alt: 'Palm trees silhouetted against an orange sunset and clouds at Mai Khao, Phuket',
+      caption: 'An April sunset at Mai Khao.',
+    },
+    heroCredit: { author: 'Dennis Wong', url: 'https://commons.wikimedia.org/wiki/File:Sunset_at_Mai_Khao_Beach.jpg', license: 'CC BY 2.0', licenseUrl: 'https://creativecommons.org/licenses/by/2.0/' },
+    readTime: '2 min read',
+    sections: [
+      {
+        heading: 'Choose your month',
+        paragraphs: ['Phuket stays warm all year. December to March usually makes beach and boat plans easier; May to October suits a more flexible holiday. November is a changeover month, so don’t count on settled weather just yet.'],
+        table: {
+          headings: ['Months', 'What to expect'],
+          rows: [
+            ['January–February', 'Usually the driest months. A popular time for beach holidays.'],
+            ['March–April', 'Hotter days, with showers becoming more frequent.'],
+            ['May–August', 'More rain, with showers and dry breaks.'],
+            ['September–October', 'Typically the wettest stretch. Keep plans flexible.'],
+            ['November', 'Rain generally eases, but the weather is still changeable.'],
+            ['December', 'Drier weather becomes more established. Book holiday travel early.'],
+          ],
+        },
+        links: [sources.weather, { title: 'Seasonal apartment prices', url: '/rates/' }],
+      },
+      {
+        heading: 'Rain doesn’t always take the whole day',
+        paragraphs: ['Some days bring a heavy shower followed by a dry stretch; others stay wet for longer. Keep a café, massage or museum visit in reserve, and use dry gaps for a walk.', 'The weeks around the start and end of the main season can be quieter. They work well if you’re happy to choose outings as the weather unfolds.'],
+        links: [guideLink('Ideas for a rainy day', 'phuket-rainy-day-guide')],
+      },
+      {
+        heading: 'Let the sea decide',
+        paragraphs: ['West-coast beaches can have large waves and strong currents, especially from May to October. Check the flags even when the sun comes out. A red flag means stay out of the water; follow the lifeguards’ advice.', 'For a boat trip, ask the operator about conditions and leave a spare day in case the weather changes.'],
+        links: [guideLink('Nai Harn & Ya Nui', 'nai-harn-and-ya-nui-beaches'), { title: 'Sea forecast', url: 'https://www.tmd.go.th/en/forecast/shipping' }],
+      },
+      {
+        heading: 'Pack for sun and showers',
+        paragraphs: ['Bring light clothes, a hat, sunscreen and shoes with grip. A small umbrella and a waterproof phone pouch are handy. Keep water with you, and save longer walks for the cooler part of the day.'],
+      },
+    ],
+    sources: [{ title: 'Thailand tourism: planning an Andaman trip', url: 'https://www.tatnews.org/2026/10/the-andaman-opens-its-doors-again/' }],
+    relatedGuides: ['nai-harn-and-ya-nui-beaches', 'phuket-rainy-day-guide', 'phuket-festivals-and-night-markets'],
+  },
+  {
+    slug: 'phuket-festivals-and-night-markets', title: 'Phuket festivals & night markets', eyebrow: 'After the beach',
+    summary: 'Sunday walks in Old Town, dinner among the stalls and festivals worth planning an evening around.',
+    hero: {
+      src: '/images/guide-phuket-walking-street.webp', width: 1440, height: 1080,
+      alt: 'Food stalls and visitors between colorful shophouses on Thalang Road in Phuket Old Town',
+      caption: 'Sunday market stalls on Thalang Road, Phuket Old Town.',
+    },
+    heroCredit: { author: 'Christophe95', url: 'https://commons.wikimedia.org/wiki/File:Phuket_Weekend_Market.jpg', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' },
+    readTime: '2 min read',
+    sections: [
+      {
+        heading: 'Choose your market',
+        paragraphs: ['Pick one market for dinner, then leave time to wander. For a first visit, choose Lard Yai if you’re here on a Sunday. Bring small baht notes and share a few dishes so there’s room to try more.'],
+        table: {
+          headings: ['Market', 'When & what to go for'],
+          rows: [
+            ['Lard Yai · Sunday Walking Street', 'Sunday, 16:00–22:00. Street food and small gifts along colorful Thalang Road. Pair it with an afternoon in Old Town.'],
+            ['Naka Weekend Market', 'Saturday–Sunday, from 16:00. Dinner plus a longer browse for clothes, souvenirs and accessories.'],
+            ['Chillva Market', 'Monday–Saturday, 17:00–23:00. Food stalls, fashion and live music in Samkong, north of Old Town. Closed Sunday.'],
+          ],
+        },
+        links: [map('Lard Yai map', 'Phuket Sunday Walking Street Lard Yai Thalang Road'), map('Naka map', 'Naka Weekend Market Wirat Hong Yok Road Phuket'), map('Chillva map', 'Chillva Market 141/2 Yaowarat Road Phuket')],
+      },
+      {
+        heading: 'Festivals through the year',
+        paragraphs: ['These are the usual times of year. Open the latest event listings for this year’s dates and venues.'],
+        table: {
+          headings: ['Festival', 'When & what to expect'],
+          rows: [
+            ['Chinese New Year & Old Town Festival', 'Usually January–February. Food fairs and cultural performances in Old Town. The local festival has its own announced dates.'],
+            ['Songkran', '13–15 April. Thai New Year brings water celebrations and temple traditions. Patong and Phuket Town hold local events; keep your phone in a waterproof pouch.'],
+            ['Vegetarian Festival', 'Nine days in September or October. Vegetarian food, shrine ceremonies and street processions. Some rituals are intense; the food stalls offer a gentler introduction.'],
+            ['Loy Krathong', 'Full moon, usually November. Candlelit floats and waterside celebrations. Choose an announced local event for the evening.'],
+          ],
+        },
+        links: [{ title: 'Latest festival dates & venues', url: 'https://www.tatnews.org/category/thailand-events-festivals/' }],
+      },
+      {
+        heading: 'An easy evening from Rawai',
+        paragraphs: ['Take a taxi or app car, save the market pin and arrange your return pickup away from the busiest entrance. With children, arrive near opening time and keep the plan to one market.', 'For a bus outing, check the route and last departure first. Prefer to stay close? Have dinner at Rawai Seafood Market and take a walk by the waterfront.'],
+        links: [{ title: 'Phuket bus routes', url: 'https://onemap.phuket.cloud' }, guideLink('Dinner at Rawai Seafood Market', 'rawai-seafood-market')],
+      },
+    ],
+    sources: [
+      { title: 'Lard Yai updates', url: 'https://www.facebook.com/phuketwalkingstreet' },
+      { title: 'Naka Market hours & events', url: 'https://www.phuketnakamarket.com/naka-weekend-market/' },
+      { title: 'Chillva updates', url: 'https://www.facebook.com/Chillvamarket/' },
+      { title: 'Chillva visitor information · Phuket Smart Bus', url: 'https://www.phuketsmartbus.com/blog/chillva-market-phuket' },
+    ],
+    relatedGuides: ['rawai-food-and-markets', 'a-slow-week-in-rawai', 'phuket-seasons'],
   },
 ];
 
