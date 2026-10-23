@@ -1,0 +1,15 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import { guides } from '../../data/guides';
+export function getStaticPaths() { return guides.map(guide => ({ params: { slug: guide.slug }, props: { guide } })); }
+const { guide } = Astro.props;
+const related = guides.filter(item => guide.relatedGuides.includes(item.slug));
+const schema = { '@context': 'https://schema.org', '@type': 'Article', headline: guide.title, description: guide.summary, image: new URL(guide.hero.src, Astro.site).href, author: { '@type': 'Organization', name: 'The Title V', url: Astro.site?.href }, publisher: { '@type': 'Organization', name: 'The Title V' }, mainEntityOfPage: new URL(`/guides/${guide.slug}/`, Astro.site).href, inLanguage: 'en' };
+---
+<Layout title={guide.title} description={guide.summary} image={guide.hero.src} schema={schema}>
+  <section class="page-intro container"><div class="breadcrumbs"><a href="/">Home</a><span>/</span><a href="/guides/">The Rawai journal</a></div><p class="eyebrow">{guide.eyebrow} · {guide.readTime}</p><h1 class="simple-title">{guide.title}</h1><p class="lede">{guide.summary}</p></section>
+  <div class="container"><figure class="article-figure"><img class="article-hero" src={guide.hero.src} width={guide.hero.width} height={guide.hero.height} alt={guide.hero.alt} fetchpriority="high"/>{guide.hero.caption && <figcaption>{guide.hero.caption}</figcaption>}</figure></div>
+  <section class="container content-section article-layout"><article class="rich-copy">{guide.sections.map((section, index) => <section id={`part-${index}`}><h2>{section.heading}</h2>{section.paragraphs.map(text => <p>{text}</p>)}{section.bullets && <ul>{section.bullets.map(text => <li>{text}</li>)}</ul>}</section>)}<div class="notice">Have a specific question about your stay? your host can help you work out the practical details before you book.</div>{guide.sources.length > 0 && <div class="sources"><p class="eyebrow">FURTHER READING & SOURCES</p><ul>{guide.sources.map(source => <li><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title} <Icon name="arrow" size={13}/></a></li>)}</ul></div>}</article><aside><p class="eyebrow">IN THIS GUIDE</p>{guide.sections.map((section, index) => <a href={`#part-${index}`}>{section.heading}</a>)}<div style="margin-top:35px"><p class="eyebrow">MAKE RAWAI YOUR BASE</p><p style="font-size:13px;color:var(--muted)">Your own apartment, a leafy residence and a host you can talk to.</p><a href="/stays/" class="text-link">Explore the apartments <Icon name="arrow" size={15}/></a></div></aside></section>
+  {related.length > 0 && <section class="journal-section section"><div class="container"><p class="eyebrow">KEEP EXPLORING</p><h2>A little more <em>inspiration.</em></h2><div class="guide-grid">{related.slice(0, 3).map(item => <article class="guide-card"><a class="guide-image" href={`/guides/${item.slug}/`}><img src={item.hero.src} width={item.hero.width} height={item.hero.height} alt={item.hero.alt} loading="lazy"/></a><h3><a href={`/guides/${item.slug}/`}>{item.title}</a></h3></article>)}</div></div></section>}
+</Layout>

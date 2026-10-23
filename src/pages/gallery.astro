@@ -1,0 +1,8 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { properties, images } from '../data/properties';
+const groups = [{ name: properties[0].name, photos: properties[0].gallery.slice(0, 7) }, { name: properties[1].name, photos: properties[1].gallery.slice(0, 7) }, { name: 'A little life around The Title V', photos: [images.poolCourtyard, images.centralPool, images.gardenWalkway, images.coworking, images.gym, images.rawai] }];
+---
+<Layout title="A photo journal · The apartments & residence" description="Explore real photographs of the Bright and Cozy apartments, kitchens, bedrooms, balconies, shared pools and tropical gardens at The Title V in Rawai.">
+  <section class="page-intro container"><p class="eyebrow">A CLOSER LOOK AT YOUR LITTLE ESCAPE</p><h1>Wish you were <em>here.</em></h1><p class="lede">The actual apartments. The shared gardens and pools. And a glimpse of life beyond the front door.</p></section>{groups.map(group => <section class="container content-section"><h2 style="font-size:38px;max-width:700px">{group.name}</h2><div class="apartment-gallery">{group.photos.map(photo => <figure><a href={photo.src} target="_blank" rel="noopener noreferrer" aria-label={`View full photo: ${photo.alt}`}><img src={photo.src} width={photo.width} height={photo.height} alt={photo.alt} loading="lazy"/></a><figcaption>{photo.caption || photo.alt}</figcaption></figure>)}</div></section>)}
+</Layout>

@@ -1,0 +1,69 @@
+---
+import '@fontsource/cormorant-garamond/400.css';
+import '@fontsource/cormorant-garamond/500.css';
+import '@fontsource/cormorant-garamond/400-italic.css';
+import '@fontsource/dm-sans/400.css';
+import '@fontsource/dm-sans/500.css';
+import '@fontsource/dm-sans/600.css';
+import '../styles/global.css';
+import { site, navigation, whatsappUrl } from '../data/site';
+import Icon from '../components/Icon.astro';
+interface Props { title: string; description?: string; image?: string; schema?: object | object[]; noindex?: boolean; }
+const { title, description = site.description, image = '/images/pool-courtyard.webp', schema = [], noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const fullTitle = `${title} | The Title V · Rawai, Phuket`;
+const structured = [
+  { '@context': 'https://schema.org', '@type': 'LodgingBusiness', '@id': new URL('/#host', Astro.site).href, name: 'The Title V', description: site.description, url: Astro.site?.href, image: new URL('/images/pool-courtyard.webp', Astro.site).href, telephone: '+79139098949', address: { '@type': 'PostalAddress', addressLocality: 'Rawai', addressRegion: 'Phuket', addressCountry: 'TH' } },
+  ...(Array.isArray(schema) ? schema : [schema]),
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#234a3e" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'} />
+    <meta name="google-site-verification" content="uuctEabtnMYENhvGMuU61L3EeMI8znGYenoaLYQ48Sg" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="text/plain" title="Information for AI assistants" href="/llms.txt" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="The Title V" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(image, Astro.site)} />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(image, Astro.site)} />
+    <script type="application/ld+json" set:html={JSON.stringify(structured).replace(/</g, '\\u003c')} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a href="/" class="brand" aria-label="The Title V home"><span>THE TITLE V<span class="brand-dot">.</span></span><small>RAWAI · PHUKET</small></a>
+      <nav class="desktop-nav" aria-label="Main navigation">{navigation.map(item => <a href={item.href} aria-current={Astro.url.pathname.startsWith(item.href) ? 'page' : undefined}>{item.label}</a>)}</nav>
+      <a class="button header-cta" href="/book/">Find your stay <Icon name="arrow" size={17} /></a>
+      <details class="mobile-nav"><summary aria-label="Open navigation"><span></span><span></span></summary><nav aria-label="Mobile navigation">{navigation.map(item => <a href={item.href}>{item.label}</a>)}<a href="/book/">Availability & booking</a></nav></details>
+    </header>
+    <main id="main"><slot /></main>
+    <section class="closing-cta"><div><p class="eyebrow">A LITTLE CLOSER TO YOUR NEXT ESCAPE</p><h2>See you in <em>Rawai.</em></h2></div><div><p>A few days away. A month to settle in.<br />Let’s find your place in Phuket.</p><a class="button button-light" href="/book/">Find your dates <Icon name="arrow" size={18} /></a></div></section>
+    <footer class="site-footer">
+      <div class="footer-top"><div><a href="/" class="brand"><span>THE TITLE V.</span><small>YOUR PLACE IN RAWAI</small></a><p>Thoughtfully hosted by your host.<br />Two apartments. One lovely corner of Phuket.</p><a class="text-link" href={whatsappUrl} target="_blank" rel="noopener noreferrer">Say hello on WhatsApp <Icon name="arrow" size={16}/></a></div><div><p class="eyebrow">STAY A LITTLE</p><a href="/stays/">Our apartments</a><a href="/book/">Availability</a><a href="/rates/">Rates & longer stays</a><a href="/gallery/">Photo journal</a></div><div><p class="eyebrow">GET TO KNOW RAWAI</p><a href="/location/">Our neighbourhood</a><a href="/guides/">Local guides</a><a href="/about/">Meet your host</a><a href="/faq/">Good to know</a></div></div>
+      <div class="footer-bottom"><span>© {new Date().getFullYear()} The Title V</span><span><a href="/booking-terms/">Booking details</a><a href="/privacy/">Privacy</a><a href="/contact/">Contact</a></span><span>MADE FOR SLOWER DAYS <Icon name="sun" size={15}/></span></div>
+    </footer>
+    <script>
+      const reveal = document.querySelectorAll('[data-reveal]');
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); } }), { threshold: 0.08 });
+        reveal.forEach(el => { el.classList.add('will-reveal'); observer.observe(el); });
+      }
+      document.querySelector('.mobile-nav')?.addEventListener('keydown', event => { if ((event as KeyboardEvent).key === 'Escape') (event.currentTarget as HTMLDetailsElement).open = false; });
+    </script>
+  </body>
+</html>

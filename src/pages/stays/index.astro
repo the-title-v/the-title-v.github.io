@@ -1,0 +1,9 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PropertyCard from '../../components/PropertyCard.astro';
+import { properties } from '../../data/properties';
+---
+<Layout title="Our apartments" description="Choose Title V New & Bright, Title V New & Cozy, or two adjacent apartments in Rawai. See real apartment photos, amenities and direct-booking availability.">
+  <section class="page-intro container"><p class="eyebrow">COME IN. MAKE YOURSELF AT HOME.</p><h1>Small details.<br /><em>Lovely stays.</em></h1><p class="lede">Two individual homes, thoughtfully equipped for life in Phuket. Choose the one that feels like you, or take both and bring your favourite people.</p></section>
+  <section class="container content-section"><div class="property-grid">{properties.map((property, index) => <PropertyCard property={property} index={index}/>)}</div></section>
+</Layout>
