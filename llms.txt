@@ -11,10 +11,10 @@
   Public Airbnb source: https://www.airbnb.com/rooms/926800271304117606
 Children must be aged 14 or under; guests aged 15+ count as adults. Each apartment has one queen bed and one sofa bed. Per-apartment capacity always applies, including when booking the pair.
 
-## Booking and reference pricing
+## Booking and pricing
 - [Availability and estimate calculator](https://the-title-v.github.io/book/): Airbnb calendar availability is indicative and may be delayed. An enquiry does not reserve dates.
-- [Rates](https://the-title-v.github.io/rates/): Per-apartment reference THB/night: May–September 1,000; April and October 1,300; March and November 2,000; December–February 3,300. Base rate includes 2 guests per apartment, 4 for both. Each additional child beyond that count: THB300/night.
-- Accommodation discounts: 10% for 7–27 nights; 20% from 28 nights; not cumulative. Extra-guest and cleaning fees are not discounted. Online estimates support 2–180 nights.
+- [Rates](https://the-title-v.github.io/rates/): Per-apartment THB/night: May–September 1,000; April and October 1,300; March and November 2,000; December 1–22 and February 3,300; festive nights December 23–January 12 at 4,500; January peak nights January 13–31 at 4,000. Date endpoints are inclusive occupied nights and recur annually. Base rate includes 2 guests per apartment, 4 for both. Each additional child beyond that count: THB300/night.
+- Accommodation discounts: 10% for 7–27 nights; 20% from 28 nights; not cumulative. Extra-guest and cleaning fees are not discounted. Online estimates support 7–180 nights.
 - Stay total includes discounted accommodation, extra-guest charges and cleaning: THB1,500 per apartment per stay; THB3,000 for both.
 - Refundable deposit is separate: THB10,000 per booking up to 30 nights; THB20,000 for 31+ nights, also for the pair. Return arrangements and any documented deductions are agreed in writing.
 - Metered utilities are separate from the stay estimate: water THB55/m³; electricity THB6/kWh.
@@ -27,26 +27,34 @@ A local agent meets and greets guests and handles the apartment handover. Check-
 ## Residence and location
 - [The residence](https://the-title-v.github.io/residence/): Shared pools, gardens, gym, sauna/steam room, coworking, children's facilities and parking.
 - [Map and nearby places](https://the-title-v.github.io/location/): The Title V (Rawai-Phuket), 555 Wiset Road, Rawai, Phuket 83130. Use the Title V map pin; other phases have similar names.
-The apartments are within the residence, near Rawai waterfront, not on the sand. Rawai is known for boats, seafood and island departures. Nai Harn and Ya Nui are separate swimming-beach outings, subject to local conditions. The two apartments have separate entrances; no internal connecting door is advertised.
+The apartments are within the residence, near Rawai waterfront, not on the sand. Rawai is known for boats, seafood and island departures. Nai Harn and Ya Nui are separate swimming-beach outings, subject to local conditions. The two apartments have separate entrances and no internal connecting door.
 
 ## Local guides
-- [Find your rhythm in Rawai](https://the-title-v.github.io/guides/rawai-neighborhood-guide/): A waterfront of longtail boats, everyday cafés, and an easy base for exploring Phuket’s south. Here is how to make Rawai feel familiar.
-- [Nai Harn, Ya Nui, and the Rawai waterfront](https://the-title-v.github.io/guides/nai-harn-and-ya-nui-beaches/): Three nearby coastal settings with different personalities. Choose a full beach day, a smaller cove, or a walk beside the boats.
-- [Make a longer stay feel like home](https://the-title-v.github.io/guides/long-stays-in-rawai/): The practical details that matter once you stop living out of a suitcase: a real routine, a clear quote, and space for everyday life.
-- [Work days, with room for island life](https://the-title-v.github.io/guides/work-from-phuket/): Plan a comfortable place to work, check the connection you need, and give your day a beginning and an end.
-- [An easier Rawai stay with children](https://the-title-v.github.io/guides/phuket-with-children/): Start with the sleeping arrangement, keep beach days flexible, and make room for the routines that help everyone enjoy the trip.
-- [Arriving in Rawai, without the rush](https://the-title-v.github.io/guides/phuket-airport-to-rawai/): Plan the transfer around your arrival time, luggage, and group. Then make the final part of the journey simple.
-- [Getting around southern Phuket](https://the-title-v.github.io/guides/getting-around-south-phuket/): Choose transport for the day you have planned: a waterfront stroll, a coastal bus ride, or a car for a few places together.
-- [Where to eat, get coffee and buy groceries](https://the-title-v.github.io/guides/rawai-food-and-markets/): Start with Tops and Starbucks at Mixxmall, add a salad lunch at We Café, then choose a seafood dinner by the water.
-- [A slow week in Rawai](https://the-title-v.github.io/guides/a-slow-week-in-rawai/): An adaptable seven-day outline with a few good outings and plenty of time to enjoy the place you are staying.
-- [An evening at Promthep Cape](https://the-title-v.github.io/guides/promthep-cape-sunset/): Make a little room for the view at Phuket’s southern end, with a flexible plan for getting there and coming home.
-- [When the island asks you to slow down](https://the-title-v.github.io/guides/phuket-rainy-day-guide/): Keep a second kind of day in mind: a museum, an unhurried lunch, a useful errand, or time at home with the balcony doors in view.
-- [Travel together, with a home each](https://the-title-v.github.io/guides/two-apartments-for-family-and-friends/): Two adjacent apartments can make a shared trip feel easier: time together when you want it, and your own space at the end of the day.
-- [A practical evening at Rawai Seafood Market](https://the-title-v.github.io/guides/rawai-seafood-market/): Choose the seafood, agree the cooking, and enjoy dinner near Rawai Pier. Here is how to make the market visit straightforward.
-- [A longtail day from Rawai](https://the-title-v.github.io/guides/island-trips-from-rawai/): Bon Island and Coral Island are places to explore with a local boat operator. Build the day around the sea, your group and a clear return plan.
-- [Find the right massage in Rawai](https://the-title-v.github.io/guides/rawai-massage-and-wellness/): Two local options with published menus, plus a few details that make booking the right treatment easier.
+- [Your first days in Rawai](https://the-title-v.github.io/guides/rawai-neighborhood-guide/): Seafood by the water, a stocked fridge and a beach day nearby. Start with the places you’ll use most.
+- [Nai Harn and Ya Nui: choose your beach](https://the-title-v.github.io/guides/nai-harn-and-ya-nui-beaches/): A wide sandy bay or a small cove? Both are a short drive from Rawai, and each is worth an unhurried visit.
+- [Settle into a longer stay](https://the-title-v.github.io/guides/long-stays-in-rawai/): A kitchen, a washing machine and a few favorite local stops make everyday life in Rawai easy.
+- [Work from Rawai](https://the-title-v.github.io/guides/work-from-phuket/): A proper desk, 100 Mbps Wi-Fi and a quieter place to finish the working day.
+- [Rawai with children](https://the-title-v.github.io/guides/phuket-with-children/): Easy meals, pool time and small outings make a more relaxed family holiday.
+- [Phuket Airport to Rawai: taxi or bus?](https://the-title-v.github.io/guides/phuket-airport-to-rawai/): A direct car for an easy arrival, or the ฿100 coastal bus. Here are the fares, pickup points and departures.
+- [Getting around southern Phuket](https://the-title-v.github.io/guides/getting-around-south-phuket/): Use a car for flexible days out, a taxi for simple trips, or the coastal bus when you have time.
+- [Where to eat, get coffee and buy groceries](https://the-title-v.github.io/guides/rawai-food-and-markets/): A few useful starting points for breakfast, a stocked fridge and dinner by the sea.
+- [A slow week in Rawai](https://the-title-v.github.io/guides/a-slow-week-in-rawai/): A loose plan with beaches, good food and enough room to do very little.
+- [Sunset at Promthep Cape](https://the-title-v.github.io/guides/promthep-cape-sunset/): An open sea horizon and one of Phuket’s classic evening views, close to Rawai.
+- [A rainy day in Rawai](https://the-title-v.github.io/guides/phuket-rainy-day-guide/): Coffee, a massage, a museum or a quiet day at home. Keep a few easy options ready.
+- [Travel together, with a home each](https://the-title-v.github.io/guides/two-apartments-for-family-and-friends/): Bright and Cozy are next door to each other: two complete apartments for a shared trip.
+- [Dinner at Rawai Seafood Market](https://the-title-v.github.io/guides/rawai-seafood-market/): Choose fresh seafood, have it cooked nearby and settle in for a waterfront dinner.
+- [A longtail day from Rawai](https://the-title-v.github.io/guides/island-trips-from-rawai/): Bon Island and Coral Island are close enough for a day out. Choose a calm day and agree the whole trip before leaving.
+- [A massage at Kim’s in Rawai](https://the-title-v.github.io/guides/rawai-massage-and-wellness/): Kim’s has a branch on Rawai Beach Road, handy for a massage followed by dinner on the waterfront.
+- [A family afternoon at Rawai Park](https://the-title-v.github.io/guides/rawai-park-with-children/): Water slides, a kids club and playgrounds close to Rawai’s waterfront. Bring swimwear and socks.
+- [Schools and kindergartens near Rawai](https://the-title-v.github.io/guides/rawai-schools-and-kindergartens/): Start with these local options, then arrange a visit and check places for your dates.
+- [Banks, ATMs and cash in Rawai](https://the-title-v.github.io/guides/rawai-banks-and-atms/): Named places for a cash withdrawal, bank visit or currency exchange, with map links to save.
+- [Phuket through the seasons](https://the-title-v.github.io/guides/phuket-seasons/): Drier months, tropical showers and changing seas. Choose the time of year that suits your kind of holiday.
+- [Phuket festivals & night markets](https://the-title-v.github.io/guides/phuket-festivals-and-night-markets/): Sunday walks in Old Town, dinner among the stalls and festivals worth planning an evening around.
 
 ## Practical information
+- [Guest reviews](https://the-title-v.github.io/reviews/): Dated Airbnb ratings for each individual apartment and selected guest excerpts. Follow source links for the full reviews.
+- [Explore Phuket island map](https://the-title-v.github.io/explore-phuket/)
+- [Thailand visas by passport](https://the-title-v.github.io/visas/)
 - [Local welcome](https://the-title-v.github.io/about/)
 - [Frequently asked questions](https://the-title-v.github.io/faq/)
 - [Privacy](https://the-title-v.github.io/privacy/)
