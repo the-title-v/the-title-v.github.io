@@ -44,9 +44,9 @@ test('the widget communicates arrival and metered utility terms without an owner
 });
 
 
-test('the calendar describes periodic updates without implying a visitor triggers an Airbnb fetch', () => {
+test('the calendar explains delayed data without claiming automatic Airbnb refreshes', () => {
   const markup = render();
   assert.match(markup, /Loading calendar updates/);
-  assert.match(markup, /periodically/i);
-  assert.doesNotMatch(markup, /Checking the Airbnb calendars/);
+  assert.match(markup, /Calendar data can be delayed/i);
+  assert.doesNotMatch(markup, /Checking the Airbnb calendars|update periodically|automatically refresh/i);
 });
