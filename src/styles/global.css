@@ -19,3 +19,5 @@
 .paired-hero{margin:0 0 20px}.paired-hero img{aspect-ratio:16/9;object-fit:contain;width:100%;height:auto}.paired-hero figcaption{font-size:12px;color:var(--muted);margin-top:12px}
 .apartment-gallery img.paired-photo{aspect-ratio:16/9;object-fit:contain}.fee-table td:last-child{white-space:normal;min-width:125px}
 @media(max-width:560px){.stay-invitation{align-items:flex-start;flex-direction:column;gap:18px;padding-block:24px}.stay-invitation .button{width:100%}.paired-hero figcaption{font-size:10px}.property-meta>span:last-child{display:none}}
+
+.footer-top .footer-whatsapp{display:block;width:fit-content;margin-top:10px;font-size:.875rem}
