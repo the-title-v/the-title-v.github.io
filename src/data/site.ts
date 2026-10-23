@@ -11,6 +11,7 @@ export const navigation = [
   { label: 'The residence', href: '/residence/' },
   { label: 'Location', href: '/location/' },
   { label: 'Local guides', href: '/guides/' },
+  { label: 'Reviews', href: '/reviews/' },
   { label: 'Rates', href: '/rates/' },
 ];
 export const faqs = [

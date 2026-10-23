@@ -19,8 +19,8 @@ test('base rates change at the seasonal boundaries', () => {
 });
 
 test('both apartments share seasonal rates and the bundle sums them', () => {
-  assert.equal(getNightlyRate('2027-01-13', cozy), 3300);
-  assert.equal(getNightlyRate('2027-01-13', both), 6600);
+  assert.equal(getNightlyRate('2027-02-01', cozy), 3300);
+  assert.equal(getNightlyRate('2027-02-01', both), 6600);
 });
 
 test('the festive rate overrides peak season from December 23 through January 12 every year', () => {
@@ -30,8 +30,18 @@ test('the festive rate overrides peak season from December 23 through January 12
     assert.equal(getNightlyRate(`${year}-12-31`, bright), 4500);
     assert.equal(getNightlyRate(`${year + 1}-01-01`, cozy), 4500);
     assert.equal(getNightlyRate(`${year + 1}-01-12`, bright), 4500);
-    assert.equal(getNightlyRate(`${year + 1}-01-13`, bright), 3300);
+    assert.equal(getNightlyRate(`${year + 1}-01-13`, bright), 4000);
     assert.equal(getNightlyRate(`${year + 1}-01-12`, both), 9000);
+  }
+});
+
+test('the January peak applies from January 13 through 31 and ends before February every year', () => {
+  for (const year of [2027, 2028, 2029]) {
+    assert.equal(getNightlyRate(`${year}-01-12`, bright), 4500);
+    assert.equal(getNightlyRate(`${year}-01-13`, bright), 4000);
+    assert.equal(getNightlyRate(`${year}-01-31`, cozy), 4000);
+    assert.equal(getNightlyRate(`${year}-01-31`, both), 8000);
+    assert.equal(getNightlyRate(`${year}-02-01`, bright), 3300);
   }
 });
 
@@ -39,8 +49,31 @@ test('a festive boundary quote charges occupied nights and excludes checkout fro
   const before = calculateQuote({ propertyId: bright, checkIn: '2026-12-16', checkOut: '2026-12-23' });
   const through = calculateQuote({ propertyId: bright, checkIn: '2027-01-10', checkOut: '2027-01-17' });
   assert.equal(before.baseTotal, 7 * 3300);
-  assert.equal(through.baseTotal, 3 * 4500 + 4 * 3300);
-  assert.equal(through.accommodationTotal, 24030);
+  assert.equal(through.baseTotal, 3 * 4500 + 4 * 4000);
+  assert.equal(through.accommodationTotal, 26550);
+});
+
+test('January checkout stays exclusive and a February crossing uses each occupied-night rate', () => {
+  const throughJanuary = calculateQuote({ propertyId: bright, checkIn: '2027-01-25', checkOut: '2027-02-01' });
+  const intoFebruary = calculateQuote({ propertyId: bright, checkIn: '2027-01-29', checkOut: '2027-02-05' });
+  assert.equal(throughJanuary.baseTotal, 7 * 4000);
+  assert.equal(throughJanuary.accommodationTotal, 25200);
+  assert.equal(intoFebruary.baseTotal, 3 * 4000 + 4 * 3300);
+  assert.equal(intoFebruary.accommodationTotal, 22680);
+  assert.deepEqual(intoFebruary.nightly.map(({ rate }) => rate), [4000, 4000, 4000, 3300, 3300, 3300, 3300]);
+});
+
+test('monthly discounts apply across both winter premiums while fees stay separate', () => {
+  const quote = calculateQuote({ propertyId: bright, checkIn: '2027-01-04', checkOut: '2027-02-01', adults: 2, children: 2 });
+  assert.equal(quote.nights, 28);
+  assert.equal(quote.baseTotal, 9 * 4500 + 19 * 4000);
+  assert.equal(quote.discountRate, 0.2);
+  assert.equal(quote.discountTotal, 23300);
+  assert.equal(quote.accommodationTotal, 93200);
+  assert.equal(quote.extraGuestTotal, 16800);
+  assert.equal(quote.cleaningTotal, 1500);
+  assert.equal(quote.total, 111500);
+  assert.equal(quote.refundableDeposit, 10000);
 });
 
 test('a cross-season quote prices each occupied night and excludes checkout', () => {

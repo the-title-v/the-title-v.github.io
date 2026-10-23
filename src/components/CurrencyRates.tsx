@@ -1,7 +1,7 @@
 import CurrencyControls, { CurrencyProvider, useCurrency } from './CurrencyControls';
-import { FESTIVE_RATE, PRICING_POLICY, SEASONAL_RATES } from '../lib/pricing';
+import { FESTIVE_RATE, JANUARY_PEAK_RATE, PRICING_POLICY, SEASONAL_RATES } from '../lib/pricing';
 
-const periods = ['May–Sep', 'Apr & Oct', 'Mar & Nov', 'Dec–Feb*'];
+const periods = ['May–Sep', 'Apr & Oct', 'Mar & Nov', '1–22 Dec & Feb'];
 
 function RateSheet() {
   const { money, currency } = useCurrency();
@@ -13,7 +13,8 @@ function RateSheet() {
         <table className="rate-table"><thead><tr><th scope="col">Season</th><th scope="col">Dates</th><th scope="col">{currency} / night</th></tr></thead><tbody>
           {SEASONAL_RATES.map((rate, index) => <tr key={rate.id}><th scope="row">{rate.name}</th><td>{periods[index]}</td><td>{money(rate.nightlyRate)}</td></tr>)}
           <tr className="festive-rate"><th scope="row">{FESTIVE_RATE.name}</th><td>23 Dec–12 Jan</td><td>{money(FESTIVE_RATE.nightlyRate)}</td></tr>
-        </tbody></table><p className="rates-footnote">*Festive rates apply to nights from 23 December through 12 January.</p>
+          <tr className="festive-rate"><th scope="row">{JANUARY_PEAK_RATE.name}</th><td>13–31 Jan</td><td>{money(JANUARY_PEAK_RATE.nightlyRate)}</td></tr>
+        </tbody></table><p className="rates-footnote">Dates refer to occupied nights.</p>
         <div className="stay-savings"><div><strong>10% <em>off</em></strong><span>7–27 nights</span></div><div><strong>20% <em>off</em></strong><span>28+ nights</span></div><p>Accommodation only.<br />Applied automatically.</p></div>
       </section>
       <section className="stay-fees" aria-labelledby="fees-heading">

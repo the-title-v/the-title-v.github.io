@@ -42,6 +42,14 @@ export const FESTIVE_RATE = {
   nightlyRate: 4500,
 } as const;
 
+/** A separate January premium keeps the holiday rate limited to its own dates. */
+export const JANUARY_PEAK_RATE = {
+  name: 'January peak',
+  startMonthDay: '01-13',
+  endMonthDay: '01-31',
+  nightlyRate: 4000,
+} as const;
+
 const APARTMENT_COUNTS: Record<PropertyId, number> = {
   'bright-1br-rawai-beach': 1,
   'cozy-1br-rawai-beach': 1,
@@ -137,6 +145,9 @@ export function getNightlyRate(date: string, propertyId: string): number {
   const monthDay = date.slice(5);
   if (monthDay >= FESTIVE_RATE.startMonthDay || monthDay <= FESTIVE_RATE.endMonthDay) {
     return FESTIVE_RATE.nightlyRate * apartments;
+  }
+  if (monthDay >= JANUARY_PEAK_RATE.startMonthDay && monthDay <= JANUARY_PEAK_RATE.endMonthDay) {
+    return JANUARY_PEAK_RATE.nightlyRate * apartments;
   }
   const month = new Date(time).getUTCMonth() + 1;
   const season = SEASONAL_RATES.find((entry) => (entry.months as readonly number[]).includes(month));
