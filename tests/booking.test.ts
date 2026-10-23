@@ -43,7 +43,7 @@ test('combined request keeps the deposit per booking and the total consistent', 
 });
 
 test('an unavailable calendar produces an explicit confirmation request', () => {
-  const quote = calculateQuote({ propertyId: 'cozy-1br-rawai-beach', checkIn: '2027-10-01', checkOut: '2027-10-03' });
+  const quote = calculateQuote({ propertyId: 'cozy-1br-rawai-beach', checkIn: '2027-10-01', checkOut: '2027-10-08' });
   assert.match(new URL(booking.buildWhatsAppRequest('Cozy', quote, 'unavailable')).searchParams.get('text')!, /calendar could not be verified/);
 });
 

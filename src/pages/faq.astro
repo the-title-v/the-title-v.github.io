@@ -3,6 +3,6 @@ import Layout from '../layouts/Layout.astro';
 import { faqs } from '../data/site';
 const schema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(faq => ({ '@type': 'Question', name: faq.question, acceptedAnswer: { '@type': 'Answer', text: faq.answer } })) };
 ---
-<Layout title="Good to know · Frequently asked questions" description="Answers about booking directly, live calendars, weekly and monthly discounts, apartment amenities, arrival arrangements and staying in Rawai." schema={schema}>
+<Layout title="Good to know · Frequently asked questions" description="Answers about booking directly, calendar updates, weekly and monthly discounts, apartment amenities, arrival arrangements and staying in Rawai." schema={schema}>
   <section class="page-intro container"><p class="eyebrow">THE LITTLE THINGS, EXPLAINED</p><h1>Good to <em>know.</em></h1><p class="lede">A few useful answers before you make yourself at home.</p></section><section class="container content-section"><div class="faq-list">{faqs.map(faq => <details><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}</div></section>
 </Layout>

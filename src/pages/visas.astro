@@ -1,0 +1,21 @@
+---
+import Layout from '../layouts/Layout.astro';
+import VisaFinder from '../components/VisaFinder';
+import { visaCheckedOn, visaSources } from '../data/visas';
+import '../styles/visas.css';
+---
+<Layout title="Thailand visas & entry · Find your passport’s options" description="Choose your passport to explore Thailand’s current visa-free entry, Visa on Arrival, Tourist Visa and Destination Thailand Visa routes, with official resources and the TDAC arrival form.">
+  <section class="page-intro container visa-page-intro">
+    <div><p class="eyebrow">BEFORE YOUR DAYS IN RAWAI</p><h1>Your way to <em>Thailand.</em></h1><p class="lede">A short holiday or a season in the sun. Find the entry route that fits your passport, then make a little room for Phuket.</p></div>
+    <div class="visa-update"><span class="visa-update-line" aria-hidden="true"></span><p>Thailand’s entry rules changed on<br /><strong>15 September 2026.</strong></p><p>Official sources checked<br />{visaCheckedOn}</p></div>
+  </section>
+  <div class="container visa-content">
+    <VisaFinder client:load />
+    <noscript><p class="visa-noscript">Enable JavaScript to use the passport selector, or check the <a href={visaSources.entryEnglish}>official passport list</a> and <a href={visaSources.evisa}>Thai e-Visa</a> directly.</p></noscript>
+    <section class="visa-tdac" id="tdac" aria-labelledby="tdac-heading">
+      <div><p class="eyebrow">ONE LAST THING BEFORE YOU FLY</p><h2 id="tdac-heading">Your arrival form.<br /><em>It’s free.</em></h2></div>
+      <div><p>Non-Thai travellers entering Thailand need the Thailand Digital Arrival Card (TDAC), including when travelling with a visa or visa exemption.</p><p>Complete it on the official Immigration website within the three days before arrival. Have your passport, journey and Thailand accommodation details ready. The arrival form does not replace a visa.</p><a class="button" href={visaSources.tdac} target="_blank" rel="noopener noreferrer">Complete the official TDAC <span aria-hidden="true">↗</span></a><a class="visa-tdac-guide" href={visaSources.tdacGuide} target="_blank" rel="noopener noreferrer">Official step-by-step guide ↗</a></div>
+    </section>
+    <div class="visa-source-note"><p>This guide covers ordinary passports and holiday planning. Your passport type, travel history and purpose can affect entry; the Thai embassy and Immigration make the final decision. Recheck the official rules before travelling, and follow the permitted stay stamped in your passport.</p><p><a href={visaSources.entry} target="_blank" rel="noopener noreferrer">MFA country lists ↗</a><a href={visaSources.evisa} target="_blank" rel="noopener noreferrer">Thai e-Visa ↗</a><a href={visaSources.dtvUpdate} target="_blank" rel="noopener noreferrer">DTV application update ↗</a></p></div>
+  </div>
+</Layout>

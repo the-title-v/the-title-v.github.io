@@ -50,3 +50,12 @@ test('the calendar describes periodic updates without implying a visitor trigger
   assert.match(markup, /periodically/i);
   assert.doesNotMatch(markup, /Checking the Airbnb calendars/);
 });
+
+test('the booking widget shows the seven-night minimum and offers currency selection', () => {
+  const markup = render();
+  assert.match(markup, /7-night minimum/);
+  assert.match(markup, /Display currency/);
+  for (const code of ['THB', 'USD', 'EUR', 'GBP', 'AUD', 'CAD', 'RUB', 'CNY']) {
+    assert.match(markup, new RegExp(`value="${code}"`));
+  }
+});

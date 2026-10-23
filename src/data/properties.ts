@@ -158,33 +158,33 @@ export const images: Record<string, GalleryImage> = {
   rawai: {
     src: '/images/rawai-waterfront.webp', width: 1920, height: 1440,
     alt: 'Longtail boats offshore at the Rawai waterfront, viewed from the sand',
-    caption: 'The Rawai waterfront. This is a neighborhood view, not a view from the apartments.',
+    caption: 'Longtail boats on the Rawai waterfront.',
   },
   seafoodMarket: {
     src: '/images/rawai-seafood-market.webp', width: 1200, height: 1200,
     alt: 'Seafood stalls with fish and shellfish at a local Rawai market',
-    caption: 'A market photo from the apartment’s Airbnb gallery.',
+    caption: 'Fresh seafood at the Rawai market.',
   },
   groceries: {
     src: '/images/grocery-produce.webp', width: 1200, height: 800,
-    alt: 'Fresh fruit and produce in a supermarket featured in the listing gallery',
-    caption: 'Everyday shopping, pictured in the listing’s neighborhood gallery.',
+    alt: 'Fresh fruit and vegetables at a local supermarket',
+    caption: 'Fresh produce for your kitchen.',
   },
   cafe: {
     src: '/images/rawai-cafe.webp', width: 1200, height: 1200,
     alt: 'A café exterior with windows facing the Rawai waterfront',
-    caption: 'A neighborhood café pictured in the listing gallery.',
+    caption: 'A coffee stop on the waterfront.',
   },
   bus: {
     src: '/images/rawai-bus-stop.webp', width: 1200, height: 900,
     alt: 'A Phuket Smart Bus stopped beside a bus-stop sign in Rawai',
-    caption: 'Check the operator’s current route and timetable before travel.',
+    caption: 'The Phuket Smart Bus at Rawai.',
   },
 };
 
 const sharedAmenities = [
   'Kitchen with electric hob', 'Refrigerator and microwave', 'Kettle and toaster',
-  'Dedicated workspace', 'Wi-Fi and Ethernet', 'Air conditioning in both rooms',
+  'Dedicated workspace', '100 Mbps Wi-Fi & Ethernet', 'Air conditioning in both rooms',
   'Smart TV', 'Washing machine', 'Private balcony', 'Shared swimming pools',
   'Shared gym', 'Sauna and steam room', 'Shared coworking area',
   'Free on-site parking', 'Elevator', 'Local agent welcome',
@@ -192,8 +192,8 @@ const sharedAmenities = [
 
 const singlePractical = [
   { title: 'Sleeping arrangements', description: 'Up to 2 adults and 2 children aged 14 or under. A queen bed in the bedroom and a sofa bed in the living room. Guests aged 15 or older count as adults. Include children’s ages in your request.' },
-  { title: 'A local welcome', description: 'Our local agent meets and greets you and handles the apartment handover. The apartment is on the second floor, with elevator access.' },
-  { title: 'Arrival and departure', description: 'Check-in from 3:00 pm; check-out by 12:00 noon, Phuket time. Early check-in and late check-out can be negotiated, subject to availability, and may cost extra.' },
+  { title: 'A local welcome', description: 'A local agent welcomes you. Second-floor apartment with elevator access.' },
+  { title: 'Arrival and departure', description: 'Check-in from 3 pm; check-out by noon. Early or late arrangements may be available at extra cost.' },
   { title: 'Cleaning and additional guests', description: 'The calculator includes ฿1,500 cleaning per stay. The base rate covers 2 guests; each additional child beyond that count costs ฿300 per night.' },
   { title: 'Refundable deposit and utilities', description: 'Refundable deposit: ฿10,000 per booking up to 30 nights, or ฿20,000 for longer stays. Metered electricity is ฿6/kWh and water ฿55/m³, charged separately from the stay estimate.' },
   { title: 'House rules', description: 'No pets, no smoking. Keep noise low, respect neighbours and follow all condominium rules.' },
@@ -268,7 +268,7 @@ export const properties: Property[] = [
       { title: 'Book both for the same dates', description: 'We confirm availability for the pair before you make plans.' },
     ],
     practical: [
-      { title: 'Two independent homes', description: 'These are adjacent apartments with separate entrances. There is no advertised internal connecting door.' },
+      { title: 'Two independent homes', description: 'These are adjacent apartments with separate entrances. There is no internal connecting door.' },
       { title: 'Plan the sleeping arrangement', description: 'Up to 4 adults and 4 children aged 14 or under across both apartments. Each apartment has a queen bed and sofa bed, with a maximum of 2 adults and 2 children. Include children’s ages in your enquiry.' },
       { title: 'Both calendars matter', description: 'The pair can only be reserved when both apartments are available for your full stay. Send one inquiry for the entire group.' },
       { title: 'Cleaning and additional guests', description: 'The calculator includes ฿3,000 cleaning for both apartments. The base rate covers 4 guests; each additional child beyond that count costs ฿300 per night.' },

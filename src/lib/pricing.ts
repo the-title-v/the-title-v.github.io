@@ -1,4 +1,4 @@
-/** Public reference pricing. Source and limitations: docs/pricing-methodology.md. */
+/** Editable nightly rates and stay policies. Internal notes: docs/pricing-methodology.md. */
 export type PropertyId =
   | 'bright-1br-rawai-beach'
   | 'cozy-1br-rawai-beach'
@@ -7,7 +7,7 @@ export type PropertyId =
 export const PRICING_POLICY = {
   currency: 'THB',
   timeZone: 'Asia/Bangkok',
-  minNights: 2,
+  minNights: 7,
   maxNights: 180,
   maxGuestsPerApartment: 4,
   maxAdultsPerApartment: 2,
@@ -33,6 +33,14 @@ export const SEASONAL_RATES = [
   { id: 'high', name: 'High season', months: [3, 11], nightlyRate: 2000 },
   { id: 'peak', name: 'Peak season', months: [12, 1, 2], nightlyRate: 3300 },
 ] as const;
+
+/** Recurring occupied-night override; both endpoints are included. */
+export const FESTIVE_RATE = {
+  name: 'Festive season',
+  startMonthDay: '12-23',
+  endMonthDay: '01-12',
+  nightlyRate: 4500,
+} as const;
 
 const APARTMENT_COUNTS: Record<PropertyId, number> = {
   'bright-1br-rawai-beach': 1,
@@ -126,6 +134,10 @@ export function resolveOccupancy(propertyId: string, input: Pick<QuoteInput, 'ad
 export function getNightlyRate(date: string, propertyId: string): number {
   const time = dateToTime(date);
   const apartments = apartmentCount(propertyId);
+  const monthDay = date.slice(5);
+  if (monthDay >= FESTIVE_RATE.startMonthDay || monthDay <= FESTIVE_RATE.endMonthDay) {
+    return FESTIVE_RATE.nightlyRate * apartments;
+  }
   const month = new Date(time).getUTCMonth() + 1;
   const season = SEASONAL_RATES.find((entry) => (entry.months as readonly number[]).includes(month));
   if (!season) throw new RangeError('No reference rate is configured for this date.');

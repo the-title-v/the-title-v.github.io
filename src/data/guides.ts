@@ -1,9 +1,17 @@
 import { images, type GalleryImage } from './properties';
-import { localSources } from './location';
+import { localSources, placeMapUrl, residenceLocation } from './location';
 
 export interface GuideSource {
   title: string;
   url: string;
+}
+
+export interface GuideSection {
+  heading: string;
+  paragraphs: string[];
+  bullets?: string[];
+  links?: GuideSource[];
+  table?: { headings: string[]; rows: string[][] };
 }
 
 export interface Guide {
@@ -12,636 +20,524 @@ export interface Guide {
   eyebrow: string;
   summary: string;
   hero: GalleryImage;
+  heroCredit?: { author: string; url: string; license?: string; licenseUrl?: string };
   readTime: string;
-  sections: { heading: string; paragraphs: string[]; bullets?: string[] }[];
+  sections: GuideSection[];
   sources: GuideSource[];
   relatedGuides: string[];
 }
 
+const map = (title: string, query: string): GuideSource => ({ title, url: placeMapUrl(query) });
+const guideLink = (title: string, slug: string): GuideSource => ({ title, url: `/guides/${slug}/` });
 const sources = {
-  bright: { title: 'Bright apartment · public Airbnb listing', url: 'https://www.airbnb.com/rooms/622135535519576635' },
-  cozy: { title: 'Cozy apartment · public Airbnb listing', url: 'https://www.airbnb.com/rooms/922904332708842126' },
-  pair: { title: 'Two adjacent apartments · public Airbnb listing', url: 'https://www.airbnb.com/rooms/926800271304117606' },
-  rawai: { title: 'Phuket Provincial Government · Rawai Beach', url: 'https://www.phuket.go.th/eng/Beaches-Rawai%20Beach.php' },
-  naiHarn: { title: 'Phuket Provincial Government · Nai Harn Beach', url: 'https://www.phuket.go.th/eng/Beaches-Nai%20Harn%20Beach.php' },
-  yaNui: { title: 'Phuket Provincial Government · Ya Nui Beach', url: 'https://www.phuket.go.th/eng/Beaches-Ya%20Nui%20Beach.php' },
-  cape: { title: 'Phuket Provincial Government · Promthep Cape', url: 'https://www.phuket.go.th/eng/Attractions-Capes.php' },
-  airport: { title: 'Airports of Thailand · Phuket airport transport', url: 'https://phuket.airportthai.co.th/service/way-to-airport/detail/97' },
-  bus: { title: 'Phuket Smart Bus · current timetable', url: 'https://phuketsmartbus.com/timetable' },
-  busHome: { title: 'Phuket Smart Bus · routes and live tracking', url: 'https://phuketsmartbus.com/' },
-  weather: { title: 'Thai Meteorological Department · Phuket forecast', url: 'https://www.tmd.go.th/en/weather/province/phuket' },
-  thaiHua: { title: 'Phuket Provincial Government · Thai Hua Museum', url: 'https://www.phuket.go.th/eng/Museums-Phuket%20Thai%20Hua%20Museum.php' },
-  oldTown: { title: 'Tourism Authority of Thailand · Phuket Old Town', url: 'https://www.tourismthailand.org/Articles/stroll-the-historic-roads-in-phuket-old-town' },
-  phuket: { title: 'Tourism Authority of Thailand · Phuket', url: 'https://www.tourismthailand.org/Destinations/Provinces/phuket/350' },
+  bright: { title: 'Bright apartment on Airbnb', url: 'https://www.airbnb.com/rooms/622135535519576635' },
+  cozy: { title: 'Cozy apartment on Airbnb', url: 'https://www.airbnb.com/rooms/922904332708842126' },
+  pair: { title: 'Both apartments on Airbnb', url: 'https://www.airbnb.com/rooms/926800271304117606' },
+  rawai: { title: 'Rawai Beach', url: 'https://www.phuket.go.th/eng/Beaches-Rawai%20Beach.php' },
+  naiHarn: { title: 'Nai Harn Beach', url: 'https://www.phuket.go.th/eng/Beaches-Nai%20Harn%20Beach.php' },
+  yaNui: { title: 'Ya Nui Beach', url: 'https://www.phuket.go.th/eng/Beaches-Ya%20Nui%20Beach.php' },
+  cape: { title: 'Promthep Cape', url: 'https://www.phuket.go.th/eng/Attractions-Capes.php' },
+  airport: { title: 'Phuket Airport transport', url: 'https://phuket.airportthai.co.th/service/way-to-airport/detail/97' },
+  airportTaxi: { title: 'Airport Limousine prices & pickup points', url: 'https://phuketairportlimousine.com/product/limousine-service-phuket-area-dropoff/' },
+  bus: { title: 'Smart Bus timetable', url: 'https://phuketsmartbus.com/timetable/' },
+  busHome: { title: 'Smart Bus stops & live tracking', url: 'https://phuketsmartbus.com/' },
+  townBus: { title: 'Airport Bus 8411 timetable', url: 'https://www.airportbusphuket.com/time-table/' },
+  townBusFare: { title: 'Airport Bus 8411 fares', url: 'https://www.airportbusphuket.com/price-table/' },
+  weather: { title: 'Phuket weather', url: 'https://www.tmd.go.th/en/weather/province/phuket' },
+  thaiHua: { title: 'Thai Hua Museum', url: 'https://www.phuket.go.th/eng/Museums-Phuket%20Thai%20Hua%20Museum.php' },
+  oldTown: { title: 'Phuket Old Town', url: 'https://www.tourismthailand.org/Articles/stroll-the-historic-roads-in-phuket-old-town' },
+  kims: { title: 'Kim’s Rawai branch & photo gallery', url: 'https://www.kimsmassagespa.com/kimsrawaibeach' },
+  kimsMenu: { title: 'Kim’s massage menu · choose Rawai / Kim’s 3', url: 'https://www.kimsmassagespa.com/packages' },
+  park: { title: 'Rawai Park opening hours & events', url: 'https://www.rawaipark.com/' },
+  parkRules: { title: 'Rawai Park age limits & visitor rules', url: 'https://www.rawaipark.com/rules' },
+  isp: { title: 'ISP Nursery & Kindergarten', url: 'https://www.ispkindergarten.com/' },
+  lighthouse: { title: 'Lighthouse International School', url: 'https://lighthousephuket.com/' },
+  lighthouseContacts: { title: 'Lighthouse campus maps & contacts', url: 'https://lighthousephuket.com/contact/' },
+  lighthouseKindergarten: { title: 'Lighthouse kindergartens', url: 'https://kindergartenphuket.com/' },
+  bcis: { title: 'BCIS Phuket', url: 'https://www.bcisphuket.ac.th/' },
+  krungsri: { title: 'Krungsri branch & ATM finder', url: 'https://www.krungsri.com/en/locations' },
+  scbAtms: { title: 'SCB ATM locations', url: 'https://www.scb.co.th/getmedia/7e4e4401-347b-4fdb-a934-010c8fcd5bfd/scb-easy-id-atm-service.pdf' },
+};
+
+const naiHarnPhoto: GalleryImage = {
+  src: '/images/guide-nai-harn.webp', width: 1752, height: 1168,
+  alt: 'Nai Harn’s sandy bay, clear blue water and green headland',
+  caption: 'Nai Harn Beach.',
+};
+const naiHarnCredit = {
+  author: 'Tuderna',
+  url: 'https://commons.wikimedia.org/wiki/File:Nai_Harn_beach_(%E0%B8%AB%E0%B8%B2%E0%B8%94%E0%B9%83%E0%B8%99%E0%B8%AB%E0%B8%B2%E0%B8%99)_-_panoramio.jpg',
+  license: 'CC BY 3.0', licenseUrl: 'https://creativecommons.org/licenses/by/3.0/',
 };
 
 export const guides: Guide[] = [
   {
-    slug: 'rawai-neighborhood-guide',
-    title: 'Find your rhythm in Rawai',
-    eyebrow: 'The neighborhood',
-    summary: 'A waterfront of longtail boats, everyday cafés, and an easy base for exploring Phuket’s south. Here is how to make Rawai feel familiar.',
-    hero: images.rawai,
-    readTime: '4 min read',
+    slug: 'rawai-neighborhood-guide', title: 'Your first days in Rawai', eyebrow: 'The neighborhood',
+    summary: 'Seafood by the water, a stocked fridge and a beach day nearby. Start with the places you’ll use most.',
+    hero: images.rawai, readTime: '2 min read',
     sections: [
       {
         heading: 'Start at the waterfront',
-        paragraphs: [
-          'Rawai is a working waterfront as well as a place to stay. Boats line the shore, restaurants face the sea, and the horizon is dotted with nearby islands. It rewards a slow first walk: notice the entrance you came from, find somewhere for breakfast, and save the location of a useful shop.',
-          'Think of the waterfront as somewhere to wander and eat. For a dedicated beach day, plan a separate outing to Nai Harn or Ya Nui and choose your activities around the conditions that day.',
-        ],
+        paragraphs: ['Rawai is a working waterfront lined with longtail boats and seafood restaurants. Come for a morning walk, lunch by the water or a boat trip to the nearby islands. For swimming, head to Nai Harn or Ya Nui.', 'The Title V is close to the waterfront. Save the residence pin before your first walk so your return is easy.'],
+        links: [{ title: 'The Title V on the map', url: residenceLocation.mapsUrl }, map('Rawai waterfront', 'Rawai Beach Phuket')],
       },
       {
-        heading: 'A base for the southern part of the island',
-        paragraphs: [
-          'Rawai, Nai Harn, Ya Nui, and Promthep Cape give you several different ways to spend an afternoon without building your holiday around long excursions. They are distinct places, so use a current map for the route you actually intend to take. A short line on a map does not tell you about hills, traffic, or walking conditions.',
-          'The Title V apartments sit within a residence near Rawai’s waterfront. The photos of boats and the shoreline show the neighborhood; the apartment balconies look toward the residence and its greenery.',
-        ],
+        heading: 'Coffee, groceries and a first dinner',
+        paragraphs: ['Tops Rawayana at Mixxmall is handy for fruit, drinking water and breakfast supplies. There’s a Starbucks in the same complex. We Café Rawai is another option for coffee, salads and a light lunch.', 'For dinner, try the seafood stalls and restaurants beside Rawai Pier. Nikita’s on the waterfront works well when your group wants a mix of Thai food, seafood and pizza.'],
+        links: [guideLink('Food, cafés & groceries', 'rawai-food-and-markets'), guideLink('Banks, ATMs & exchange', 'rawai-banks-and-atms')],
       },
       {
-        heading: 'Make the first day deliberately small',
-        paragraphs: [
-          'A grocery stop, a meal nearby, and a little time around the residence are enough after a travel day. Unpack properly if you are staying longer. Learning your immediate surroundings before planning island-wide days makes the rest of the week easier.',
-        ],
-        bullets: [
-          'Save the residence entrance and your check-in instructions on your phone.',
-          'Buy a modest first supply of breakfast items and drinking water.',
-          'Pick one outing for tomorrow, with a return journey in mind.',
-          'Leave time to explore the pools and shared spaces when they are open.',
-        ],
-      },
-      {
-        heading: 'Save the practical stops as well',
-        paragraphs: [
-          'Tops and Starbucks at Mixxmall Rawayana make a useful first grocery-and-coffee stop. Money Shop lists a Rawai currency-exchange office at 57/62 Rawai; compare the final amount for the cash you want to exchange and check its current opening hours.',
-          'For cash withdrawals, open a current bank ATM locator or search around Rawai Beach Road, then check the machine’s displayed charge and your own bank’s fees. Save your chosen machine, the residence entrance and the Rawai Smart Bus stop before you need them.',
-        ],
+        heading: 'Keep the first outing close',
+        paragraphs: ['A beach afternoon at Nai Harn and sunset at Promthep Cape make an easy introduction to southern Phuket. Choose one or both depending on your energy after the flight.', 'Save longer drives for another day. There’s plenty nearby for a relaxed start: the residence pools, a massage at Kim’s Rawai branch, or Rawai Park with the children.'],
+        links: [guideLink('Choose a beach', 'nai-harn-and-ya-nui-beaches'), guideLink('Kim’s Massage in Rawai', 'rawai-massage-and-wellness')],
       },
     ],
-    sources: [sources.rawai, sources.naiHarn, sources.yaNui, sources.bright, localSources.mixxmall, localSources.tops, localSources.money, localSources.atm],
+    sources: [sources.rawai, localSources.mixxmall],
     relatedGuides: ['rawai-food-and-markets', 'nai-harn-and-ya-nui-beaches', 'getting-around-south-phuket'],
   },
   {
-    slug: 'nai-harn-and-ya-nui-beaches',
-    title: 'Nai Harn, Ya Nui, and the Rawai waterfront',
-    eyebrow: 'Beach days',
-    summary: 'Three nearby coastal settings with different personalities. Choose a full beach day, a smaller cove, or a walk beside the boats.',
-    hero: images.rawai,
-    readTime: '4 min read',
+    slug: 'nai-harn-and-ya-nui-beaches', title: 'Nai Harn and Ya Nui: choose your beach', eyebrow: 'Beach days',
+    summary: 'A wide sandy bay or a small cove? Both are a short drive from Rawai, and each is worth an unhurried visit.',
+    hero: naiHarnPhoto, heroCredit: naiHarnCredit, readTime: '2 min read',
     sections: [
       {
-        heading: 'Nai Harn for an unhurried beach outing',
-        paragraphs: [
-          'Nai Harn is a sandy bay north of Promthep Cape, with a freshwater lagoon inland. It is a familiar choice for visitors planning time on the sand. Give it its own part of the day instead of rushing between several beaches: arrive, see the conditions, and decide whether the day calls for swimming, sitting in the shade, or simply walking.',
-          'Arrange transport with the return in mind. Bring what you need for several hours, but keep the plan easy to change if the weather or sea does not suit you.',
-        ],
+        heading: 'Nai Harn for a full beach day',
+        paragraphs: ['Nai Harn has a broad sweep of sand between green headlands, with a lake just inland. It’s the natural choice when you want a few hours at the beach rather than a quick stop.', 'Bring water, a towel and sun protection. Go early for a gentler start to the day, or come later when the light softens. A car or taxi keeps the journey from Rawai simple.'],
+        links: [map('Nai Harn Beach on the map', 'Nai Harn Beach Phuket')],
       },
       {
-        heading: 'Ya Nui for a different scale',
-        paragraphs: [
-          'Ya Nui is a small cove between the Windmill viewpoint and Promthep Cape. Its smaller scale gives it a different feel from Nai Harn. It is a good place to consider when you want a shorter stop as part of exploring the southern coast.',
-          'A small bay can still have changing conditions. Check the signs and advice on arrival, and let what you see determine the activity. Equipment rentals and other services should be confirmed locally rather than assumed from an older recommendation.',
-        ],
+        heading: 'Ya Nui for a smaller cove',
+        paragraphs: ['Ya Nui sits between the Windmill viewpoint and Promthep Cape. Its compact bay makes a lovely stop on a drive around the southern coast.', 'On calm days, ask at the beach about snorkeling or kayak rental. Pair it with the viewpoint, then return to Rawai for dinner.'],
+        links: [map('Ya Nui Beach on the map', 'Ya Nui Beach Phuket'), guideLink('Sunset at Promthep Cape', 'promthep-cape-sunset')],
       },
       {
-        heading: 'Rawai for the waterfront atmosphere',
-        paragraphs: [
-          'Rawai’s shore is associated with longtail boats, island departures, and seafood. Use it as a place to enjoy the view and the neighborhood. It is a different setting from a beach day at Nai Harn, even though all three places are part of the same southern Phuket stay.',
-          'An early waterfront walk can fit around breakfast or the beginning of a day out. Keep an eye on the boats and the changing shoreline, then head to the beach you have chosen for a longer stay on the sand.',
-        ],
-      },
-      {
-        heading: 'Make the conditions part of the plan',
-        paragraphs: [
-          'Phuket’s official visitor guidance calls attention to beach warning flags, and the provincial Nai Harn guide warns of strong seasonal currents. Follow flags and local instructions, including a red flag that means you should stay out of the water. A pool afternoon or a shore walk can be a better choice on a rough day.',
-        ],
-        bullets: ['Check the current Phuket forecast before setting out.', 'Pack water, sun protection, and a change of clothes.', 'Keep a dry place for your phone and return-journey details.', 'Choose one main beach and leave room to linger.'],
+        heading: 'Look at the flags first',
+        paragraphs: ['Sea conditions change through the year, and strong currents can reach these bays. A red flag means stay out of the water. Follow the lifeguards’ advice; a walk on the sand or an afternoon by the pool is a good alternative.', 'Rawai itself is best for boats, seafood and a waterfront walk. Make Nai Harn or Ya Nui your swimming outing when conditions are suitable.'],
       },
     ],
-    sources: [sources.naiHarn, sources.yaNui, sources.rawai, sources.phuket, sources.weather],
+    sources: [sources.naiHarn, sources.yaNui, sources.weather],
     relatedGuides: ['promthep-cape-sunset', 'phuket-with-children', 'a-slow-week-in-rawai'],
   },
   {
-    slug: 'long-stays-in-rawai',
-    title: 'Make a longer stay feel like home',
-    eyebrow: 'A week, a month, a little longer',
-    summary: 'The practical details that matter once you stop living out of a suitcase: a real routine, a clear quote, and space for everyday life.',
-    hero: images.brightBalcony,
-    readTime: '4 min read',
+    slug: 'long-stays-in-rawai', title: 'Settle into a longer stay', eyebrow: 'A week or a month',
+    summary: 'A kitchen, a washing machine and a few favorite local stops make everyday life in Rawai easy.',
+    hero: images.brightBalcony, readTime: '2 min read',
     sections: [
       {
-        heading: 'Choose for an ordinary Tuesday',
-        paragraphs: [
-          'For a longer visit, picture a normal day as well as a holiday highlight. Where will you make breakfast, take a call, dry clothes, and put your suitcase? A separate bedroom and living room give the day more shape, while a kitchen and washing machine reduce the small errands that otherwise fill a stay.',
-          'Both apartments have a queen bedroom, sofa bed, kitchen, washer, balcony, and dedicated workspace. Their layouts are similar, so compare the individual photos to choose the interior you prefer.',
-        ],
+        heading: 'Space for everyday life',
+        paragraphs: ['Both apartments have a separate queen bedroom, a living room with a sofa bed, a kitchen, washer, balcony and desk. Unpack, stock a few breakfast essentials and give yourself a day to settle in.', 'Bright and Cozy have similar layouts with different interiors. Look through the photos and choose the one that feels most like home.'],
       },
       {
-        heading: 'Compare the full cost for your dates',
-        paragraphs: [
-          'Send your complete date range, including any flexibility, and ask for one written total. A monthly stay may cross more than one pricing period, so multiplying a nightly starting price is not a reliable quote. Confirm whether extending the stay would depend on another booking.',
-          'Review the electricity and water meter-reading arrangements, cleaning charge, deposit, payment schedule, and cancellation terms in the written quote before making plans around the reservation.',
-        ],
+        heading: 'Know the cost for your whole stay',
+        paragraphs: ['Enter your full dates to see the stay price and any weekly or monthly discount. Cleaning is ฿1,500 per apartment per stay. Electricity is metered at ฿6/kWh and water at ฿55/m³.', 'The refundable deposit is ฿10,000 for stays up to 30 nights and ฿20,000 for 31 nights or more. If you may extend, mention that when booking so we can check the dates.'],
+        links: [{ title: 'Check dates & prices', url: '/stays/' }],
       },
       {
-        heading: 'Build a simple weekly rhythm',
-        paragraphs: [
-          'Start with a few repeatable habits: a grocery day, a preferred breakfast spot, and a beach outing that fits around work or family time. Buy supplies gradually rather than filling every cupboard on the first day. You will quickly learn what you actually enjoy preparing at home.',
-          'The shared gym, pools, and coworking area give you more options within the residence. Check the operating hours when you arrive and plan around the fact that these are shared spaces.',
-        ],
-      },
-      {
-        heading: 'Mention the details that change the fit',
-        paragraphs: [
-          'If your stay involves frequent video calls, a child’s naps, lots of luggage, or two people working at once, tell us before you choose. A longer visit deserves a more specific conversation than a simple guest count.',
-        ],
-        bullets: ['Your preferred arrival and departure dates, plus any flexibility.', 'Who is staying, including the ages of children.', 'Work requirements and the need for a recent connection test.', 'Any equipment, access, or cleaning requirements to confirm in advance.'],
+        heading: 'Build your own routine',
+        paragraphs: ['Use Tops Rawayana for groceries, find a favorite breakfast spot, and keep beach trips for the cooler parts of the day. The shared gym and coworking area give you a change of scene close to home.', 'Working during your stay or coming with children? Tell us your working hours and the children’s ages. We can help with the apartment setup before arrival.'],
+        links: [guideLink('Working from Rawai', 'work-from-phuket'), guideLink('Local schools & kindergartens', 'rawai-schools-and-kindergartens')],
       },
     ],
     sources: [sources.bright, sources.cozy],
-    relatedGuides: ['work-from-phuket', 'rawai-food-and-markets', 'getting-around-south-phuket'],
+    relatedGuides: ['work-from-phuket', 'rawai-food-and-markets', 'rawai-schools-and-kindergartens'],
   },
   {
-    slug: 'work-from-phuket',
-    title: 'Work days, with room for island life',
-    eyebrow: 'Working from Rawai',
-    summary: 'Plan a comfortable place to work, check the connection you need, and give your day a beginning and an end.',
-    hero: images.brightWorkspace,
-    readTime: '4 min read',
+    slug: 'work-from-phuket', title: 'Work from Rawai', eyebrow: 'Work & island life',
+    summary: 'A proper desk, 100 Mbps Wi-Fi and a quieter place to finish the working day.',
+    hero: images.brightWorkspace, readTime: '2 min read',
     sections: [
       {
-        heading: 'Look at the actual workspace',
-        paragraphs: [
-          'A work-friendly stay begins with the place where you will sit each day. Both apartments have a dedicated desk, a chair, Wi-Fi, and an Ethernet connection listed. The individual galleries show the actual desks, so you can assess the surface, chair, and surrounding space before booking.',
-          'If you travel with a monitor, need a particular cable, or plan to work with a second person, mention it in your inquiry. The photographs do not promise office equipment beyond what is visible and confirmed.',
-        ],
+        heading: 'Your desk and connection',
+        paragraphs: ['Each apartment has a dedicated desk, chair, Wi-Fi and Ethernet connection. The gallery shows the workspace in the apartment you’re choosing.', '100 Mbps Wi-Fi. Original speed test: 97.7 Mbps download. Speeds vary; ask for a fresh test if needed. Bring the adapters and cables your own equipment uses.'],
       },
       {
-        heading: 'Match the connection to your work',
-        paragraphs: [
-          'The Airbnb descriptions advertise a 100 Mbit/s connection, and the Cozy amenities display a measured speed of 93 Mbps. These are listing details rather than a guarantee for every device or hour. For important calls or large transfers, ask for a recent test from the apartment you intend to reserve.',
-          'Download essential files before a deadline and consider what backup access you would use if your work cannot tolerate an interruption. Your employer’s requirements may also determine whether a shared network or remote location suits the work you do.',
-        ],
+        heading: 'A change of scene',
+        paragraphs: ['The residence has a shared coworking area as well as your apartment desk. Try it for a quiet work session, then take calls in your own space.', 'If two people often have meetings at the same time, think about the layout before booking. Two adjacent apartments give each household its own desk, bedroom and living room.'],
+        links: [guideLink('Staying in both apartments', 'two-apartments-for-family-and-friends')],
       },
       {
-        heading: 'Give different tasks different spaces',
-        paragraphs: [
-          'The residence has a shared coworking area as another place to sit. It can be useful for a change of scene, but it is not a reserved private office. Check its hours and atmosphere before relying on it for a confidential or time-sensitive call.',
-          'If two people have overlapping meetings, discuss the layout carefully. Sliding doors separate the bedroom and living room, but that is not the same as two soundproof offices. For two households or independent work schedules, the adjacent-apartment option gives you a full home each.',
-        ],
-      },
-      {
-        heading: 'Leave a little space around the working day',
-        paragraphs: [
-          'Pick a dependable breakfast, a realistic lunch break, and a stopping time. Save longer outings for days when your calendar permits them. A pool break or a waterfront walk can fit a quieter day without turning every afternoon into a race across the island.',
-        ],
-        bullets: ['Share your working hours and any essential connection needs.', 'Ask about the specific apartment rather than a general building connection.', 'Bring the adapters and cables your own equipment needs.', 'Plan transport before making a café or beach part of a tight schedule.'],
+        heading: 'Leave room for the rest of the day',
+        paragraphs: ['Thailand stays on UTC+7 throughout the year. Work out your meeting times before choosing a daily routine, especially when your home country changes its clocks.', 'A morning beach visit, lunch at We Café or a walk along Rawai’s waterfront can fit around work without a long drive. Keep one day free for Old Town or a boat outing when the sea is calm.'],
+        links: [guideLink('Cafés & everyday food', 'rawai-food-and-markets'), guideLink('A slow week in Rawai', 'a-slow-week-in-rawai')],
       },
     ],
-    sources: [sources.bright, sources.cozy, sources.pair],
+    sources: [sources.bright, sources.cozy],
     relatedGuides: ['long-stays-in-rawai', 'two-apartments-for-family-and-friends', 'rawai-neighborhood-guide'],
   },
   {
-    slug: 'phuket-with-children',
-    title: 'An easier Rawai stay with children',
-    eyebrow: 'Family time',
-    summary: 'Start with the sleeping arrangement, keep beach days flexible, and make room for the routines that help everyone enjoy the trip.',
-    hero: images.childrensPool,
-    readTime: '4 min read',
+    slug: 'phuket-with-children', title: 'Rawai with children', eyebrow: 'Family time',
+    summary: 'Easy meals, pool time and small outings make a more relaxed family holiday.',
+    hero: images.childrensPool, readTime: '2 min read',
     sections: [
       {
-        heading: 'Plan the sleeping arrangement first',
-        paragraphs: [
-          'Each apartment accommodates up to two adults and two children aged 14 or younger, with one queen bed and a convertible sofa in the living room. Share the children’s ages and your preferred sleeping arrangement when booking.',
-          'The bedroom is separated from the living area by sliding doors. This gives you two zones for the evening, though it is worth considering how much quiet you need around naps or an early bedtime. Ask about any baby equipment before booking; do not assume it is already in the apartment.',
-        ],
+        heading: 'Start with sleeping and meals',
+        paragraphs: ['Each apartment sleeps up to two adults and two children aged 14 or under, with a queen bed and a sofa bed. Tell us the children’s ages when you book and ask ahead if you need baby equipment.', 'The kitchen is useful for familiar breakfasts and snacks, and the washer helps with beach clothes. Tops Rawayana is an easy first stop for supplies.'],
       },
       {
-        heading: 'Keep the useful routines',
-        paragraphs: [
-          'A kitchen helps when breakfast needs to happen early or someone wants a familiar meal. The washing machine and drying rack make it easier to pack for beach clothes without bringing a suitcase for every eventuality. Set aside time on arrival to work out the appliances and where everything belongs.',
-          'Both apartments are on the second floor with elevator access listed. If you are bringing a stroller or need a particular access arrangement, check the route and dimensions that matter to you in advance.',
-        ],
+        heading: 'Pool mornings and a beach afternoon',
+        paragraphs: ['The residence has shared pools, a children’s pool and an outdoor playground. Stay with children around the water and play areas.', 'For a beach trip, try Nai Harn when the sea is calm. Bring shade and water, follow the flags, and leave time to return for a rest. One outing a day is often plenty in the heat.'],
+        links: [guideLink('Nai Harn & Ya Nui', 'nai-harn-and-ya-nui-beaches')],
       },
       {
-        heading: 'Pools are part of the day, not the whole plan',
-        paragraphs: [
-          'The residence has shared pools, including a children’s pool, and a small outdoor playground pictured in the listing gallery. Follow the posted rules and supervise children around the water. A children’s pool should not be taken to mean there is a lifeguard or that children can use it alone.',
-          'Alternate active time with shade, a meal, and a break in the apartment. On beach days, check flags and local instructions before anyone enters the sea.',
-        ],
-      },
-      {
-        heading: 'Make outings easy to shorten',
-        paragraphs: [
-          'One beach or one main outing is often enough for a day with younger children. Arrange the return journey before everyone is tired, and keep an easy dinner option in reserve. The best plan is one you can bring forward, slow down, or finish early.',
-          'Rawai Park is a separate nearby family attraction with play areas and water play. Check its current opening days, admission and age guidance before going. For a relaxed afternoon, combine one outing with a meal and a break at the apartment.',
-        ],
+        heading: 'A few plans beyond the pool',
+        paragraphs: ['Rawai Park has water play, a kids club, playgrounds and a trampoline zone. It’s a useful local change of scene; take swimwear, a towel and socks.', 'For a longer stay, contact local nurseries and schools before arrival. Start with your child’s age, language and dates, then arrange a visit.'],
+        links: [guideLink('Plan a visit to Rawai Park', 'rawai-park-with-children'), guideLink('Schools & kindergartens', 'rawai-schools-and-kindergartens')],
       },
     ],
-    sources: [sources.bright, sources.cozy, sources.pair, sources.phuket, localSources.park],
-    relatedGuides: ['two-apartments-for-family-and-friends', 'nai-harn-and-ya-nui-beaches', 'phuket-airport-to-rawai'],
+    sources: [sources.bright, sources.cozy, sources.park],
+    relatedGuides: ['rawai-park-with-children', 'rawai-schools-and-kindergartens', 'two-apartments-for-family-and-friends'],
   },
   {
-    slug: 'phuket-airport-to-rawai',
-    title: 'Arriving in Rawai, without the rush',
-    eyebrow: 'Getting here',
-    summary: 'Plan the transfer around your arrival time, luggage, and group. Then make the final part of the journey simple.',
-    hero: images.entrance,
-    readTime: '4 min read',
+    slug: 'phuket-airport-to-rawai', title: 'Phuket Airport to Rawai: taxi or bus?', eyebrow: 'Getting here',
+    summary: 'A direct car for an easy arrival, or the ฿100 coastal bus. Here are the fares, pickup points and departures.',
+    hero: images.bus, readTime: '3 min read',
     sections: [
       {
-        heading: 'Use your flight details to choose the transfer',
-        paragraphs: [
-          'Before choosing transport, consider when you land, how many people are traveling, and how much luggage you have. Add time for immigration where relevant, baggage collection, and finding the meeting point. Avoid promising yourself a fixed arrival time at the apartment before those details are known.',
-          'For a late arrival, a family group, or bulky bags, a prearranged car or van can make the last part of the trip simpler. Confirm the full price, luggage capacity, meeting instructions, and what happens if the flight is delayed directly with the provider.',
-        ],
+        heading: 'Taxi: straight to the apartment',
+        paragraphs: ['Phuket Airport Limousine lists Rawai at ฿1,000 for a taxi with up to three passengers, or ฿1,400 for a Fortuner with up to four. Its Fortuner service is listed for 07:00–18:00. Agree the fare and luggage space when booking; request child seats ahead.', 'The operator’s counters are outside Domestic Exit 1 and International Exit 2. A prebooked car is the simplest option with children, several bags or a late arrival. Grab also shows a fare and pickup instructions in the app.'],
+        links: [sources.airportTaxi],
       },
       {
-        heading: 'Consider the coastal bus route',
-        paragraphs: [
-          'Airports of Thailand lists Phuket Smart Bus as an airport transport option serving the west-coast beach route through to Rawai. The operator publishes a current timetable and live tracking. Check those directly before deciding whether the departure time and journey suit your arrival.',
-          'A route to Rawai does not automatically mean a door-to-door ride to the apartment. Identify the stop you plan to use and the final leg to the residence, especially if you are arriving after dark or carrying several bags. Use the current fare and payment information from the operator.',
-        ],
+        heading: 'Smart Bus: ฿100 along the coast',
+        paragraphs: ['The Phuket Smart Bus runs from the Domestic Terminal through Surin, Kamala, Patong, Karon and Kata to Rawai Beach. The fare is ฿100 per person. The published journey takes about 2 hours 10 minutes to 2 hours 40 minutes, before traffic delays.', 'Departures below are from the operator’s timetable checked on 23 October 2026. Open the live tracker before walking to the stop.'],
+        table: {
+          headings: ['Direction', 'Departures'],
+          rows: [
+            ['Airport → Rawai', '08:15; every 30 minutes from 09:00 to 22:00; then 22:40 and 23:30.'],
+            ['Rawai → Airport', '06:45, 07:45, 08:45, 09:45; then 10:20 and 10:45, repeating each hour through 17:45; 18:20, 18:40 and 19:30.'],
+          ],
+        },
+        links: [sources.bus, sources.busHome, map('Rawai Smart Bus stop', 'Phuket Smart Bus Rawai Beach bus stop')],
       },
       {
-        heading: 'Keep the arrival information together',
-        paragraphs: [
-          'Save The Title V (Rawai–Phuket), 555 Wiset Road, Rawai, Phuket 83130, together with the entrance pin and check-in contact sent by the booking team. A local agent meets and greets guests; share flight changes so the meeting can be coordinated. Several residences nearby use The Title name, so keep the V in your destination.',
-        ],
-        bullets: ['Flight number and scheduled arrival date and time.', 'Number of travelers, luggage, and any child-seat requirements.', 'Transfer provider’s meeting instructions and contact.', 'Your confirmed apartment and check-in instructions.'],
+        heading: 'The other airport bus goes to town',
+        paragraphs: ['Airport Bus 8411 costs ฿100 to Phuket Town’s Bus Terminal 1. It does not continue to Rawai, so you’ll need another ride from town. Choose the Smart Bus for a direct coastal route to Rawai.'],
+        links: [sources.townBus, sources.townBusFare],
       },
       {
-        heading: 'Make departure day just as clear',
-        paragraphs: [
-          'Plan the return transfer before your final evening. Check the airline’s recommended airport arrival time and allow for the journey and traffic. If you are using a bus, choose a departure with a comfortable margin and have another option in mind if the service no longer fits your flight.',
-          'Early check-in, late checkout, and luggage arrangements depend on the booking schedule and must be confirmed separately. Let us know what you need before you set the day’s plans.',
-        ],
+        heading: 'Arriving at The Title V',
+        paragraphs: ['Give your driver the full destination: The Title V (Rawai–Phuket), 555 Wiset Road. Our local agent will meet you for the handover. Send your flight details and keep the arrival instructions on your phone.', 'Check-in starts at 15:00. For the return trip, leave plenty of time for traffic as well as your airline’s check-in deadline.'],
+        links: [{ title: 'The Title V directions', url: residenceLocation.directionsUrl }],
       },
     ],
-    sources: [sources.airport, sources.bus, sources.busHome, localSources.titleV],
-    relatedGuides: ['getting-around-south-phuket', 'rawai-neighborhood-guide', 'phuket-with-children'],
+    sources: [sources.airport],
+    relatedGuides: ['getting-around-south-phuket', 'rawai-neighborhood-guide', 'rawai-banks-and-atms'],
   },
   {
-    slug: 'getting-around-south-phuket',
-    title: 'Getting around southern Phuket',
-    eyebrow: 'Local journeys',
-    summary: 'Choose transport for the day you have planned: a waterfront stroll, a coastal bus ride, or a car for a few places together.',
-    hero: images.bus,
-    readTime: '4 min read',
+    slug: 'getting-around-south-phuket', title: 'Getting around southern Phuket', eyebrow: 'Local transport',
+    summary: 'Use a car for flexible days out, a taxi for simple trips, or the coastal bus when you have time.',
+    hero: images.bus, readTime: '2 min read',
     sections: [
       {
-        heading: 'Walk locally, ride to the beach',
-        paragraphs: [
-          'The Rawai waterfront, Tops and Starbucks at Mixxmall, and local meals can fit into a walk from The Title V. Nai Harn, Ya Nui and Promthep Cape are separate outings: a car or arranged ride is usually the more practical plan for those coastal roads.',
-          'Open directions from the residence entrance before leaving. A short distance on a map does not show pavement quality, crossings, heat or hills. In rain, after dark, or with a tired child, a ride may suit even a local errand.',
-        ],
+        heading: 'Taxis and app rides',
+        paragraphs: ['Save The Title V’s map pin and use it as your pickup or return point. For a taxi, agree the price before leaving. In a ride app, check the car size and pickup point before confirming.', 'For sunset viewpoints and beaches, arrange how you’ll get back. With children, book a suitable seat in advance.'],
+        links: [{ title: 'Save The Title V on the map', url: residenceLocation.mapsUrl }],
       },
       {
-        heading: 'Use the bus when its route fits',
-        paragraphs: [
-          'Phuket Smart Bus runs the coastal route from Rawai through Kata, Karon and Patong toward the airport. It is useful when the destination lies on that route and your day has room for stops. It does not serve every southern beach or take you to the apartment door.',
-          'Check both directions before leaving. Save the location of the return stop, the last suitable service, and a backup way home. The bus photograph in the listing is a helpful orientation image, not a current timetable.',
-        ],
+        heading: 'The ฿100 coastal bus',
+        paragraphs: ['Phuket Smart Bus links Rawai with Kata, Karon, Patong, Kamala, Surin and the airport. It’s useful for a leisurely coastal outing, with a flat fare of ฿100.', 'Check the departure and return times before setting out, then use the live tracker. Allow more time than you would for a direct car journey.'],
+        links: [sources.bus, sources.busHome, guideLink('Airport transfers & fares', 'phuket-airport-to-rawai')],
       },
       {
-        heading: 'Compare a driver, a car and a scooter',
-        paragraphs: [
-          'A booked driver is useful for an airport transfer, several stops or a family outing. Agree the total, waiting time, return pickup and child-seat needs. A rental car can make groceries and beach equipment easier during a longer stay; ask the booking team about residence parking.',
-          'Enigma publishes both car and scooter options in Rawai; Anda Rawai is another local motorbike provider to compare. Confirm the vehicle, pickup or delivery, deposit, insurance, licence requirements and damage record directly. For a scooter, bring the appropriate riding experience and check helmet fit; it is not a necessary part of staying in Rawai.',
-        ],
-      },
-      {
-        heading: 'Leave some space in the day',
-        paragraphs: [
-          'Traffic, rain, and the time it takes to gather a group can change a journey. Use live mapping on the day and give a sunset outing or restaurant reservation a little breathing room. Planning one main destination often makes a better afternoon than fitting in every viewpoint.',
-        ],
-        bullets: ['Save the residence entrance before setting out.', 'Confirm the fare or scope of the booking before the ride.', 'Check the return journey while you still have time to choose.', 'Keep transport flexible when the weather changes.'],
+        heading: 'Renting a car or scooter',
+        paragraphs: ['Enigma rents cars and scooters in Rawai; Anda Rawai is another local motorbike option. Compare the total price, deposit, insurance and pickup or delivery arrangements.', 'A car is usually more practical with children or several beach bags. For a scooter, wear a properly fitted helmet and make sure your licence and insurance cover the bike.'],
+        links: [{ title: 'Enigma rentals', url: localSources.rental.url }, { title: 'Anda Rawai rentals', url: localSources.bike.url }],
       },
     ],
-    sources: [sources.airport, sources.bus, sources.busHome, sources.weather, localSources.rental, localSources.bike, localSources.mixxmall],
-    relatedGuides: ['phuket-airport-to-rawai', 'promthep-cape-sunset', 'a-slow-week-in-rawai'],
+    sources: [],
+    relatedGuides: ['phuket-airport-to-rawai', 'nai-harn-and-ya-nui-beaches', 'promthep-cape-sunset'],
   },
   {
-    slug: 'rawai-food-and-markets',
-    title: 'Where to eat, get coffee and buy groceries',
-    eyebrow: 'Everyday Rawai',
-    summary: 'Start with Tops and Starbucks at Mixxmall, add a salad lunch at We Café, then choose a seafood dinner by the water.',
-    hero: images.seafoodMarket,
-    readTime: '4 min read',
+    slug: 'rawai-food-and-markets', title: 'Where to eat, get coffee and buy groceries', eyebrow: 'Everyday favorites',
+    summary: 'A few useful starting points for breakfast, a stocked fridge and dinner by the sea.',
+    hero: images.seafoodMarket, readTime: '2 min read',
     sections: [
       {
-        heading: 'Tops and Starbucks: one useful first stop',
-        paragraphs: [
-          'Mixxmall Rawayana on Rawai Beach Road brings a Tops supermarket and Starbucks together in one stop. It is a useful place to begin after checking in: pick up breakfast ingredients and drinking water, then pause for a familiar coffee.',
-          'Use the Tops Rawayana branch page for its current hours and map. When looking for Starbucks, select Rawayana Mixxmall rather than a branch farther away in Chalong. Both are local walking options from the residence, with the exact route depending on the entrance you use.',
-        ],
+        heading: 'Groceries and morning coffee',
+        paragraphs: ['Tops Rawayana at Mixxmall is a handy supermarket for breakfast ingredients, fruit, drinking water and household supplies. Starbucks is in the same complex, so you can combine coffee with a small grocery run.', 'Keep the first shop simple. The apartments have a hob, microwave and fridge for easy meals at home.'],
+        links: [map('Tops Rawayana', 'Tops Rawayana Phuket'), map('Starbucks at Mixxmall', 'Starbucks Rawayana Mixxmall Rawai Phuket')],
       },
       {
-        heading: 'We Café for lunch, Nikita’s for a mixed group',
-        paragraphs: [
-          'We Café’s Rawai branch is a place to consider for salads and café food when you want a lighter lunch. Its own site has the menu and a link to the correct branch, which helps distinguish it from the Chao Fah and Samkong locations.',
-          'Nikita’s Beach Restaurant offers Thai food, seafood, wood-fired pizza and international dishes beside the water. That breadth makes it a useful option when a group cannot agree on one cuisine. Check the current menu and table availability directly.',
-        ],
+        heading: 'Seafood beside Rawai Pier',
+        paragraphs: ['At Rawai Seafood Market, choose seafood at the stalls and have a nearby restaurant cook it. Agree the ingredient price and the separate cooking charge before buying.', 'Mook Manee is a useful restaurant to start with in the market area. You can also order directly from the restaurant if you prefer a simpler dinner.'],
+        links: [guideLink('How the seafood market works', 'rawai-seafood-market'), map('Mook Manee', 'Mook Manee Rawai Phuket')],
       },
       {
-        heading: 'Seafood at the market and Mook Manee',
-        paragraphs: [
-          'The seafood-market area beside Rawai Pier is a different kind of evening: choose seafood from the stalls and arrange to have it cooked by a nearby restaurant. Confirm the weight, ingredient price and preparation charge before committing.',
-          'Mook Manee is one specific restaurant to explore in this area, with a live-seafood selection described by the MICHELIN Guide. You can also keep the evening simpler by ordering from a restaurant menu. Explain allergies or dietary requirements directly before ordering.',
-        ],
-      },
-      {
-        heading: 'Leave room for meals at home',
-        paragraphs: [
-          'Each kitchen has a refrigerator, electric hob, microwave, kettle, toaster, utensils and dishes. Look through it before a larger shop and buy what suits your normal breakfast or a simple dinner. The dining table is set for two in each apartment.',
-          'Keep a small meal in reserve for a late beach day or a rainy evening. Ask the booking team for a current local suggestion if you have a particular cuisine, budget or arrival time in mind.',
-        ],
+        heading: 'When everyone wants something different',
+        paragraphs: ['Nikita’s on the waterfront serves Thai food, seafood, pizza and other international dishes. It works well for a mixed group after a day out.', 'We Café Rawai is a good option for salads, café food and coffee. Choose the Rawai branch when opening directions.'],
+        links: [map('Nikita’s Beach Restaurant', 'Nikitas Beach Restaurant Rawai Phuket'), map('We Café Rawai', 'WeCafe Rawai Phuket')],
       },
     ],
-    sources: [localSources.tops, localSources.mixxmall, localSources.weCafe, localSources.nikitas, localSources.market, localSources.mookManee, sources.bright],
-    relatedGuides: ['rawai-seafood-market', 'rawai-neighborhood-guide', 'long-stays-in-rawai'],
+    sources: [localSources.tops, localSources.mixxmall, localSources.weCafe, localSources.nikitas],
+    relatedGuides: ['rawai-seafood-market', 'rawai-neighborhood-guide', 'rawai-banks-and-atms'],
   },
   {
-    slug: 'a-slow-week-in-rawai',
-    title: 'A slow week in Rawai',
-    eyebrow: 'A little inspiration',
-    summary: 'An adaptable seven-day outline with a few good outings and plenty of time to enjoy the place you are staying.',
-    hero: images.poolCourtyard,
-    readTime: '4 min read',
+    slug: 'a-slow-week-in-rawai', title: 'A slow week in Rawai', eyebrow: 'Seven easy days',
+    summary: 'A loose plan with beaches, good food and enough room to do very little.',
+    hero: images.poolCourtyard, readTime: '2 min read',
     sections: [
       {
-        heading: 'Days one and two: settle in, then find the sea',
-        paragraphs: [
-          'Keep arrival day for the apartment and the immediate neighborhood. Put your bags away, pick up breakfast supplies, and have a meal without a complicated journey. If the timing suits, take a first walk by Rawai’s boats and waterfront.',
-          'Make the next day your main beach outing. Choose Nai Harn or Ya Nui, check the conditions, and allow the afternoon to unfold. There is no need to visit both just because they appear on the same map. Come home with enough time to shower and enjoy dinner.',
-        ],
+        heading: 'Days 1–2: settle in, then find the beach',
+        paragraphs: ['On arrival, unpack, pick up a few groceries and have dinner nearby. The pools and a short waterfront walk are enough for the first afternoon.', 'Make Nai Harn your first proper outing. Spend a few hours on the sand, come home for a rest, then choose a restaurant along Rawai’s waterfront.'],
+        links: [guideLink('Nai Harn & Ya Nui', 'nai-harn-and-ya-nui-beaches')],
       },
       {
-        heading: 'Days three and four: a wider view and a day close to home',
-        paragraphs: [
-          'Set aside a day for Phuket Old Town if you would like a change from the coast. Walk a few historic streets, take a long lunch, and consider Thai Hua Museum for more context on the island’s Chinese heritage. Check opening times and your transport before setting out.',
-          'Follow the outing with a quieter day: breakfast on the balcony, time at the residence, a grocery top-up, or a book beside the pool when it is open. A free day is useful space for laundry, work, or doing very little.',
-        ],
+        heading: 'Days 3–4: one outing, one quiet day',
+        paragraphs: ['Choose a longtail trip if the sea is calm, or head to Phuket Old Town for a walk and lunch. Keep the following day light: breakfast on the balcony, a swim and a massage at Kim’s Rawai branch.', 'With children, swap the massage for Rawai Park. You don’t need to cross the island to find something new to do.'],
+        links: [guideLink('Longtail trips from Rawai', 'island-trips-from-rawai'), guideLink('Rawai Park', 'rawai-park-with-children')],
       },
       {
-        heading: 'Days five and six: choose one special outing',
-        paragraphs: [
-          'Rawai has boats serving nearby islands. If an island trip appeals, speak to an operator about the route, weather, equipment, inclusions, and cancellation terms before committing. Keep this as a flexible part of the week rather than an essential promise on a particular day.',
-          'Use another afternoon for Promthep Cape and the southern coast. Check the sunset time and conditions, then choose a comfortable place to enjoy the view. Alternatively, return to the beach or café you liked best. Repeating a good day is part of a holiday too.',
-        ],
-      },
-      {
-        heading: 'Day seven: keep the final hours easy',
-        paragraphs: [
-          'Confirm the return transfer, leave time to pack, and choose something close by for the last meal. Avoid making departure day dependent on a boat trip or a long journey across the island. You will enjoy the final morning more when the practical details are already settled.',
-        ],
-        bullets: ['Swap the order around your arrival time and the daily weather.', 'Choose one main outing per day, with open space around it.', 'Keep a beach day and an indoor alternative available.', 'Use this as an outline to adapt, not a timetable to complete.'],
+        heading: 'Days 5–7: the southern coast, then favorites',
+        paragraphs: ['Try Ya Nui and the Windmill viewpoint, finishing with sunset at Promthep Cape. On another evening, take your time over dinner at the seafood market.', 'Leave your final full day open. Revisit your favorite beach, enjoy the residence, or do the outing the weather postponed. Arrange the airport ride before the last evening.'],
+        links: [guideLink('Promthep Cape', 'promthep-cape-sunset'), guideLink('Airport transport', 'phuket-airport-to-rawai')],
       },
     ],
-    sources: [sources.rawai, sources.naiHarn, sources.yaNui, sources.oldTown, sources.thaiHua, sources.cape, sources.weather],
-    relatedGuides: ['promthep-cape-sunset', 'phuket-rainy-day-guide', 'rawai-food-and-markets'],
+    sources: [sources.oldTown],
+    relatedGuides: ['rawai-food-and-markets', 'phuket-rainy-day-guide', 'island-trips-from-rawai'],
   },
   {
-    slug: 'promthep-cape-sunset',
-    title: 'An evening at Promthep Cape',
-    eyebrow: 'Southern horizons',
-    summary: 'Make a little room for the view at Phuket’s southern end, with a flexible plan for getting there and coming home.',
-    hero: images.rawai,
-    readTime: '3 min read',
+    slug: 'promthep-cape-sunset', title: 'Sunset at Promthep Cape', eyebrow: 'The southern coast',
+    summary: 'An open sea horizon and one of Phuket’s classic evening views, close to Rawai.',
+    hero: {
+      src: '/images/guide-promthep.webp', width: 1920, height: 1440,
+      alt: 'Palm trees and the view along the coast from Promthep Cape toward Nai Harn', caption: 'The view along the coast from Promthep Cape.',
+    },
+    heroCredit: { author: 'ADwarf', url: 'https://commons.wikimedia.org/wiki/File:Promthep_Cape_03.jpg', license: 'Public domain', licenseUrl: 'https://commons.wikimedia.org/wiki/File:Promthep_Cape_03.jpg#Licensing' },
+    readTime: '2 min read',
     sections: [
       {
-        heading: 'Give the cape its own moment',
-        paragraphs: [
-          'Promthep Cape is a rocky headland at the southern end of Phuket, known for its sunset views. The provincial visitor guide describes steps leading to the viewpoint and views toward the offshore islands. It is somewhere to arrive with time to look around instead of appearing just as the light changes.',
-          'Start from Rawai with enough space in the afternoon to enjoy the coast. A visit can be as simple as spending time at the main viewpoint, watching the light move across the water, and choosing an easy dinner afterward.',
-        ],
+        heading: 'Arrive before the sun goes down',
+        paragraphs: ['Aim to arrive about 30–45 minutes before sunset. That gives you time to walk up from the parking area and enjoy the changing light without rushing.', 'The main viewpoint looks over the headland and offshore islands. You don’t need to scramble down the cape to enjoy the view. Keep children close around the steps and edges.'],
+        links: [map('Promthep Cape on the map', 'Promthep Cape Phuket')],
       },
       {
-        heading: 'Check the sky, then the time',
-        paragraphs: [
-          'A clear horizon and the day’s clouds affect what you will see. Check the current forecast and sunset time before leaving, and keep expectations open: a dramatic sky, a soft evening, and a cloudy visit can all be different experiences of the same place.',
-          'If conditions are poor, move the outing to another evening instead of forcing it into the schedule. A flexible stay gives you more chances than a single packed afternoon.',
-        ],
+        heading: 'Make an afternoon of the southern coast',
+        paragraphs: ['Ya Nui Beach and the Windmill viewpoint are nearby stops if you want a longer outing. Spend the afternoon at the beach, then continue to the cape as the day cools.', 'Take water and wear shoes you’re comfortable walking in. If rain moves in, save the viewpoint for another evening.'],
+        links: [map('Windmill viewpoint', 'Windmill Viewpoint Phuket'), guideLink('Nai Harn & Ya Nui', 'nai-harn-and-ya-nui-beaches')],
       },
       {
-        heading: 'Choose a comfortable way to visit',
-        paragraphs: [
-          'Arrange the outward and return journey together. If a driver is waiting, agree on the time and meeting point. If you are traveling independently, save the pickup location while there is still daylight and leave room for other visitors doing the same journey.',
-          'Wear footwear suited to steps and stay on the established visitor routes. You do not need to scramble down the headland to enjoy a view. Let the group’s comfort and the light determine when to head back.',
-        ],
-      },
-      {
-        heading: 'Keep the rest of the evening light',
-        paragraphs: [
-          'Pair the visit with an easy dinner rather than a tight reservation across the island. Another option is a late afternoon around Nai Harn or Ya Nui followed by the cape, as long as the group still feels like moving. One pleasant stop is enough if you would rather linger.',
-        ],
+        heading: 'Dinner back in Rawai',
+        paragraphs: ['Agree a pickup place with your driver before wandering off. Sunset draws visitors, so allow a little patience on the way out.', 'Back at the waterfront, choose seafood by the pier or an easy dinner at Nikita’s. The view is the main event; the rest of the evening can stay simple.'],
+        links: [guideLink('Dinner on the waterfront', 'rawai-food-and-markets')],
       },
     ],
-    sources: [sources.cape, sources.yaNui, sources.naiHarn, sources.weather],
-    relatedGuides: ['nai-harn-and-ya-nui-beaches', 'getting-around-south-phuket', 'a-slow-week-in-rawai'],
+    sources: [sources.cape],
+    relatedGuides: ['nai-harn-and-ya-nui-beaches', 'rawai-seafood-market', 'getting-around-south-phuket'],
   },
   {
-    slug: 'phuket-rainy-day-guide',
-    title: 'When the island asks you to slow down',
-    eyebrow: 'Rainy-day plans',
-    summary: 'Keep a second kind of day in mind: a museum, an unhurried lunch, a useful errand, or time at home with the balcony doors in view.',
-    hero: images.cozyLiving,
-    readTime: '4 min read',
+    slug: 'phuket-rainy-day-guide', title: 'A rainy day in Rawai', eyebrow: 'A change of plans',
+    summary: 'Coffee, a massage, a museum or a quiet day at home. Keep a few easy options ready.',
+    hero: images.cozyLiving, readTime: '2 min read',
     sections: [
       {
-        heading: 'Plan from the day’s forecast',
-        paragraphs: [
-          'A weather symbol alone is not a whole day’s plan. Use the Thai Meteorological Department’s Phuket forecast and current warnings to decide what fits. A passing shower and a day of unsettled weather call for different choices, and marine conditions matter separately if you are considering a boat trip.',
-          'Keep beach and island plans movable where possible. Check the operator’s decision and cancellation terms for a booked excursion, and follow local flags and instructions at the shore.',
-        ],
+        heading: 'Stay local',
+        paragraphs: ['Start with coffee and a late breakfast, then book a massage at Kim’s Rawai branch. Mixxmall is useful for groceries and a café stop when you want a small outing close to home.', 'Heavy rain is a good reason to leave the scooter parked and take a car. Save the beach and boat trip for a better weather window.'],
+        links: [guideLink('Kim’s Massage in Rawai', 'rawai-massage-and-wellness'), guideLink('Cafés & groceries', 'rawai-food-and-markets')],
       },
       {
-        heading: 'Give Phuket Town time beyond a photo stop',
-        paragraphs: [
-          'Phuket Old Town offers historic streets, local food, and places to spend time under a roof between walks. Thai Hua Museum on Krabi Road explores Phuket’s Chinese history in a former school building. It provides a different perspective on the island from a week focused entirely on the coast.',
-          'Check current opening hours before traveling, and pair one indoor visit with lunch rather than a long list of stops. Travel conditions still matter on a wet day, so decide whether the outing makes sense before arranging the journey.',
-        ],
+        heading: 'Make a day of Old Town',
+        paragraphs: ['If you feel like going farther, combine Phuket Old Town with Thai Hua Museum and lunch. The museum is a good place to learn about Phuket’s Chinese heritage.', 'Check the museum’s opening hours before the drive. Leave space between stops so you can wait out a shower over coffee.'],
+        links: [map('Thai Hua Museum', 'Phuket Thai Hua Museum'), sources.oldTown],
       },
       {
-        heading: 'Enjoy the apartment you chose',
-        paragraphs: [
-          'A separate living room can be especially welcome when a plan changes. Make a meal, catch up on reading, or use a quiet stretch for work. The desk, kitchen, and washer make a day close to home useful without needing to turn it into a sightseeing project.',
-          'The residence’s shared gym and coworking area may give you another place to spend time during their opening hours. Ask about current access rather than assuming every shared facility is available throughout the day.',
-        ],
-      },
-      {
-        heading: 'Keep an easy alternate plan ready',
-        paragraphs: [
-          'Before the week begins, save one indoor place you would enjoy, one local meal that is easy to reach, and something you like doing at home. This gives you choices when the weather turns without sending you back into a long search for activities.',
-        ],
-        bullets: ['Check weather and marine warnings before deciding on the day.', 'Confirm the opening hours of the indoor place you choose.', 'Allow more flexibility for transport and wet walking routes.', 'Move the beach outing to a better window when you can.'],
+        heading: 'Enjoy the apartment',
+        paragraphs: ['Cook something simple, read on the sofa or catch up with work at the desk. A separate living room and washing machine make a day in useful as well as restful.', 'You can also use the shared gym and coworking area during opening hours. A holiday doesn’t need a full schedule every day.'],
       },
     ],
-    sources: [sources.weather, sources.oldTown, sources.thaiHua, sources.bright, sources.cozy, sources.phuket],
-    relatedGuides: ['a-slow-week-in-rawai', 'rawai-food-and-markets', 'long-stays-in-rawai'],
+    sources: [sources.thaiHua, sources.weather],
+    relatedGuides: ['rawai-massage-and-wellness', 'rawai-food-and-markets', 'long-stays-in-rawai'],
   },
   {
-    slug: 'two-apartments-for-family-and-friends',
-    title: 'Travel together, with a home each',
-    eyebrow: 'Family and friends',
-    summary: 'Two adjacent apartments can make a shared trip feel easier: time together when you want it, and your own space at the end of the day.',
-    hero: images.brightWide,
-    readTime: '4 min read',
+    slug: 'two-apartments-for-family-and-friends', title: 'Travel together, with a home each', eyebrow: 'Family & friends',
+    summary: 'Bright and Cozy are next door to each other: two complete apartments for a shared trip.',
+    hero: images.pairedApartments, readTime: '2 min read',
     sections: [
       {
-        heading: 'Understand the arrangement',
-        paragraphs: [
-          'The combined listing brings together Bright and Cozy, two adjacent one-bedroom apartments at The Title V. Each is 37 m² and has its own bedroom, living area, kitchen, bathroom, and balcony. You are booking two complete homes with separate entrances; an internal connecting door is not advertised.',
-          'This arrangement can suit two couples, friends, or an extended family who want to stay close while keeping their own morning and evening routines. It is worth comparing both galleries so everyone understands the rooms they will use.',
-        ],
+        heading: 'Two homes, side by side',
+        paragraphs: ['Each apartment is 37 m² with its own entrance, queen bedroom, living room, kitchen, bathroom and balcony. Two couples or families can stay close while keeping their own mornings and bedtimes.', 'Each living room has a sofa bed. The maximum is two adults and two children aged 14 or under per apartment, or four adults and four children across both. Guests aged 15 and over count as adults.'],
       },
       {
-        heading: 'Decide who sleeps where',
-        paragraphs: [
-          'Each apartment has one queen bed and one sofa bed, with a maximum of two adults and two children aged 14 or younger. Booking both gives a combined maximum of four adults and four children in that age range. Include every guest and the children’s ages in the inquiry.',
-          'If someone needs privacy for early work, a child has an early bedtime, or a member of the group prefers quieter mornings, allocate the apartments around those routines. Separate bathrooms and kitchens can make those differences much easier to manage.',
-        ],
+        heading: 'Time together and space to retreat',
+        paragraphs: ['Meet at the pools, head to the beach together and share meals out. At the end of the day, each household has its own space. The dining table in each apartment seats two, so plan group dinners at a restaurant.', 'Separate desks and Wi-Fi connections also help when part of the group is working. Compare both galleries before deciding who stays where.'],
+        links: [guideLink('Working from Rawai', 'work-from-phuket')],
       },
       {
-        heading: 'Know where you will spend time together',
-        paragraphs: [
-          'The pools and shared grounds give the group places to meet during the residence’s opening hours. Outings and meals out can be shared, while each household still has somewhere to retreat. Treat the shared facilities as common spaces used by other residents too.',
-          'The dining table in each apartment is set for two. If you imagine all eight guests sitting down to a meal in one apartment, discuss that expectation before booking. Two homes provide flexibility, but they do not create a large combined dining room.',
-        ],
-      },
-      {
-        heading: 'Ask about both apartments in one conversation',
-        paragraphs: [
-          'Send the full group’s dates and guest details in a single inquiry. Both apartments need to be available for the whole stay, including any proposed extension. If different households arrive on different days, include those details so the check-in arrangements can be planned clearly.',
-        ],
-        bullets: ['Confirm that the quote covers both apartments for the full date range.', 'Review the cleaning charge and metered utilities for each apartment.', 'Agree on the deposit, payment, and cancellation arrangements.', 'Share flight or arrival information for each part of the group.'],
+        heading: 'Book the whole group together',
+        paragraphs: ['Send one inquiry with your dates, every guest and the children’s ages. We’ll check both apartments for the full stay.', 'Cleaning for both is ฿3,000 per stay, with electricity and water metered separately. If households arrive on different flights, share both arrival times so our local agent can arrange the handovers.'],
+        links: [{ title: 'See both apartments', url: '/stays/' }],
       },
     ],
-    sources: [sources.pair, sources.bright, sources.cozy],
+    sources: [sources.pair],
     relatedGuides: ['phuket-with-children', 'work-from-phuket', 'a-slow-week-in-rawai'],
   },
   {
-    slug: 'rawai-seafood-market',
-    title: 'A practical evening at Rawai Seafood Market',
-    eyebrow: 'At the waterfront',
-    summary: 'Choose the seafood, agree the cooking, and enjoy dinner near Rawai Pier. Here is how to make the market visit straightforward.',
-    hero: images.seafoodMarket,
-    readTime: '3 min read',
+    slug: 'rawai-seafood-market', title: 'Dinner at Rawai Seafood Market', eyebrow: 'By the pier',
+    summary: 'Choose fresh seafood, have it cooked nearby and settle in for a waterfront dinner.',
+    hero: images.seafoodMarket, readTime: '2 min read',
     sections: [
       {
-        heading: 'Find the market by Rawai Pier',
-        paragraphs: [
-          'Rawai Seafood Market occupies a short strip beside the pier, with seafood stalls and restaurants close together. It is a waterfront outing from The Title V: open the market pin, choose a comfortable walking route, and allow time to look around before you buy.',
-          'The common arrangement is to purchase seafood at a stall and take it to a nearby restaurant for cooking. You can also order directly at a restaurant, which may suit a smaller appetite or a group that wants a simpler evening.',
-        ],
+        heading: 'Choose your seafood',
+        paragraphs: ['The market is beside Rawai Pier, with stalls and restaurants close together. Have a look around before buying; fish, prawns and shellfish are sold by weight.', 'Ask the price, watch the weighing and agree the total. Then take your seafood to a nearby restaurant to cook, or simply order a meal directly from a restaurant.'],
+        links: [map('Rawai Seafood Market on the map', 'Rawai Seafood Market Phuket')],
       },
       {
-        heading: 'Agree two parts of the bill',
-        paragraphs: [
-          'Start with the ingredients. Ask for the price by weight, watch the weighing, and confirm the total for the seafood you choose. Then ask the restaurant what it will charge to prepare it and how that charge is calculated. Drinks, rice, sauces and side dishes may be additional.',
-          'Choose the cooking method before handing over the seafood. A whole fish, prawns and shellfish can lead to very different meals; tell the restaurant how many people are eating and whether you prefer mild or spicy food.',
-        ],
-        bullets: ['Confirm the ingredient total before paying the stall.', 'Agree the restaurant’s cooking charge and any extras.', 'Describe allergies or dietary requirements directly.', 'Keep enough time for the meal rather than scheduling a tight pickup.'],
+        heading: 'Agree the cooking charge',
+        paragraphs: ['The seafood and its preparation are usually two separate bills. Ask how much the restaurant will charge before handing over your purchase, including rice, sauces and side dishes.', 'Tell the restaurant how many people are eating, how spicy you like the food and how you’d like it cooked. Mention any food allergies clearly.'],
       },
       {
-        heading: 'A restaurant to start with: Mook Manee',
-        paragraphs: [
-          'Mook Manee is a named option in the seafood-market area. The MICHELIN Guide describes its live-seafood selection and location beside the market. Use that as a starting point to inspect the menu and ask how your chosen meal would work.',
-          'The recommendation is about the type of experience, not a promise of a particular catch, bill or table. Menus and availability change; confirm everything with the restaurant on the day.',
-        ],
-      },
-      {
-        heading: 'Keep another dinner option in mind',
-        paragraphs: [
-          'If someone in the group does not want seafood, Nikita’s offers a broader mix of Thai and international dishes, including pizza, on the Rawai waterfront. For a salad-focused meal, look at the Rawai branch of We Café.',
-          'After dinner, use the saved Title V entrance pin for the return. A waterfront walk can be pleasant, but choose a ride if the weather, darkness or the group’s energy makes that easier.',
-        ],
+        heading: 'A couple of places to start',
+        paragraphs: ['Mook Manee, beside the market, serves seafood and is listed in the MICHELIN Guide. Look at its menu and seafood selection before deciding what to order.', 'If part of the group would prefer pizza or other dishes, Nikita’s is an easy alternative along the waterfront. Leave time for a walk after dinner.'],
+        links: [map('Mook Manee', 'Mook Manee Rawai Phuket'), map('Nikita’s', 'Nikitas Beach Restaurant Rawai Phuket')],
       },
     ],
-    sources: [localSources.market, localSources.mookManee, localSources.nikitas, localSources.weCafe],
+    sources: [localSources.mookManee, localSources.nikitas],
     relatedGuides: ['rawai-food-and-markets', 'rawai-neighborhood-guide', 'island-trips-from-rawai'],
   },
   {
-    slug: 'island-trips-from-rawai',
-    title: 'A longtail day from Rawai',
-    eyebrow: 'Offshore plans',
-    summary: 'Bon Island and Coral Island are places to explore with a local boat operator. Build the day around the sea, your group and a clear return plan.',
-    hero: images.rawai,
-    readTime: '3 min read',
+    slug: 'island-trips-from-rawai', title: 'A longtail day from Rawai', eyebrow: 'Out on the water',
+    summary: 'Bon Island and Coral Island are close enough for a day out. Choose a calm day and agree the whole trip before leaving.',
+    hero: images.rawai, readTime: '2 min read',
     sections: [
       {
-        heading: 'Bon Island for a nearby island outing',
-        paragraphs: [
-          'The provincial visitor guide identifies chartered longtails from Rawai to Bon Island, also written Koh Bon. It is an option to discuss when you want an island day beginning near your accommodation.',
-          'Ask which beach the boat will use, whether the captain waits, and how you will arrange the return. Confirm food, shade, toilets and other facilities for your visit instead of assuming everything shown in an older photo is available.',
-        ],
+        heading: 'Bon Island for a simple outing',
+        paragraphs: ['Longtails from Rawai can take you to Bon Island, also called Koh Bon. It’s a natural option when you want an island trip starting near the apartment.', 'Ask where the boat lands, whether the captain waits and how the return works. Find out what food, shade and toilets will be available, then pack accordingly.'],
+        links: [map('Bon Island', 'Koh Bon Island Rawai Phuket')],
       },
       {
-        heading: 'Coral Island: choose the beach and activities',
-        paragraphs: [
-          'Coral Island is also called Koh Hey or Koh Hae. Tour operators publish different beach and activity combinations, so the island name alone does not describe the day you are buying. Ask for the specific landing beach and the time available there.',
-          'JC Tour publishes private longtail itineraries for Bon and Coral Island. Its Bon itinerary identifies a Rawai departure; confirm the departure point for the exact package you choose. Other trips advertised on the same website can begin elsewhere in Phuket.',
-        ],
+        heading: 'Coral Island for a longer beach day',
+        paragraphs: ['Coral Island is also called Koh Hey or Koh Hae. Trips use different beaches and offer different activities, so choose the actual itinerary rather than just the island name.', 'JC Tour publishes private longtail trips to Bon and Coral Island. Ask for the departure point of your chosen trip; some Phuket island tours leave from Chalong.'],
+        links: [{ title: 'Private longtail itineraries', url: localSources.charter.url }],
       },
       {
-        heading: 'Get the whole plan in one quote',
-        paragraphs: [
-          'Tell the operator how many adults and children are travelling, the children’s ages, and whether anyone needs help boarding. Confirm the boat’s capacity, transfer to the departure point, landing fees, food and snorkeling equipment before comparing prices.',
-          'Ask about correctly sized life jackets, the captain’s contact, the return pickup and the weather cancellation policy. Keep the agreed plan available on your phone and share it with everyone in the group.',
-        ],
-        bullets: ['Exact departure and landing points.', 'Private or shared boat, capacity and inclusions.', 'Return time, contact and backup arrangements.', 'Weather decision, cancellation and refund terms.'],
-      },
-      {
-        heading: 'Let the conditions choose the day',
-        paragraphs: [
-          'Check the Thai Meteorological Department’s current forecast and marine warnings, then follow the operator’s decision about whether the trip should run. A nearby island still means open-water travel, and yesterday’s conditions do not settle today’s plan.',
-          'Keep a land-based alternative ready: a meal on the Rawai waterfront, a massage appointment or time around the residence. Avoid putting a boat trip on the morning of a flight.',
-        ],
+        heading: 'Before you set off',
+        paragraphs: ['Check the weather and ask the captain about the sea. If it’s rough, choose another day.', 'Agree the full price, return time, landing fees, food and snorkeling equipment. Ask for life jackets that fit everyone, including children. Keep the captain’s contact on your phone and avoid a boat outing on the morning of a flight.'],
+        links: [sources.weather],
       },
     ],
-    sources: [localSources.bon, { title: 'Phuket Provincial Government · Hey / Coral Island', url: 'https://www.phuket.go.th/eng/Is-Hey%20Island.php' }, localSources.charter, sources.weather],
+    sources: [localSources.bon, { title: 'Coral Island', url: 'https://www.phuket.go.th/eng/Is-Hey%20Island.php' }],
     relatedGuides: ['rawai-seafood-market', 'nai-harn-and-ya-nui-beaches', 'phuket-rainy-day-guide'],
   },
   {
-    slug: 'rawai-massage-and-wellness',
-    title: 'Find the right massage in Rawai',
-    eyebrow: 'A quieter afternoon',
-    summary: 'Two local options with published menus, plus a few details that make booking the right treatment easier.',
-    hero: images.gardenWalkway,
+    slug: 'rawai-massage-and-wellness', title: 'A massage at Kim’s in Rawai', eyebrow: 'A quieter afternoon',
+    summary: 'Kim’s has a branch on Rawai Beach Road, handy for a massage followed by dinner on the waterfront.',
+    hero: {
+      src: '/images/guide-kims-rawai.webp', width: 960, height: 640,
+      alt: 'Kim’s 3 Massage & Spa storefront on Rawai Beach Road at dusk', caption: 'Kim’s 3 on Rawai Beach Road.',
+    },
+    heroCredit: {
+      author: 'Kim’s Massage & Spa', url: 'https://www.kimsmassagespa.com/kimsrawaibeach',
+    },
+    readTime: '2 min read',
+    sections: [
+      {
+        heading: 'Choose Kim’s 3 · Rawai Beach',
+        paragraphs: ['Kim’s Massage & Spa has several branches in Phuket. The local one is Kim’s 3 at 50/5 Wiset Road, on Rawai Beach Road.', 'Walk in or book ahead, especially for two people together. Use the Rawai branch gallery and menu below to see the rooms and choose a treatment.'],
+        links: [map('Kim’s 3 Rawai on the map', "Kim's Massage Spa 3 50/5 Wiset Road Rawai Phuket"), sources.kims],
+      },
+      {
+        heading: 'Pick the treatment and pressure',
+        paragraphs: ['Kim’s publishes a separate Rawai menu. Choose the treatment and length you want, then ask for the current price when booking.', 'Tell the therapist whether you prefer gentle or firm pressure, and speak up during the session if you want it changed. If you’re booking for two, ask whether you can have appointments at the same time.'],
+        links: [sources.kimsMenu],
+      },
+      {
+        heading: 'Book directly',
+        paragraphs: ['Call the Rawai branch on +66 76 510 510 or use Kim’s WhatsApp on +66 81 979 0021. Include “Kim’s 3 Rawai”, your date, time, treatment and number of people.', 'Leave the rest of the afternoon easy: coffee, a stroll by the boats and dinner on the waterfront are all good companions to a massage.'],
+        links: [{ title: 'Call Kim’s Rawai', url: 'tel:+6676510510' }, { title: 'WhatsApp Kim’s', url: 'https://wa.me/66819790021' }],
+      },
+    ],
+    sources: [],
+    relatedGuides: ['phuket-rainy-day-guide', 'rawai-food-and-markets', 'long-stays-in-rawai'],
+  },
+  {
+    slug: 'rawai-park-with-children', title: 'A family afternoon at Rawai Park', eyebrow: 'Play time',
+    summary: 'Water slides, a kids club and playgrounds close to Rawai’s waterfront. Bring swimwear and socks.',
+    hero: {
+      src: '/images/guide-rawai-park.webp', width: 960, height: 641,
+      alt: 'Colorful slides and water features in Rawai Park’s children’s pool', caption: 'The children’s pool and slides at Rawai Park.',
+    },
+    heroCredit: { author: 'Rawai Park', url: 'https://www.rawaipark.com/' },
+    readTime: '2 min read',
+    sections: [
+      {
+        heading: 'What’s there',
+        paragraphs: ['Rawai Park brings together a children’s pool with slides, an indoor kids club, an outdoor playground, an activities area and a trampoline zone. Love Rawai Café is on site for a break between play sessions.', 'The kids club is for children up to seven; the trampoline zone starts at age four. Stay with your children throughout the visit.'],
+      },
+      {
+        heading: 'When to go and what to bring',
+        paragraphs: ['The park lists opening hours of 10:00–19:00, with Wednesdays closed. Check the park’s page for special events and ask for the ticket price for your children’s ages and chosen zones.', 'Pack swimwear, towels, a change of clothes and socks. The trampoline zone needs non-slip socks. Food and drinks are available on site; outside food and drinks aren’t allowed.'],
+        links: [sources.park, sources.parkRules],
+      },
+      {
+        heading: 'Make it an easy local day',
+        paragraphs: ['The park is at 58/88 Moo 6, Soi Rouyphad. Save the map pin before leaving; the entrance is off the waterfront road.', 'You can spend a few hours playing and return to the apartment for a rest, then have dinner by the sea. For birthday plans or ticket questions, call +66 98 396 5369.'],
+        links: [map('Rawai Park directions', 'Rawai Park 58/88 Soi Rouyphad Phuket'), { title: 'Call Rawai Park', url: 'tel:+66983965369' }],
+      },
+    ],
+    sources: [],
+    relatedGuides: ['phuket-with-children', 'rawai-schools-and-kindergartens', 'rawai-food-and-markets'],
+  },
+  {
+    slug: 'rawai-schools-and-kindergartens', title: 'Schools and kindergartens near Rawai', eyebrow: 'Longer family stays',
+    summary: 'Start with these local options, then arrange a visit and check places for your dates.',
+    hero: {
+      src: '/images/guide-isp-rawai.webp', width: 960, height: 640,
+      alt: 'The ISP Nursery and Kindergarten campus building in Rawai', caption: 'ISP Nursery & Kindergarten in Rawai.',
+    },
+    heroCredit: { author: 'ISP Nursery & Kindergarten', url: 'https://www.ispkindergarten.com/' },
     readTime: '3 min read',
     sections: [
       {
-        heading: 'Nam Phueng for a range of familiar treatments',
-        paragraphs: [
-          'Nam Phueng’s Rawai location publishes Thai, foot, oil and more focused massage choices. Start with the treatment menu and session length, then contact the provider to confirm the appointment and price.',
-          'Specify the Rawai branch when booking, because the business also advertises Chalong. Save the confirmed location and plan a ride if the route does not suit a walk from the waterfront.',
-        ],
+        heading: 'ISP Nursery & Kindergarten · Rawai',
+        paragraphs: ['ISP’s Rawai campus takes children aged two to six and follows the British Early Years Foundation Stage. Its website has the daily schedule, campus photos and 2026–27 fees.', 'This is a useful first option for younger children. Ask about your exact dates, settling-in time, naps and the minimum enrolment period.'],
+        links: [sources.isp, map('ISP Nursery & Kindergarten map', 'ISP Nursery Kindergarten Rawai Phuket')],
       },
       {
-        heading: 'Nua for a dedicated studio at Fisherman Way',
-        paragraphs: [
-          'Nua Thai Massage publishes a detailed menu with Thai, aroma-oil, foot and other treatments at Fisherman Way on Wiset Road. The menu is useful when you want to compare the focus and duration before reserving.',
-          'Fisherman Way is farther north in Rawai, so treat this as a planned ride rather than a quick stroll beside the apartment. Allow time to arrive without rushing and confirm the return transport.',
-        ],
+        heading: 'Lighthouse · Rawai and Chalong',
+        paragraphs: ['Lighthouse offers kindergarten, primary and secondary education. Its primary campus is at 21/1 Soi Salika in Rawai, and its secondary campus is at 95/43 Moo 4, Soi Sanya Yukhunthon.', 'The kindergarten group lists Rawai and Chalong options for ages one to seven. Tell admissions your child’s age so they can direct you to the right campus and explain the Canadian and Cambridge pathways.'],
+        links: [sources.lighthouse, sources.lighthouseKindergarten, sources.lighthouseContacts],
       },
       {
-        heading: 'Book the experience you actually want',
-        paragraphs: [
-          'Tell the provider whether you want gentle pressure or a firmer massage, a full-body treatment or attention to a particular area, and whether two people want appointments at the same time. Ask about the room arrangement if privacy matters to you.',
-          'Confirm the full price, duration, availability and cancellation terms directly. Speak up if the pressure is uncomfortable; the session should reflect your preference, not an assumption based on the menu title.',
-        ],
-        bullets: ['The exact branch and appointment time.', 'Treatment style, duration and preferred pressure.', 'One or two guests, and preferred room arrangement.', 'The current total and cancellation terms.'],
+        heading: 'BCIS Phuket · Chalong',
+        paragraphs: ['BCIS offers British Cambridge and French curricula, from early years through secondary school. Its Chalong address is 28/89 Moo 4.', 'It’s farther from the waterfront than the Rawai options. Try the school run at the time you’d actually travel, and ask about school transport before committing to a daily journey.'],
+        links: [sources.bcis, map('BCIS Phuket map', 'BCIS International School Phuket 28/89 Chalong')],
       },
       {
-        heading: 'Or keep the afternoon at the residence',
-        paragraphs: [
-          'The Title V has shared pools, a sauna and a steam-room area for guests to use under the residence’s rules. They can make an unplanned afternoon feel complete without arranging an outing.',
-          'These are shared condominium facilities. Massage appointments at outside businesses are separate from the apartment stay, and the garden photo above shows the residence rather than either massage provider.',
-        ],
+        heading: 'Ask these questions first',
+        paragraphs: ['Send each school your child’s age, home language, current year group and planned dates. Arrange a visit while classes are running if possible.'],
+        bullets: ['Is there a place for the full stay, and can you join for a week or month?', 'What are the school hours, holidays and settling-in arrangements?', 'What is the total, including registration, meals, uniform and transport?', 'What support is available for a child learning English?'],
       },
     ],
-    sources: [localSources.namPhueng, { title: 'Nam Phueng · current massage menu', url: 'https://www.namphueng.co.th/massagepricelist' }, localSources.nua, sources.bright],
-    relatedGuides: ['phuket-rainy-day-guide', 'rawai-food-and-markets', 'long-stays-in-rawai'],
+    sources: [],
+    relatedGuides: ['long-stays-in-rawai', 'phuket-with-children', 'rawai-park-with-children'],
+  },
+  {
+    slug: 'rawai-banks-and-atms', title: 'Banks, ATMs and cash in Rawai', eyebrow: 'Everyday essentials',
+    summary: 'Named places for a cash withdrawal, bank visit or currency exchange, with map links to save.',
+    hero: {
+      src: '/images/guide-krungsri-rawai.webp', width: 1920, height: 1440,
+      alt: 'Krungsri Bank’s Ban Sai Yuan branch in Rawai', caption: 'Krungsri’s Ban Sai Yuan branch in Rawai, photographed in 2010.',
+    },
+    heroCredit: { author: 'ADwarf', url: 'https://commons.wikimedia.org/wiki/File:Bank_of_Ayudhya_Phuket.jpg', license: 'Public domain', licenseUrl: 'https://commons.wikimedia.org/wiki/File:Bank_of_Ayudhya_Phuket.jpg#Licensing' },
+    readTime: '2 min read',
+    sections: [
+      {
+        heading: 'An ATM near Rawai Beach',
+        paragraphs: ['SCB lists an ATM at Lotus’s Go Fresh, Rawai Beach, store 2038. It’s a specific place to look for cash while you’re near the waterfront.', 'Read the charge on the screen before confirming a withdrawal, and keep a little cash for markets, small shops and transport. Your own bank may charge separately.'],
+        links: [map('SCB ATM · Lotus’s Go Fresh Rawai Beach', "SCB ATM Lotus's Go Fresh Rawai Beach 2038 Phuket")],
+      },
+      {
+        heading: 'Bank branches in Rawai and Chalong',
+        paragraphs: ['Krungsri has a Ban Sai Yuan (Rawai) branch and a Ha Yaek Chalong Phuket branch near Chalong Circle. Choose Rawai for a local errand, or combine Chalong with shopping farther north.', 'Check branch hours before leaving. If you need counter service, call ahead to ask which documents to bring.'],
+        links: [map('Krungsri · Ban Sai Yuan, Rawai', 'Krungsri Bank Ban Sai Yuan Rawai Phuket'), map('Krungsri · Ha Yaek Chalong', 'Krungsri Bank Ha Yaek Chalong Phuket'), sources.krungsri],
+      },
+      {
+        heading: 'Changing cash',
+        paragraphs: ['Money Shop has a Rawai exchange office at 57/62 Rawai. Compare the final baht amount for the currency and notes you’re exchanging, and bring your passport.', 'Make cash errands part of a grocery or coffee stop so you don’t have to plan a separate trip. Keep your return pin for The Title V saved on your phone.'],
+        links: [map('Money Shop Rawai', 'Money Shop 57/62 Rawai Phuket'), { title: 'Money Shop locations', url: localSources.money.url }],
+      },
+    ],
+    sources: [sources.scbAtms],
+    relatedGuides: ['rawai-food-and-markets', 'rawai-neighborhood-guide', 'getting-around-south-phuket'],
   },
 ];
 

@@ -5,9 +5,9 @@ import { calculateQuote, getNightlyRate, PRICING_POLICY } from '../src/lib/prici
 const bright = 'bright-1br-rawai-beach';
 const cozy = 'cozy-1br-rawai-beach';
 const both = 'two-adjacent-apartments-title-v-rawai';
-const summerStay = { propertyId: bright, checkIn: '2027-06-01', checkOut: '2027-06-04' };
+const summerStay = { propertyId: bright, checkIn: '2027-06-01', checkOut: '2027-06-08' };
 
-test('historical reference rates change at the seasonal boundaries', () => {
+test('base rates change at the seasonal boundaries', () => {
   assert.equal(getNightlyRate('2027-02-28', bright), 3300);
   assert.equal(getNightlyRate('2027-03-01', bright), 2000);
   assert.equal(getNightlyRate('2027-04-01', bright), 1300);
@@ -18,33 +18,62 @@ test('historical reference rates change at the seasonal boundaries', () => {
   assert.equal(getNightlyRate('2027-12-01', bright), 3300);
 });
 
-test('both apartments share pooled reference rates and the bundle sums them', () => {
-  assert.equal(getNightlyRate('2027-01-10', cozy), 3300);
-  assert.equal(getNightlyRate('2027-01-10', both), 6600);
+test('both apartments share seasonal rates and the bundle sums them', () => {
+  assert.equal(getNightlyRate('2027-01-13', cozy), 3300);
+  assert.equal(getNightlyRate('2027-01-13', both), 6600);
+});
+
+test('the festive rate overrides peak season from December 23 through January 12 every year', () => {
+  for (const year of [2026, 2027, 2028]) {
+    assert.equal(getNightlyRate(`${year}-12-22`, bright), 3300);
+    assert.equal(getNightlyRate(`${year}-12-23`, bright), 4500);
+    assert.equal(getNightlyRate(`${year}-12-31`, bright), 4500);
+    assert.equal(getNightlyRate(`${year + 1}-01-01`, cozy), 4500);
+    assert.equal(getNightlyRate(`${year + 1}-01-12`, bright), 4500);
+    assert.equal(getNightlyRate(`${year + 1}-01-13`, bright), 3300);
+    assert.equal(getNightlyRate(`${year + 1}-01-12`, both), 9000);
+  }
+});
+
+test('a festive boundary quote charges occupied nights and excludes checkout from the override', () => {
+  const before = calculateQuote({ propertyId: bright, checkIn: '2026-12-16', checkOut: '2026-12-23' });
+  const through = calculateQuote({ propertyId: bright, checkIn: '2027-01-10', checkOut: '2027-01-17' });
+  assert.equal(before.baseTotal, 7 * 3300);
+  assert.equal(through.baseTotal, 3 * 4500 + 4 * 3300);
+  assert.equal(through.accommodationTotal, 24030);
 });
 
 test('a cross-season quote prices each occupied night and excludes checkout', () => {
-  const quote = calculateQuote({ propertyId: bright, checkIn: '2026-11-29', checkOut: '2026-12-03', guests: 2 });
+  const quote = calculateQuote({ propertyId: bright, checkIn: '2026-11-29', checkOut: '2026-12-06', guests: 2 });
   assert.equal(quote.currency, 'THB');
-  assert.equal(quote.nights, 4);
-  assert.equal(quote.baseTotal, 10600);
-  assert.equal(quote.discountRate, 0);
-  assert.equal(quote.discountTotal, 0);
-  assert.equal(quote.accommodationTotal, 10600);
-  assert.equal(quote.total, 12100);
+  assert.equal(quote.nights, 7);
+  assert.equal(quote.baseTotal, 20500);
+  assert.equal(quote.discountRate, 0.1);
+  assert.equal(quote.discountTotal, 2050);
+  assert.equal(quote.accommodationTotal, 18450);
+  assert.equal(quote.total, 19950);
   assert.deepEqual(quote.nightly, [
     { date: '2026-11-29', rate: 2000 },
     { date: '2026-11-30', rate: 2000 },
     { date: '2026-12-01', rate: 3300 },
     { date: '2026-12-02', rate: 3300 },
+    { date: '2026-12-03', rate: 3300 },
+    { date: '2026-12-04', rate: 3300 },
+    { date: '2026-12-05', rate: 3300 },
   ]);
 });
 
-test('weekly discount starts at seven nights and applies only to accommodation', () => {
-  const six = calculateQuote({ ...summerStay, checkOut: '2027-06-07', adults: 2, children: 1 });
+test('the seven-night minimum applies to every accommodation and cannot be bypassed with a quote link', () => {
+  for (const propertyId of [bright, cozy, both]) {
+    for (let nights = 1; nights < 7; nights++) {
+      assert.throws(() => calculateQuote({ ...summerStay, propertyId, checkOut: `2027-06-0${nights + 1}` }), /at least 7 nights/);
+    }
+    assert.equal(calculateQuote({ ...summerStay, propertyId }).nights, 7);
+  }
+});
+
+test('weekly discount at the seven-night minimum applies only to accommodation', () => {
   const seven = calculateQuote({ ...summerStay, checkOut: '2027-06-08', adults: 2, children: 1 });
-  assert.equal(six.discountRate, 0);
-  assert.equal(six.total, 9300);
   assert.equal(seven.baseTotal, 7000);
   assert.equal(seven.discountRate, 0.1);
   assert.equal(seven.discountTotal, 700);
@@ -76,18 +105,18 @@ test('children within the two included guests do not incur a supplement', () => 
   assert.equal(quote.guests, 2);
   assert.equal(quote.extraGuests, 0);
   assert.equal(quote.extraGuestTotal, 0);
-  assert.equal(quote.total, 4500);
+  assert.equal(quote.total, 7800);
 });
 
 test('each child beyond the included guest count adds 300 THB per night', () => {
   const oneExtra = calculateQuote({ ...summerStay, adults: 2, children: 1 });
   const twoExtra = calculateQuote({ ...summerStay, adults: 2, children: 2 });
   assert.equal(oneExtra.extraGuests, 1);
-  assert.equal(oneExtra.extraGuestTotal, 900);
-  assert.equal(oneExtra.total, 5400);
+  assert.equal(oneExtra.extraGuestTotal, 2100);
+  assert.equal(oneExtra.total, 9900);
   assert.equal(twoExtra.extraGuests, 2);
-  assert.equal(twoExtra.extraGuestTotal, 1800);
-  assert.equal(twoExtra.total, 6300);
+  assert.equal(twoExtra.extraGuestTotal, 4200);
+  assert.equal(twoExtra.total, 12000);
 });
 
 test('bundle includes four guests, sums cleaning, and discounts lodging only once', () => {
@@ -119,10 +148,10 @@ test('the refundable deposit changes after 30 nights and is charged per booking'
 });
 
 test('civil-day arithmetic includes leap day without depending on server timezone', () => {
-  const quote = calculateQuote({ propertyId: bright, checkIn: '2028-02-28', checkOut: '2028-03-02' });
-  assert.equal(quote.nights, 3);
-  assert.equal(quote.accommodationTotal, 8600);
-  assert.deepEqual(quote.nightly.map((night) => night.date), ['2028-02-28', '2028-02-29', '2028-03-01']);
+  const quote = calculateQuote({ propertyId: bright, checkIn: '2028-02-28', checkOut: '2028-03-06' });
+  assert.equal(quote.nights, 7);
+  assert.equal(quote.accommodationTotal, 14940);
+  assert.deepEqual(quote.nightly.map((night) => night.date), ['2028-02-28', '2028-02-29', '2028-03-01', '2028-03-02', '2028-03-03', '2028-03-04', '2028-03-05']);
 });
 
 test('invalid and non-date input is rejected instead of silently normalized', () => {
@@ -136,9 +165,9 @@ test('checkout must be after check-in and stay length respects website limits', 
   for (const checkOut of ['2027-06-01', '2027-05-31']) {
     assert.throws(() => calculateQuote({ ...summerStay, checkOut }), /after/i);
   }
-  assert.equal(PRICING_POLICY.minNights, 2);
+  assert.equal(PRICING_POLICY.minNights, 7);
   assert.equal(PRICING_POLICY.maxNights, 180);
-  assert.throws(() => calculateQuote({ ...summerStay, checkOut: '2027-06-02' }), /2 nights/i);
+  assert.throws(() => calculateQuote({ ...summerStay, checkOut: '2027-06-02' }), /7 nights/i);
   assert.throws(() => calculateQuote({ propertyId: bright, checkIn: '2027-01-01', checkOut: '2027-07-01' }), /180 nights/i);
 });
 
