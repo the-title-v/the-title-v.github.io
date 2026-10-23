@@ -45,7 +45,7 @@ for (const path of pages) {
 }
 for (const path of files.filter(path => /\.(html|js|json|txt|xml)$/.test(path))) {
   const body = await readFile(path, 'utf8');
-  assert(!/calendar\/ical\/|AIRBNB_ICAL_|Quorvexis|Tynophael/i.test(body), `Private or legacy content leaked: ${path}`);
+  assert(!/calendar\/ical\/|AIRBNB_ICAL_|Quorvexis|Tynophael|\bPRIVATE_IDENTITY_PLACEHOLDER\b|\bPRIVATE_IDENTITY_PLACEHOLDER\b/i.test(body), `Private, owner-name or legacy content leaked: ${path}`);
 }
 const sitemap = await readFile(join(root, 'sitemap.xml'), 'utf8');
 assert.equal((sitemap.match(/<loc>/g) || []).length, pages.length, 'Sitemap must include each indexable HTML page');

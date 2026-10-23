@@ -14,6 +14,9 @@ export interface Property {
   description: string[];
   airbnbUrl: string;
   guests: number;
+  adults: number;
+  children: number;
+  capacityLabel: string;
   bedrooms: number;
   bathrooms: number;
   areaSqm: number;
@@ -28,6 +31,11 @@ export interface Property {
 }
 
 export const images: Record<string, GalleryImage> = {
+  pairedApartments: {
+    src: '/images/two-apartments-combined.webp', width: 1920, height: 1080,
+    alt: 'Two separate apartment interiors side by side: Bright with a cream sofa on the left, Cozy with a gray sofa on the right',
+    caption: 'Bright and Cozy, side by side. Two real apartments with separate entrances.',
+  },
   brightLiving: {
     src: '/images/bright-living-room.webp', width: 1920, height: 1440,
     alt: 'Bright apartment living room with a cream sofa, balcony doors, and a separate bedroom',
@@ -155,7 +163,7 @@ export const images: Record<string, GalleryImage> = {
   seafoodMarket: {
     src: '/images/rawai-seafood-market.webp', width: 1200, height: 1200,
     alt: 'Seafood stalls with fish and shellfish at a local Rawai market',
-    caption: 'A market photo from your host’s Airbnb gallery.',
+    caption: 'A market photo from the apartment’s Airbnb gallery.',
   },
   groceries: {
     src: '/images/grocery-produce.webp', width: 1200, height: 800,
@@ -179,13 +187,16 @@ const sharedAmenities = [
   'Dedicated workspace', 'Wi-Fi and Ethernet', 'Air conditioning in both rooms',
   'Smart TV', 'Washing machine', 'Private balcony', 'Shared swimming pools',
   'Shared gym', 'Sauna and steam room', 'Shared coworking area',
-  'Free on-site parking', 'Elevator', 'Self check-in',
+  'Free on-site parking', 'Elevator', 'Local agent welcome',
 ];
 
 const singlePractical = [
-  { title: 'Sleeping arrangements', description: 'A queen bed in the bedroom and a convertible sofa in the living room. Share your guest count and children’s ages so we can confirm the setup.' },
-  { title: 'Your arrival', description: 'The apartment is on the second floor, with elevator access. Check-in instructions and the arrival contact are shared with your confirmed booking.' },
-  { title: 'Your full quote', description: 'Ask for your dates and length of stay. We will confirm the total, utility allowance, cleaning, deposit, and cancellation terms before you book.' },
+  { title: 'Sleeping arrangements', description: 'Up to 2 adults and 2 children aged 14 or under. A queen bed in the bedroom and a sofa bed in the living room. Guests aged 15 or older count as adults. Include children’s ages in your request.' },
+  { title: 'A local welcome', description: 'Our local agent meets and greets you and handles the apartment handover. The apartment is on the second floor, with elevator access.' },
+  { title: 'Arrival and departure', description: 'Check-in from 3:00 pm; check-out by 12:00 noon, Phuket time. Early check-in and late check-out can be negotiated, subject to availability, and may cost extra.' },
+  { title: 'Cleaning and additional guests', description: 'The calculator includes ฿1,500 cleaning per stay. The base rate covers 2 guests; each additional child beyond that count costs ฿300 per night.' },
+  { title: 'Refundable deposit and utilities', description: 'Refundable deposit: ฿10,000 per booking up to 30 nights, or ฿20,000 for longer stays. Metered electricity is ฿6/kWh and water ฿55/m³, charged separately from the stay estimate.' },
+  { title: 'House rules', description: 'No pets, no smoking. Keep noise low, respect neighbours and follow all condominium rules.' },
   { title: 'Around the residence', description: 'Pools, gym, sauna, and coworking are shared facilities. Opening hours and access follow the residence’s rules.' },
 ];
 
@@ -200,7 +211,7 @@ export const properties: Property[] = [
       'Make breakfast in the kitchen, open your laptop at the desk, or take your coffee outside. A washing machine and air conditioning in both rooms make everyday life simple.',
     ],
     airbnbUrl: 'https://www.airbnb.com/rooms/622135535519576635',
-    guests: 4, bedrooms: 1, bathrooms: 1, areaSqm: 37,
+    guests: 4, adults: 2, children: 2, capacityLabel: '2 adults + 2 children (up to 14)', bedrooms: 1, bathrooms: 1, areaSqm: 37,
     beds: ['1 queen bed', '1 sofa bed'], floor: 'Second floor · elevator access',
     hero: images.brightLiving,
     gallery: [images.brightLiving, images.brightBedroom, images.brightKitchen, images.brightBathroom, images.brightBalcony, images.brightWorkspace, images.centralPool, images.coworking, images.gym],
@@ -223,7 +234,7 @@ export const properties: Property[] = [
       'There is a kitchen for breakfast at home, a dedicated desk, and a balcony table for a slower start to the day. Keep the evening simple with a meal in, or head out to discover Rawai.',
     ],
     airbnbUrl: 'https://www.airbnb.com/rooms/922904332708842126',
-    guests: 4, bedrooms: 1, bathrooms: 1, areaSqm: 37,
+    guests: 4, adults: 2, children: 2, capacityLabel: '2 adults + 2 children (up to 14)', bedrooms: 1, bathrooms: 1, areaSqm: 37,
     beds: ['1 queen bed', '1 sofa bed'], floor: 'Second floor · elevator access',
     hero: images.cozyLiving,
     gallery: [images.cozyLiving, images.cozyBedroom, images.cozyKitchen, images.cozyBathroom, images.cozyBalcony, images.cozyWorkspace, images.cozyDining, images.cozyLaundry, images.poolSide],
@@ -246,10 +257,10 @@ export const properties: Property[] = [
       'Meet for a pool morning or dinner out, then return to your own space. Each apartment has a queen bed and sofa bed, so tell us who is coming and we will help confirm a comfortable arrangement.',
     ],
     airbnbUrl: 'https://www.airbnb.com/rooms/926800271304117606',
-    guests: 8, bedrooms: 2, bathrooms: 2, areaSqm: 74,
+    guests: 8, adults: 4, children: 4, capacityLabel: '4 adults + 4 children (up to 14)', bedrooms: 2, bathrooms: 2, areaSqm: 74,
     beds: ['2 queen beds', '2 sofa beds'], floor: 'Two adjacent apartments · second floor',
-    hero: images.brightWide,
-    gallery: [images.brightLiving, images.cozyLiving, images.brightBedroom, images.cozyBedroom, images.brightKitchen, images.cozyKitchen, images.brightBalcony, images.cozyBalcony, images.centralPool],
+    hero: images.pairedApartments,
+    gallery: [images.pairedApartments, images.brightLiving, images.cozyLiving, images.brightBedroom, images.cozyBedroom, images.brightKitchen, images.cozyKitchen, images.brightBalcony, images.cozyBalcony, images.centralPool],
     amenities: ['Two separate apartments', 'Two kitchens', 'Two bathrooms', 'Two balconies', ...sharedAmenities],
     highlights: [
       { title: 'A home for each household', description: 'Two complete apartments, each with a separate queen bedroom.' },
@@ -258,9 +269,10 @@ export const properties: Property[] = [
     ],
     practical: [
       { title: 'Two independent homes', description: 'These are adjacent apartments with separate entrances. There is no advertised internal connecting door.' },
-      { title: 'Plan the sleeping arrangement', description: 'The combined listing accommodates up to eight guests across two queen beds and two sofa beds. Please include children’s ages in your inquiry.' },
+      { title: 'Plan the sleeping arrangement', description: 'Up to 4 adults and 4 children aged 14 or under across both apartments. Each apartment has a queen bed and sofa bed, with a maximum of 2 adults and 2 children. Include children’s ages in your enquiry.' },
       { title: 'Both calendars matter', description: 'The pair can only be reserved when both apartments are available for your full stay. Send one inquiry for the entire group.' },
-      { title: 'One clear booking conversation', description: 'Ask for a written quote for both homes, including the utility allowance per apartment, cleaning, deposit, and cancellation terms.' },
+      { title: 'Cleaning and additional guests', description: 'The calculator includes ฿3,000 cleaning for both apartments. The base rate covers 4 guests; each additional child beyond that count costs ฿300 per night.' },
+      ...singlePractical.filter(item => ['A local welcome', 'Arrival and departure', 'Refundable deposit and utilities', 'House rules', 'Around the residence'].includes(item.title)),
     ],
     relatedGuides: ['two-apartments-for-family-and-friends', 'phuket-with-children', 'a-slow-week-in-rawai'],
   },

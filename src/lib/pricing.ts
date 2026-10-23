@@ -10,6 +10,17 @@ export const PRICING_POLICY = {
   minNights: 2,
   maxNights: 180,
   maxGuestsPerApartment: 4,
+  maxAdultsPerApartment: 2,
+  maxChildrenPerApartment: 2,
+  childMaxAge: 14,
+  includedGuestsPerApartment: 2,
+  extraGuestNightlyRate: 300,
+  cleaningPerApartment: 1500,
+  shortStayDeposit: 10000,
+  longStayDeposit: 20000,
+  longStayDepositMinNights: 31,
+  waterPerCubicMeter: 55,
+  electricityPerKwh: 6,
   weeklyMinNights: 7,
   weeklyDiscountRate: 0.1,
   monthlyMinNights: 28,
@@ -34,13 +45,21 @@ export type QuoteInput = {
   propertyId: string;
   checkIn: string;
   checkOut: string;
+  adults?: number;
+  /** Children aged 14 or under. Guests aged 15+ must be counted as adults. */
+  children?: number;
+  /** Legacy guests-only requests count every guest as an adult. */
   guests?: number;
 };
+
+export type Occupancy = { adults: number; children: number; guests: number };
 
 export type Quote = {
   propertyId: PropertyId;
   checkIn: string;
   checkOut: string;
+  adults: number;
+  children: number;
   guests: number;
   currency: 'THB';
   nights: number;
@@ -48,7 +67,14 @@ export type Quote = {
   discountRate: number;
   discountTotal: number;
   discountLabel: 'Weekly stay' | 'Monthly stay' | null;
+  accommodationTotal: number;
+  extraGuests: number;
+  extraGuestTotal: number;
+  cleaningTotal: number;
+  refundableDeposit: number;
+  /** Stay total, excluding the refundable deposit and metered utilities. */
   total: number;
+  totalIncludingDeposit: number;
   nightly: { date: string; rate: number }[];
 };
 
@@ -70,6 +96,32 @@ function apartmentCount(propertyId: string): number {
   return APARTMENT_COUNTS[propertyId as PropertyId];
 }
 
+export function getOccupancyLimits(propertyId: string) {
+  const apartments = apartmentCount(propertyId);
+  return {
+    maxAdults: apartments * PRICING_POLICY.maxAdultsPerApartment,
+    maxChildren: apartments * PRICING_POLICY.maxChildrenPerApartment,
+    includedGuests: apartments * PRICING_POLICY.includedGuestsPerApartment,
+  };
+}
+
+export function resolveOccupancy(propertyId: string, input: Pick<QuoteInput, 'adults' | 'children' | 'guests'>): Occupancy {
+  const { maxAdults, maxChildren } = getOccupancyLimits(propertyId);
+  const adults = input.adults ?? input.guests ?? 2;
+  const children = input.children ?? 0;
+  if (!Number.isInteger(adults) || adults < 1 || adults > maxAdults) {
+    throw new RangeError(`Choose between 1 and ${maxAdults} adults. Guests aged 15 or over count as adults.`);
+  }
+  if (!Number.isInteger(children) || children < 0 || children > maxChildren) {
+    throw new RangeError(`Choose between 0 and ${maxChildren} children aged ${PRICING_POLICY.childMaxAge} or under.`);
+  }
+  const guests = adults + children;
+  if (input.guests !== undefined && input.guests !== guests) {
+    throw new RangeError('The total guest count must match the adults and children.');
+  }
+  return { adults, children, guests };
+}
+
 /** A date is a Bangkok civil date; it is never parsed in the server's local zone. */
 export function getNightlyRate(date: string, propertyId: string): number {
   const time = dateToTime(date);
@@ -80,7 +132,7 @@ export function getNightlyRate(date: string, propertyId: string): number {
   return season.nightlyRate * apartments;
 }
 
-/** Accommodation estimate only. Availability and host confirmation are separate. */
+/** Stay estimate with separate fees and refundable deposit. Availability is checked separately. */
 export function calculateQuote(input: QuoteInput): Quote {
   const apartments = apartmentCount(input.propertyId);
   const start = dateToTime(input.checkIn);
@@ -93,11 +145,7 @@ export function calculateQuote(input: QuoteInput): Quote {
   if (nights > PRICING_POLICY.maxNights) {
     throw new RangeError(`For stays longer than ${PRICING_POLICY.maxNights} nights, contact the host.`);
   }
-  const guests = input.guests ?? 2;
-  const maxGuests = apartments * PRICING_POLICY.maxGuestsPerApartment;
-  if (!Number.isInteger(guests) || guests < 1 || guests > maxGuests) {
-    throw new RangeError(`Choose between 1 and ${maxGuests} guests for this accommodation.`);
-  }
+  const occupancy = resolveOccupancy(input.propertyId, input);
 
   const nightly = Array.from({ length: nights }, (_, index) => {
     const date = new Date(start + index * DAY_MS).toISOString().slice(0, 10);
@@ -108,19 +156,32 @@ export function calculateQuote(input: QuoteInput): Quote {
   const weekly = nights >= PRICING_POLICY.weeklyMinNights;
   const discountRate = monthly ? PRICING_POLICY.monthlyDiscountRate : weekly ? PRICING_POLICY.weeklyDiscountRate : 0;
   const discountTotal = Math.round(baseTotal * discountRate);
+  const accommodationTotal = baseTotal - discountTotal;
+  const extraGuests = Math.max(0, occupancy.guests - apartments * PRICING_POLICY.includedGuestsPerApartment);
+  const extraGuestTotal = extraGuests * PRICING_POLICY.extraGuestNightlyRate * nights;
+  const cleaningTotal = apartments * PRICING_POLICY.cleaningPerApartment;
+  const refundableDeposit = nights >= PRICING_POLICY.longStayDepositMinNights
+    ? PRICING_POLICY.longStayDeposit : PRICING_POLICY.shortStayDeposit;
+  const total = accommodationTotal + extraGuestTotal + cleaningTotal;
 
   return {
     propertyId: input.propertyId as PropertyId,
     checkIn: input.checkIn,
     checkOut: input.checkOut,
-    guests,
+    ...occupancy,
     currency: PRICING_POLICY.currency,
     nights,
     baseTotal,
     discountRate,
     discountTotal,
     discountLabel: monthly ? 'Monthly stay' : weekly ? 'Weekly stay' : null,
-    total: baseTotal - discountTotal,
+    accommodationTotal,
+    extraGuests,
+    extraGuestTotal,
+    cleaningTotal,
+    refundableDeposit,
+    total,
+    totalIncludingDeposit: total + refundableDeposit,
     nightly,
   };
 }

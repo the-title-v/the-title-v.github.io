@@ -4,9 +4,9 @@ import Icon from './Icon.astro';
 interface Props { property: Property; index?: number }
 const { property, index = 0 } = Astro.props;
 ---
-<article class="property-card" data-reveal>
+<article class:list={["property-card", { "paired-card": property.bedrooms > 1 }]} data-reveal>
   <a class="property-photo" href={`/stays/${property.slug}/`}><img src={property.hero.src} width={property.hero.width} height={property.hero.height} alt={property.hero.alt} loading="lazy" /><span class="photo-label">{property.bedrooms === 1 ? 'YOUR OWN ONE-BEDROOM RETREAT' : 'BETTER TOGETHER'}</span><span class="photo-number">0{index + 1}</span></a>
-  <div class="property-meta"><span>{property.guests} guests <b>·</b> {property.bedrooms} bedroom{property.bedrooms > 1 ? 's' : ''} <b>·</b> {property.areaSqm} m²</span><span>THE TITLE V</span></div>
+  <div class="property-meta"><span>{property.capacityLabel} <b>·</b> {property.bedrooms} bedroom{property.bedrooms > 1 ? 's' : ''} <b>·</b> {property.areaSqm} m²</span><span>THE TITLE V</span></div>
   <h3><a href={`/stays/${property.slug}/`}>{property.name}</a></h3>
   <p>{property.summary}</p>
   <a class="text-link" href={`/stays/${property.slug}/`}>Make yourself at home <Icon name="arrow" size={18}/></a>

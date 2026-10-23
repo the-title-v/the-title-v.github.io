@@ -10,3 +10,11 @@
 @media(max-width:380px){.site-header{padding-inline:16px;gap:8px}.site-header .brand>span{font-size:22px}.header-cta{font-size:9px;padding-inline:9px;min-height:44px}.header-cta svg{display:none}.mobile-nav nav{right:-16px;min-width:0;width:min(290px,calc(100vw - 32px))}}
 
 .article-figure{margin:0}.article-figure .article-hero{margin-bottom:0}.article-figure figcaption{font-size:11px;color:var(--muted);margin-top:12px}
+
+.stay-invitation{display:flex;justify-content:space-between;align-items:center;gap:30px;padding:28px 0;border-bottom:1px solid var(--line)}
+.stay-invitation p{margin:0;display:grid;gap:5px;font-size:13px}.stay-invitation p span{font-size:12px;color:var(--muted)}
+.residence-link{margin-top:30px}.home-detail-links{display:flex;flex-wrap:wrap;gap:22px;margin-top:28px}
+.property-meta{flex-wrap:wrap}.paired-card .property-photo{aspect-ratio:16/9}.paired-card .property-photo img{object-fit:contain}
+.paired-hero{margin:0 0 20px}.paired-hero img{aspect-ratio:16/9;object-fit:contain;width:100%;height:auto}.paired-hero figcaption{font-size:12px;color:var(--muted);margin-top:12px}
+.apartment-gallery img.paired-photo{aspect-ratio:16/9;object-fit:contain}.fee-table td:last-child{white-space:normal;min-width:125px}
+@media(max-width:560px){.stay-invitation{align-items:flex-start;flex-direction:column;gap:18px;padding-block:24px}.stay-invitation .button{width:100%}.paired-hero figcaption{font-size:10px}.property-meta>span:last-child{display:none}}
