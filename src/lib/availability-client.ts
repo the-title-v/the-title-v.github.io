@@ -1,10 +1,11 @@
 import { mergeBlockedRanges, type BlockedDateRange } from './calendar';
+import { AVAILABILITY_FRESH_MS, AVAILABILITY_PROPERTIES } from './availability-policy';
 
-export const AVAILABILITY_FRESH_MS = 5 * 60 * 1000;
+export { AVAILABILITY_FRESH_MS, AVAILABILITY_REFRESH_MS } from './availability-policy';
 export const AVAILABILITY_REQUEST_TIMEOUT_MS = 12_000;
 
 export type ClientAvailability = {
-  status: 'live' | 'unavailable';
+  status: 'snapshot' | 'unavailable';
   blocked: BlockedDateRange[];
   checkedAt: string | null;
 };
@@ -18,9 +19,9 @@ type RequestOptions = {
   scheduleTimeout?: (callback: () => void, delayMs: number) => () => void;
 };
 
-/** The server's successful-check time owns the deadline, including cache hits. */
+/** The import's successful-check time owns the deadline, including cache hits. */
 export function availabilityFreshFor(value: ClientAvailability, now = Date.now()): number {
-  if (value.status !== 'live' || typeof value.checkedAt !== 'string') return 0;
+  if (value.status !== 'snapshot' || typeof value.checkedAt !== 'string') return 0;
   const checkedAt = Date.parse(value.checkedAt);
   const age = now - checkedAt;
   if (!Number.isFinite(age) || age < 0 || age >= AVAILABILITY_FRESH_MS) return 0;
@@ -39,7 +40,7 @@ export function unverifiedAvailability(...values: (ClientAvailability | null | u
 function parseResponse(value: unknown): ClientAvailability {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid calendar response');
   const candidate = value as Record<string, unknown>;
-  if (!['live', 'unavailable'].includes(candidate.status as string) || !Array.isArray(candidate.blocked)) {
+  if (!['snapshot', 'unavailable'].includes(candidate.status as string) || !Array.isArray(candidate.blocked)) {
     throw new Error('Invalid calendar response');
   }
   const blocked = mergeBlockedRanges(candidate.blocked.map((range: unknown) => {
@@ -52,9 +53,9 @@ function parseResponse(value: unknown): ClientAvailability {
   if (typeof candidate.checkedAt !== 'string' || !Number.isFinite(Date.parse(candidate.checkedAt))) {
     throw new Error('Invalid calendar timestamp');
   }
-  // The endpoint emits canonical UTC timestamps; reject silently normalized dates.
+  // Snapshots contain canonical UTC timestamps; reject silently normalized dates.
   if (new Date(candidate.checkedAt).toISOString() !== candidate.checkedAt) throw new Error('Invalid calendar timestamp');
-  return { status: 'live', blocked, checkedAt: candidate.checkedAt };
+  return { status: 'snapshot', blocked, checkedAt: candidate.checkedAt };
 }
 
 const cancelledRequest = () => new DOMException('Calendar request was cancelled.', 'AbortError');
@@ -70,6 +71,7 @@ const scheduleTimeout = (callback: () => void, delayMs: number) => {
  */
 export async function requestAvailability(property: string, options: RequestOptions = {}): Promise<ClientAvailability> {
   if (options.signal?.aborted) throw cancelledRequest();
+  if (!(AVAILABILITY_PROPERTIES as readonly string[]).includes(property)) return unverifiedAvailability();
   const fetchAvailability = options.fetch ?? globalThis.fetch;
   const now = options.now ?? Date.now;
   const controller = new AbortController();
@@ -90,7 +92,7 @@ export async function requestAvailability(property: string, options: RequestOpti
   try {
     const value = await Promise.race([
       (async () => {
-        const response = await fetchAvailability(`/api/availability/?property=${encodeURIComponent(property)}`, {
+        const response = await fetchAvailability(`/availability/${property}.json`, {
           signal: controller.signal,
           cache: 'no-store',
         });
@@ -103,7 +105,16 @@ export async function requestAvailability(property: string, options: RequestOpti
       interrupted,
     ]);
     if (options.signal?.aborted) throw cancelledRequest();
-    return availabilityFreshFor(value, now()) > 0 ? value : unverifiedAvailability(options.previous, value);
+    const receivedAt = now();
+    const previous = options.previous;
+    if (value.status === 'snapshot' && previous?.status === 'snapshot' &&
+        availabilityFreshFor(previous, receivedAt) > 0 &&
+        Date.parse(value.checkedAt!) < Date.parse(previous.checkedAt!)) {
+      // CDN/deployment propagation can return an earlier import. Keep the newer
+      // known snapshot and its original expiry instead of reopening blocked nights.
+      return { ...previous, blocked: previous.blocked.map(range => ({ ...range })) };
+    }
+    return availabilityFreshFor(value, receivedAt) > 0 ? value : unverifiedAvailability(previous, value);
   } catch {
     if (options.signal?.aborted) throw cancelledRequest();
     return unverifiedAvailability(options.previous);
