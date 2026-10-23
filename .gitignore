@@ -11,3 +11,6 @@ __pycache__/
 *.pyc
 .DS_Store
 *.log
+# Markdown documentation is private and must stay local.
+*.[mM][dD]
+*.[mM][aA][rR][kK][dD][oO][wW][nN]
