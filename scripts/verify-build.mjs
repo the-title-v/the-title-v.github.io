@@ -3,7 +3,7 @@ import { resolve, join } from 'node:path';
 import assert from 'node:assert/strict';
 import { createPrivateIdentityCheck } from './lib/private-identity.mjs';
 
-const root = resolve('dist');
+const root = resolve(process.env.VERIFY_BUILD_DIR || 'dist');
 const structureOnly = process.argv.includes('--structure-only');
 const checkPrivateIdentity = structureOnly ? () => {} : createPrivateIdentityCheck();
 async function walk(dir) {
