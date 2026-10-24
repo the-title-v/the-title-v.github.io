@@ -1,8 +1,11 @@
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import assert from 'node:assert/strict';
+import { createPrivateIdentityCheck } from './lib/private-identity.mjs';
 
 const root = resolve('dist');
+const structureOnly = process.argv.includes('--structure-only');
+const checkPrivateIdentity = structureOnly ? () => {} : createPrivateIdentityCheck();
 async function walk(dir) {
   const paths = [];
   for (const name of await readdir(dir)) {
@@ -47,7 +50,8 @@ for (const path of pages) {
 }
 for (const path of files) {
   const body = await readFile(path, 'utf8');
-  assert(!/calendar\/ical\/|AIRBNB_ICAL_|\bPRIVATE_IDENTITY_PLACEHOLDER\b|\bPRIVATE_IDENTITY_PLACEHOLDER\b/i.test(body), `Private or owner-name content leaked: ${path}`);
+  assert(!/calendar\/ical\/|AIRBNB_ICAL_/i.test(body), `Private calendar content leaked: ${path}`);
+  checkPrivateIdentity(body, `build file ${path.slice(root.length + 1)}`);
   if (path.endsWith('.html')) {
     const footer = body.match(/<footer\b[^>]*>([\s\S]*?)<\/footer>/)?.[1] || '';
     const footerText = footer.replace(/<[^>]*>/g, ' ');
@@ -73,4 +77,4 @@ const sitemap = await readFile(join(root, 'sitemap.xml'), 'utf8');
 assert.equal((sitemap.match(/<loc>/g) || []).length, pages.length, 'Sitemap must include each indexable HTML page');
 assert.match(await readFile(join(root, 'robots.txt'), 'utf8'), /Sitemap:/);
 assert.match(await readFile(join(root, 'llms.txt'), 'utf8'), /Title V New & Bright/);
-console.log(`Verified ${pages.length} unique indexable pages, ${links} internal links/assets, ${imageCount} images, three calendar snapshots, static-only output, structured data, sitemap, permanent footer marker and public-bundle privacy.`);
+console.log(`Verified ${pages.length} unique indexable pages, ${links} internal links/assets, ${imageCount} images, three calendar snapshots, static-only output, structured data, sitemap, permanent footer marker and ${structureOnly ? 'calendar-data checks' : 'public-bundle privacy'}.`);

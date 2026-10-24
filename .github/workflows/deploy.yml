@@ -19,15 +19,19 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: '22.20.0'
           cache: npm
       - run: npm ci
       - run: npm test
+      # Private matching terms stay local. Full build/history privacy checks
+      # are required locally before publishing; CI checks the public site.
       # Calendar URLs stay on the owner's computer. CI uses unverified fixtures;
       # only locally refreshed, verified dist output is published to gh-pages.
       - run: npm run build
         env:
           SITE_URL: https://the-title-v.github.io
-      - run: npm run verify:build
+      - run: npm run verify:site

@@ -40,7 +40,6 @@ test('the widget communicates arrival and metered utility terms without an owner
   assert.match(markup, /55.*m³/);
   assert.match(markup, /6.*kWh/);
   assert.match(markup, /subject to availability.*extra/i);
-  assert.doesNotMatch(markup, /PRIVATE_IDENTITY_PLACEHOLDER/i);
 });
 
 

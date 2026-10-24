@@ -10,7 +10,9 @@
     "start": "ASTRO_TELEMETRY_DISABLED=1 astro preview --host 127.0.0.1 --port 4322",
     "test": "node --import tsx --test tests/*.test.ts",
     "check": "ASTRO_TELEMETRY_DISABLED=1 astro check",
-    "verify:build": "node scripts/verify-build.mjs",
+    "verify:build": "node --env-file-if-exists=.env.local scripts/verify-build.mjs",
+    "verify:site": "node scripts/verify-build.mjs --structure-only",
+    "verify:privacy": "node --env-file-if-exists=.env.local scripts/verify-privacy.mjs",
     "sync:availability": "node --env-file-if-exists=.env.local --import tsx scripts/sync-availability.ts"
   },
   "dependencies": {

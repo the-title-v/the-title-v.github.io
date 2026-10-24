@@ -18,7 +18,7 @@ test('WhatsApp request keeps the booking essentials in at most five short lines'
   assert.match(text, /2 adults.*1 child.*14 or under/);
   assert.match(text, /Estimate: 9,900 THB.*cleaning.*utilities.*deposit extra/);
   assert.match(text, /Please confirm availability and price/);
-  assert.doesNotMatch(text, /PRIVATE_IDENTITY_PLACEHOLDER|booking confirmed|reserved|due now|before discount|check-in.*15:00|THB\/kWh/i);
+  assert.doesNotMatch(text, /booking confirmed|reserved|due now|before discount|check-in.*15:00|THB\/kWh/i);
 });
 
 test('a combined monthly request uses the stay total without adding the refundable deposit', () => {
