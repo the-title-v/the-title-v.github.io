@@ -3,7 +3,7 @@ import { ArrowUpRight, ArrowLeft, ArrowRight, CalendarDays, Check, Info, LoaderC
 import { calculateQuote, getNightlyRate, getOccupancyLimits, PRICING_POLICY, type Quote } from '../lib/pricing';
 import { isStayAvailable } from '../lib/calendar';
 import CurrencyControls, { CurrencyProvider, useCurrency } from './CurrencyControls';
-import { addDays, bangkokToday, buildWhatsAppRequest, readBookingOccupancy } from '../lib/booking';
+import { addDays, bangkokToday, buildWhatsAppRequest, minimumStayIssue, readBookingOccupancy } from '../lib/booking';
 import { AVAILABILITY_REFRESH_MS, availabilityFreshFor, requestAvailability, unverifiedAvailability, type ClientAvailability as Availability } from '../lib/availability-client';
 
 type Stay = { slug: string; name: string; guests: number; image: string; };
@@ -32,6 +32,7 @@ function BookingCalculator({ stays }: { stays: Stay[] }) {
   const horizon = addDays(today, 365);
   const [month, setMonth] = useState(`${today.slice(0, 7)}-01`);
   const [selecting, setSelecting] = useState<'arrival' | 'departure'>('arrival');
+  const checkInButton = useRef<HTMLButtonElement>(null);
   const stay = stays.find(item => item.slug === property) || stays[0];
   const limits = getOccupancyLimits(property);
   const knownAvailability = calendarState?.property === property ? calendarState.value : null;
@@ -114,6 +115,7 @@ function BookingCalculator({ stays }: { stays: Stay[] }) {
   }, [property, checkIn, checkOut, adults, children, guestLinkError, today, horizon]);
 
   const conflicts = result.quote && availability?.blocked.length ? !isStayAvailable(checkIn, checkOut, availability.blocked) : false;
+  const arrivalIssue = minimumStayIssue(checkIn, horizon, availability?.blocked ?? []);
   const handoff = result.quote && !conflicts && !loading && availability ? buildWhatsAppRequest(stay.name, result.quote, availability.status) : null;
   const guardHandoff = (event: MouseEvent<HTMLAnchorElement>) => {
     // Recheck at activation too: background tabs may defer the expiry timer.
@@ -145,6 +147,12 @@ function BookingCalculator({ stays }: { stays: Stay[] }) {
     if (selectedDate) setMonth(`${selectedDate.slice(0, 7)}-01`);
   };
   const reset = () => { setCheckIn(''); setCheckOut(''); setSelecting('arrival'); };
+  const changeArrival = () => {
+    selectDateField('arrival');
+    setCheckIn('');
+    setCheckOut('');
+    checkInButton.current?.focus();
+  };
 
   function monthView(offset: number) {
     const start = new Date(`${month}T12:00:00Z`); start.setUTCMonth(start.getUTCMonth() + offset);
@@ -181,7 +189,7 @@ function BookingCalculator({ stays }: { stays: Stay[] }) {
       })}</div>
       <div className="booking-step"><span>02</span><h2>Choose your dates</h2></div>
       <div className="booking-dates" role="group" aria-label="Your dates">
-        <button type="button" aria-label="Choose check-in date" aria-pressed={selecting === 'arrival'} onClick={() => selectDateField('arrival')}><span>Check-in</span><strong>{displayDate(checkIn)}</strong><small>From 15:00</small></button>
+        <button ref={checkInButton} type="button" aria-label="Choose check-in date" aria-pressed={selecting === 'arrival'} onClick={() => selectDateField('arrival')}><span>Check-in</span><strong>{displayDate(checkIn)}</strong><small>From 15:00</small></button>
         <button type="button" aria-label="Choose check-out date" aria-pressed={selecting === 'departure'} onClick={() => selectDateField('departure')}><span>Check-out</span><strong>{displayDate(checkOut)}</strong><small>By 12:00</small></button>
       </div>
       <div className="calendar-status" aria-live="polite">{loading ? <><LoaderCircle size={15} className="spin"/> Loading calendar updates…</> : availability?.status === 'snapshot' ? <><span className="status-dot"/> Calendar updated {new Date(availability.checkedAt!).toLocaleString('en-GB', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} · Phuket time</> : <><Info size={15}/> Calendar temporarily unavailable. You can still request dates.</>}</div>
@@ -190,6 +198,9 @@ function BookingCalculator({ stays }: { stays: Stay[] }) {
         <div className="calendar-pair">{monthView(0)}{monthView(1)}</div>
         <div className="calendar-legend"><span><i className="legend-open"/>{availability?.status === 'snapshot' ? 'Open on calendar' : 'Not yet verified'}</span><span><i className="legend-blocked"/>Unavailable</span><span><i className="legend-selected"/>Your dates</span><button onClick={reset}>Clear dates</button></div>
       </div>
+      {arrivalIssue && <div className="booking-error" role="status"><Info size={17}/><div><p>{arrivalIssue === 'blocked'
+        ? `A ${PRICING_POLICY.minNights}-night stay from this check-in overlaps an unavailable night. Choose another check-in date or try another apartment.`
+        : `A ${PRICING_POLICY.minNights}-night stay from this check-in goes beyond the calendar. Choose an earlier check-in date or contact us about later dates.`}</p><button type="button" onClick={changeArrival}>Change check-in</button></div></div>}
       <p className="calendar-explainer">Nightly accommodation in {currency}, before discounts and fees. Calendar data can be delayed; availability is confirmed before booking.</p>
       <div className="booking-step"><span>03</span><h2>Who’s coming?</h2></div>
       <div className="booking-fields booking-guests">

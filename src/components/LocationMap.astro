@@ -22,11 +22,11 @@ const { compact = false } = Astro.props;
   iframe{display:block;width:100%;height:520px;border:0;background:var(--sage)}
   .compact iframe{height:380px}
   .map-caption{display:flex;align-items:center;justify-content:space-between;gap:32px;padding:27px 32px}
-  .map-caption .eyebrow{display:block;margin-bottom:8px;font-size:8px}
+  .map-caption .eyebrow{display:block;margin-bottom:8px;font-size:.75rem}
   h3{font-size:29px;margin-bottom:7px}
-  p{font-size:11px;line-height:1.7;color:var(--muted);margin:0;max-width:450px}
+  p{font-size:.875rem;line-height:1.7;color:var(--muted);margin:0;max-width:450px}
   .map-actions{display:flex;align-items:center;gap:26px;flex-shrink:0}
-  .map-actions .button{font-size:11px;padding:13px 18px;gap:18px}
+  .map-actions .button{font-size:.875rem;padding:13px 18px;gap:18px}
   @media(max-width:900px){.map-caption{align-items:flex-start;flex-direction:column;gap:18px}.map-actions{flex-wrap:wrap}}
-  @media(max-width:600px){iframe{height:400px}.compact iframe{height:320px}.map-caption{padding:23px}.map-actions{gap:18px}.map-actions .text-link{font-size:11px}h3{font-size:26px}}
+  @media(max-width:600px){iframe{height:400px}.compact iframe{height:320px}.map-caption{padding:23px}.map-actions{gap:18px}.map-actions .text-link{font-size:.875rem}h3{font-size:26px}}
 </style>

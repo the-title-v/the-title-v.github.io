@@ -74,3 +74,29 @@ test('Bangkok date and date arithmetic handle midnight and month boundaries', ()
   assert.equal(booking.bangkokToday(new Date('2026-10-22T18:00:00Z')), '2026-10-23');
   assert.equal(booking.addDays('2028-02-28', 2), '2028-03-01');
 });
+
+test('an arrival in a short open gap reports the known blocker before choosing checkout', () => {
+  assert.equal(booking.minimumStayIssue('2026-10-28', '2027-10-23', [
+    { start: '2026-10-30', end: '2026-11-13' },
+  ]), 'blocked');
+});
+
+test('a seven-night stay can check out on the first blocked night', () => {
+  assert.equal(booking.minimumStayIssue('2026-11-13', '2027-10-23', [
+    { start: '2026-11-20', end: '2026-11-30' },
+  ]), null);
+});
+
+test('an arrival near the calendar horizon explains when seven nights cannot fit', () => {
+  assert.equal(booking.minimumStayIssue('2027-10-17', '2027-10-23', []), 'horizon');
+  assert.equal(booking.minimumStayIssue('2027-10-16', '2027-10-23', []), null);
+});
+
+test('an unknown calendar with no known blockers keeps date requests possible', () => {
+  assert.equal(booking.minimumStayIssue('2026-10-28', '2027-10-23', []), null);
+  assert.equal(booking.minimumStayIssue('', '2027-10-23', []), null);
+});
+
+test('an invalid shared arrival date leaves date validation to the quote form', () => {
+  assert.equal(booking.minimumStayIssue('2027-02-31', '2027-10-23', []), null);
+});

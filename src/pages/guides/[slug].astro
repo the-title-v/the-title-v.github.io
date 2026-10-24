@@ -38,7 +38,7 @@ const schema = { '@context': 'https://schema.org', '@type': 'Article', headline:
     <aside>
       <p class="eyebrow">IN THIS GUIDE</p>
       {guide.sections.map((section, index) => <a href={`#part-${index}`}>{section.heading}</a>)}
-      <div style="margin-top:35px"><p class="eyebrow">STAY IN RAWAI</p><p style="font-size:13px;color:var(--muted)">Your own apartment at The Title V.</p><a href="/stays/" class="text-link">Explore the apartments <Icon name="arrow" size={15}/></a></div>
+      <div style="margin-top:35px"><p class="eyebrow">STAY IN RAWAI</p><p style="font-size:1rem;color:var(--muted)">Your own apartment at The Title V.</p><a href="/stays/" class="text-link">Explore the apartments <Icon name="arrow" size={15}/></a></div>
     </aside>
   </section>
   {related.length > 0 && <section class="journal-section section"><div class="container"><p class="eyebrow">KEEP EXPLORING</p><h2>A little more <em>inspiration.</em></h2><div class="guide-grid">{related.slice(0, 3).map(item => <article class="guide-card"><a class="guide-image" href={`/guides/${item.slug}/`}><img src={item.hero.src} width={item.hero.width} height={item.hero.height} alt={item.hero.alt} loading="lazy"/></a><h3><a href={`/guides/${item.slug}/`}>{item.title}</a></h3></article>)}</div></div></section>}
@@ -47,10 +47,10 @@ const schema = { '@context': 'https://schema.org', '@type': 'Article', headline:
   .photo-credit { font-size: .9em; }
   .photo-credit a { text-decoration: underline; text-underline-offset: 3px; }
   .guide-links { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 18px 0 30px; }
-  .guide-links li { padding: 0; margin: 0; font-size: 14px; }
+  .guide-links li { padding: 0; margin: 0; font-size:1rem; }
   .guide-links a { display: inline-flex; align-items: center; gap: 7px; text-decoration: underline; text-underline-offset: 4px; }
   .guide-table-wrap { margin: 24px 0; }
-  .guide-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.6; }
+  .guide-table { width: 100%; border-collapse: collapse; font-size:1rem; line-height: 1.6; }
   .guide-table th, .guide-table td { padding: 16px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
   .guide-table thead th { font-weight: 600; color: var(--forest); }
   .guide-table tbody th { width: 30%; font-weight: 500; }

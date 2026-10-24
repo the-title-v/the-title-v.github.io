@@ -50,7 +50,7 @@ const structured = [
     <header class="site-header">
       <a href="/" class="brand" aria-label="The Title V home"><span>THE TITLE V<span class="brand-dot">.</span></span><small>RAWAI · PHUKET</small></a>
       <nav class="desktop-nav" aria-label="Main navigation">{navigation.map(item => <a href={item.href} aria-current={Astro.url.pathname.startsWith(item.href) ? 'page' : undefined}>{item.label}</a>)}</nav>
-      <a class="button header-cta" href="/book/">Find your stay <Icon name="arrow" size={17} /></a>
+      <a class="button header-cta" href="/book/"><span class="header-cta-full">Find your stay</span><span class="header-cta-compact">Book</span><Icon name="arrow" size={17} /></a>
       <WeatherWidget client:load />
       <details class="mobile-nav"><summary aria-label="Open navigation"><span></span><span></span></summary><nav aria-label="Mobile navigation">{navigation.map(item => <a href={item.href}>{item.label}</a>)}<a href="/book/">Availability & booking</a></nav></details>
     </header>
@@ -67,7 +67,22 @@ const structured = [
         const observer = new IntersectionObserver((entries) => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); } }), { threshold: 0.08 });
         reveal.forEach(el => { el.classList.add('will-reveal'); observer.observe(el); });
       }
-      document.querySelector('.mobile-nav')?.addEventListener('keydown', event => { if ((event as KeyboardEvent).key === 'Escape') (event.currentTarget as HTMLDetailsElement).open = false; });
+      const mobileNav = document.querySelector<HTMLDetailsElement>('.mobile-nav');
+      mobileNav?.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && mobileNav.open) {
+          mobileNav.open = false;
+          mobileNav.querySelector('summary')?.focus();
+        }
+      });
+      document.addEventListener('click', event => {
+        if (mobileNav?.open && !mobileNav.contains(event.target as Node)) mobileNav.open = false;
+      });
+      const header = document.querySelector<HTMLElement>('.site-header');
+      if (header && 'ResizeObserver' in window) {
+        new ResizeObserver(() => {
+          header.style.setProperty('--header-height', `${Math.ceil(header.getBoundingClientRect().height)}px`);
+        }).observe(header);
+      }
     </script>
   </body>
 </html>

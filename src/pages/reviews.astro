@@ -50,7 +50,7 @@ const reviewMonth = (month: string) => new Intl.DateTimeFormat('en-GB', { month:
   .review-intro { padding-bottom: 58px; }
   .review-intro h1 { margin-bottom: 23px; animation: content-arrive .8s ease-out both; }
   .review-intro .lede { margin-bottom: 7px; }
-  .selection-note { color: var(--muted); font-size: 11px; margin: 0; }
+  .selection-note { color: var(--muted); font-size:.875rem; margin: 0; }
   .review-apartments { padding-bottom: 90px; }
   .review-apartment { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); gap: clamp(45px, 7vw, 100px); border-top: 1px solid var(--line); padding-block: 56px 70px; scroll-margin-top: 125px; }
   .review-apartment:last-child { padding-bottom: 0; }
@@ -63,22 +63,22 @@ const reviewMonth = (month: string) => new Intl.DateTimeFormat('en-GB', { month:
   .listing-rating p { margin: 0; line-height: 1; }
   .listing-rating strong { font-family: var(--serif); font-size: 46px; font-weight: 500; letter-spacing: -.025em; }
   .rating-star { font-size: 20px; vertical-align: 5px; margin-right: 5px; }
-  .rating-scale { color: var(--muted); font-size: 13px; }
-  .listing-rating > span { color: var(--muted); text-align: right; font-size: 11px; line-height: 1.7; }
-  .checked-date { font-size: 10px; color: var(--muted); margin: 12px 0 15px; }
-  .apartment-link { font-size: 11px; }
+  .rating-scale { color: var(--muted); font-size:1rem; }
+  .listing-rating > span { color: var(--muted); text-align: right; font-size:.875rem; line-height: 1.7; }
+  .checked-date { font-size:.875rem; color: var(--muted); margin: 12px 0 15px; }
+  .apartment-link { font-size:.875rem; }
   .guest-highlights { padding-top: 5px; }
   .guest-excerpt { margin: 0; padding: 22px 0 26px; border-bottom: 1px solid var(--line); }
   .guest-excerpt:first-child { padding-top: 0; }
-  .excerpt-rating { display: flex; align-items: center; gap: 13px; font-size: 10px; margin-bottom: 12px; }
-  .excerpt-rating > span:first-child { letter-spacing: .18em; font-size: 12px; }
+  .excerpt-rating { display: flex; align-items: center; gap: 13px; font-size:.875rem; margin-bottom: 12px; }
+  .excerpt-rating > span:first-child { letter-spacing: .18em; font-size:1rem; }
   .excerpt-rating > span:last-child { color: var(--muted); }
   .guest-excerpt blockquote { margin: 0 0 16px; }
   .guest-excerpt blockquote p { font-family: var(--serif); font-size: clamp(28px, 2.7vw, 37px); line-height: 1.18; letter-spacing: -.02em; margin: 0; }
-  .guest-excerpt figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px 20px; font-size: 11px; line-height: 1.8; }
+  .guest-excerpt figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px 20px; font-size:.875rem; line-height: 1.8; }
   .guest-excerpt figcaption time, .excerpt-note { color: var(--muted); }
   .guest-excerpt figcaption > span:first-child > span { margin-inline: 6px; }
-  .excerpt-note { font-size: 10px; }
+  .excerpt-note { font-size:.875rem; }
   .all-reviews { margin-top: 25px; }
   @media (min-width: 901px) { .review-apartment:nth-child(2) .apartment-summary { order: 2; } }
   @media (max-width: 900px) {
@@ -88,7 +88,7 @@ const reviewMonth = (month: string) => new Intl.DateTimeFormat('en-GB', { month:
   }
   @media (max-width: 560px) {
     .review-intro { padding-bottom: 35px; }
-    .selection-note { font-size: 10px; max-width: 290px; }
+    .selection-note { font-size:.875rem; max-width: 290px; }
     .review-apartments { padding-bottom: 55px; }
     .review-apartment { scroll-margin-top: 100px; }
     .guest-excerpt blockquote p { font-size: 31px; }

@@ -1,4 +1,5 @@
 import { PRICING_POLICY, resolveOccupancy, type Quote } from './pricing';
+import { isStayAvailable, type BlockedDateRange } from './calendar';
 import { whatsappUrl } from '../data/site';
 
 export function bangkokToday(now = new Date()): string {
@@ -9,6 +10,16 @@ export function addDays(date: string, days: number): string {
   const value = new Date(`${date}T12:00:00Z`);
   value.setUTCDate(value.getUTCDate() + days);
   return value.toISOString().slice(0, 10);
+}
+
+/** Explain impossible minimum stays using known blocks, even if their snapshot is stale. */
+export function minimumStayIssue(checkIn: string, horizon: string, blocked: readonly BlockedDateRange[]): 'blocked' | 'horizon' | null {
+  if (!checkIn) return null;
+  const arrival = Date.parse(`${checkIn}T12:00:00Z`);
+  if (!Number.isFinite(arrival) || new Date(arrival).toISOString().slice(0, 10) !== checkIn) return null;
+  const earliestCheckOut = addDays(checkIn, PRICING_POLICY.minNights);
+  if (earliestCheckOut > horizon) return 'horizon';
+  return isStayAvailable(checkIn, earliestCheckOut, blocked) ? null : 'blocked';
 }
 
 export const formatTHB = (value: number) => `฿${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value)}`;
