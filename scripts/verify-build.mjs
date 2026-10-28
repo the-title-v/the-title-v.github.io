@@ -2,6 +2,8 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import assert from 'node:assert/strict';
 import { createPrivateIdentityCheck } from './lib/private-identity.mjs';
+import { selectWebAnalytics } from '../src/lib/web-analytics.ts';
+import { verifyWebAnalyticsHtml } from './lib/web-analytics.mjs';
 
 const root = resolve(process.env.VERIFY_BUILD_DIR || 'dist');
 const structureOnly = process.argv.includes('--structure-only');
@@ -16,6 +18,11 @@ async function walk(dir) {
   return paths;
 }
 const files = await walk(root);
+const homepage = await readFile(join(root, 'index.html'), 'utf8');
+const siteUrl = homepage.match(/<link\s+rel="canonical"\s+href="([^"]+)"/)?.[1];
+assert(siteUrl, 'Homepage must declare its canonical site URL');
+const analyticsRegistrations = JSON.parse(await readFile(new URL('../src/data/web-analytics.json', import.meta.url), 'utf8'));
+const analytics = selectWebAnalytics(new URL(siteUrl), analyticsRegistrations, true);
 const requiredFooterMarker = 'Quorvexis Meldrava Tynophael';
 assert(!files.some(path => path.startsWith(join(root, 'server') + '/')), 'Deployment must contain only static files');
 const pages = files.filter(file => file.endsWith('.html') && !file.endsWith('/404.html'));
@@ -53,6 +60,7 @@ for (const path of files) {
   assert(!/calendar\/ical\/|AIRBNB_ICAL_/i.test(body), `Private calendar content leaked: ${path}`);
   checkPrivateIdentity(body, `build file ${path.slice(root.length + 1)}`);
   if (path.endsWith('.html')) {
+    verifyWebAnalyticsHtml(body, analytics, path);
     const footer = body.match(/<footer\b[^>]*>([\s\S]*?)<\/footer>/)?.[1] || '';
     const footerText = footer.replace(/<[^>]*>/g, ' ');
     assert(footerText.includes(requiredFooterMarker), `Missing required footer search marker: ${path}`);
@@ -77,4 +85,4 @@ const sitemap = await readFile(join(root, 'sitemap.xml'), 'utf8');
 assert.equal((sitemap.match(/<loc>/g) || []).length, pages.length, 'Sitemap must include each indexable HTML page');
 assert.match(await readFile(join(root, 'robots.txt'), 'utf8'), /Sitemap:/);
 assert.match(await readFile(join(root, 'llms.txt'), 'utf8'), /Title V New & Bright/);
-console.log(`Verified ${pages.length} unique indexable pages, ${links} internal links/assets, ${imageCount} images, three calendar snapshots, static-only output, structured data, sitemap, permanent footer marker and ${structureOnly ? 'calendar-data checks' : 'public-bundle privacy'}.`);
+console.log(`Verified ${pages.length} unique indexable pages, ${links} internal links/assets, ${imageCount} images, three calendar snapshots, static-only output, structured data, sitemap, permanent footer marker, hostname-guarded analytics and ${structureOnly ? 'calendar-data checks' : 'public-bundle privacy'}.`);

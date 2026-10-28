@@ -9,6 +9,7 @@ import '../styles/global.css';
 import { site, navigation, whatsappUrl } from '../data/site';
 import Icon from '../components/Icon.astro';
 import WeatherWidget from '../components/WeatherWidget';
+import WebAnalytics from '../components/WebAnalytics.astro';
 interface Props { title: string; description?: string; image?: string; schema?: object | object[]; noindex?: boolean; }
 const { title, description = site.description, image = '/images/pool-courtyard.webp', schema = [], noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -22,6 +23,7 @@ const structured = [
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <WebAnalytics />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#234a3e" />
     <title>{fullTitle}</title>

@@ -42,6 +42,7 @@ export const informationPages = [
     intro: 'Browse freely. You choose when to contact us.',
     sections: [
       { heading: 'Booking selections', paragraphs: ['Your apartment, dates and guest counts are processed in your browser and may appear in the page URL. The website does not ask for an account or card details. Public calendar files show blocked dates and update times. Guest details and private calendar links are never published.'] },
+      { heading: 'Website analytics', paragraphs: ['We use Cloudflare Web Analytics to understand visits and page views, referring websites, approximate countries and device types, and page performance. It does not use analytics cookies.'] },
       { heading: 'Weather, currency & maps', paragraphs: ['Weather loads from MET Norway, exchange rates from ExchangeRate-API, and maps from Google Maps or OpenStreetMap. These services receive your IP address and normal browser request details. Weather requests use Rawai’s location, not your device location.', 'Your browser may cache weather and currency data and remember your selected currency. You can clear these through your browser settings.'] },
       { heading: 'Contacting us', paragraphs: ['The booking button opens a prepared WhatsApp message. You decide whether to send it. WhatsApp and other linked services apply their own privacy policies.', 'For privacy questions, contact our booking team on WhatsApp.'] },
     ], cta: 'Contact the booking team', ctaUrl: 'https://wa.me/79139098949',

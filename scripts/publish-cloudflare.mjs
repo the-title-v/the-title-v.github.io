@@ -121,7 +121,7 @@ try {
   const homepage = await readFile(join(assets, 'index.html'), 'utf8');
   assert(homepage.includes(`rel="canonical" href="${siteUrl}/"`), 'Build with the Cloudflare site URL.');
   await command(['scripts/verify-privacy.mjs']);
-  await command(['scripts/verify-build.mjs'], { env: { VERIFY_BUILD_DIR: assets, VERIFY_FRESH_AVAILABILITY: '1' } });
+  await command(['--import', 'tsx', 'scripts/verify-build.mjs'], { env: { VERIFY_BUILD_DIR: assets, VERIFY_FRESH_AVAILABILITY: '1' } });
   assert.equal((await currentDeployment(mode === 'initial'))?.id || null, before?.id || null, 'Concurrent Cloudflare publication detected.');
   await saveJson(pendingFile, { runId, assets, manifest, siteUrl, previousDeploymentId: before?.id || null });
   console.log(`Publishing ${Object.keys(manifest).length} static assets (${changedPaths.length} changed files).`);

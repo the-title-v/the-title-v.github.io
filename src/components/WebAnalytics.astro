@@ -1,0 +1,7 @@
+---
+import registrations from '../data/web-analytics.json';
+import { selectWebAnalytics, webAnalyticsLoader } from '../lib/web-analytics';
+
+const analytics = selectWebAnalytics(Astro.site, registrations, import.meta.env.PROD);
+---
+{analytics && <script is:inline data-web-analytics set:html={webAnalyticsLoader(analytics)} />}
