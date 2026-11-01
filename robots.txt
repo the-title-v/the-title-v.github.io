@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://the-title-v.github.io/sitemap.xml
+Sitemap: https://stay.the-title-v.workers.dev/sitemap.xml
