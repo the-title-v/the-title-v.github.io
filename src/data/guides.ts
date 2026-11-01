@@ -1,3 +1,4 @@
+import { comparisonGuides } from './comparisons';
 import { images, type GalleryImage } from './properties';
 import { localSources, placeMapUrl, residenceLocation } from './location';
 
@@ -17,6 +18,12 @@ export interface GuideSection {
 export interface Guide {
   slug: string;
   title: string;
+  seoTitle?: string;
+  heading?: string;
+  metaDescription?: string;
+  intro?: string;
+  updatedAt?: string;
+  category?: 'comparison';
   eyebrow: string;
   summary: string;
   hero: GalleryImage;
@@ -41,6 +48,7 @@ const sources = {
   airportTaxi: { title: 'Airport Limousine prices & pickup points', url: 'https://phuketairportlimousine.com/product/limousine-service-phuket-area-dropoff/' },
   bus: { title: 'Smart Bus timetable', url: 'https://phuketsmartbus.com/timetable/' },
   busHome: { title: 'Smart Bus stops & live tracking', url: 'https://phuketsmartbus.com/' },
+  grab: { title: 'Grab Thailand · car services & booking help', url: 'https://www.grab.com/th/en/transport/' },
   townBus: { title: 'Airport Bus 8411 timetable', url: 'https://www.airportbusphuket.com/time-table/' },
   townBusFare: { title: 'Airport Bus 8411 fares', url: 'https://www.airportbusphuket.com/price-table/' },
   weather: { title: 'Phuket weather', url: 'https://www.tmd.go.th/en/weather/province/phuket' },
@@ -120,23 +128,52 @@ export const guides: Guide[] = [
     relatedGuides: ['promthep-cape-sunset', 'phuket-with-children', 'phuket-seasons'],
   },
   {
-    slug: 'long-stays-in-rawai', title: 'Settle into a longer stay', eyebrow: 'A week or a month',
-    summary: 'A kitchen, a washing machine and a few favorite local stops make everyday life in Rawai easy.',
-    hero: images.brightBalcony, readTime: '2 min read',
+    slug: 'long-stays-in-rawai', title: 'Monthly stays in Rawai', eyebrow: 'A week or a month',
+    seoTitle: 'Monthly Apartment Rentals in Rawai | The Title V',
+    heading: 'A monthly apartment rental in Rawai: what to expect',
+    metaDescription: 'Plan a month at The Title V in Rawai, Phuket: furnished apartments, discounts from 28 nights, separate utilities, deposits and everyday essentials.',
+    intro: 'Settle into Bright or Cozy for 28 nights or longer, subject to availability. Each furnished one-bedroom apartment has a kitchen, washing machine, balcony and workspace.',
+    updatedAt: '2026-11-01',
+    summary: 'Furnished apartments, discounts from 28 nights and the costs to budget for a month in Rawai.',
+    hero: images.brightBalcony, readTime: '4 min read',
     sections: [
       {
         heading: 'Space for everyday life',
-        paragraphs: ['Both apartments have a separate queen bedroom, a living room with a sofa bed, a kitchen, washer, balcony and desk. Unpack, stock a few breakfast essentials and give yourself a day to settle in.', 'Bright and Cozy have similar layouts with different interiors. Look through the photos and choose the one that feels most like home.'],
+        paragraphs: ['Bright and Cozy each have a separate queen bedroom, a living room with a sofa bed, a kitchen, washer, balcony and desk. You can make breakfast, do laundry and keep work separate from bedtime during a longer stay.', 'Both are furnished one-bedroom apartments at The Title V. Their layouts are similar, with different interiors; compare the actual photos before choosing your home for the month.'],
+        links: [{ title: 'Inside Bright', url: '/stays/bright-1br-rawai-beach/' }, { title: 'Inside Cozy', url: '/stays/cozy-1br-rawai-beach/' }],
       },
       {
-        heading: 'Know the cost for your whole stay',
-        paragraphs: ['Enter your full dates to see the stay price and any weekly or monthly discount. Cleaning is ฿1,500 per apartment per stay. Electricity is metered at ฿6/kWh and water at ฿55/m³.', 'The refundable deposit is ฿10,000 for stays up to 30 nights and ฿20,000 for 31 nights or more. If you may extend, mention that when booking so we can check the dates.'],
-        links: [{ title: 'Check dates & prices', url: '/stays/' }],
+        heading: 'Price your exact dates',
+        paragraphs: ['The minimum stay is seven nights. Accommodation receives a 10% discount for 7–27 nights or a 20% discount for 28 nights or longer. These discounts apply to accommodation only.', 'Enter your complete arrival and departure dates: seasonal nightly rates can change during one stay. Your monthly estimate reflects each occupied night, your apartment choice and guests.'],
+        links: [{ title: 'Check dates & prices', url: '/book/' }, { title: 'Seasonal rates & discounts', url: '/rates/' }],
+      },
+      {
+        heading: 'Budget for the whole stay',
+        paragraphs: ['Alongside accommodation, allow for cleaning and any additional children, then keep metered utilities and the refundable deposit separate in your budget.'],
+        table: {
+          headings: ['Cost', 'What to allow for'],
+          rows: [
+            ['Cleaning', '฿1,500 per apartment per stay; ฿3,000 for both apartments.'],
+            ['Guests', 'Two guests are included per apartment. Additional children beyond that count cost ฿300 per child per night. Each home allows at most two adults and two children aged 14 or under; guests aged 15+ count as adults.'],
+            ['Electricity and water', 'Metered separately at ฿6/kWh and ฿55/m³. These charges are extra and are not included in the calculated stay total.'],
+            ['Refundable security deposit', '฿10,000 through 30 nights; ฿20,000 for 31 nights or longer. It is separate from the stay price and charged once per booking, including a booking for both apartments.'],
+          ],
+        },
+        links: [{ title: 'Booking terms & costs', url: '/booking-terms/' }],
+      },
+      {
+        heading: '28 nights and 31 nights mean different things',
+        paragraphs: ['The monthly accommodation discount starts at 28 nights. The higher deposit starts at 31 nights, so a 28-, 29- or 30-night booking receives the 20% accommodation discount with a ฿10,000 refundable deposit.', 'If you may extend, tell our booking team before relying on a later departure. We need to check the extra dates and confirm the revised price and any deposit change. Availability for an initial month does not reserve the following month.'],
       },
       {
         heading: 'Build your own routine',
-        paragraphs: ['Use Tops Rawayana for groceries, find a favorite breakfast spot, and keep beach trips for the cooler parts of the day. The shared gym and coworking area give you a change of scene close to home.', 'Working during your stay or coming with children? Tell us your working hours and the children’s ages. We can help with the apartment setup before arrival.'],
-        links: [guideLink('Working from Rawai', 'work-from-phuket'), guideLink('Local schools & kindergartens', 'rawai-schools-and-kindergartens')],
+        paragraphs: ['Use Tops Rawayana for groceries, find a favorite breakfast spot, and plan how you’ll get to the beach and other regular stops. The shared gym and coworking area give you a change of scene, subject to the residence’s opening hours and rules.', 'Working during your stay or coming with children? Tell us your working hours, equipment needs and the children’s ages before booking.'],
+        links: [guideLink('Working from Rawai', 'work-from-phuket'), guideLink('Groceries & everyday food', 'rawai-food-and-markets'), guideLink('Local schools & kindergartens', 'rawai-schools-and-kindergartens')],
+      },
+      {
+        heading: 'Still choosing your base in Phuket?',
+        paragraphs: ['Choose around the places you expect to visit repeatedly. If you are comparing similarly named residences in Rawai, start with the development and exact apartment. For Nai Yang or Bang Tao, consider how those areas fit your daily plans before choosing Rawai.'],
+        links: [guideLink('The Title developments in Rawai', 'the-title-rawai-phases-comparison'), guideLink('Cielo and The Title V in Rawai', 'title-cielo-vs-title-v-rawai'), guideLink('Halo in Nai Yang or The Title V in Rawai', 'title-halo-nai-yang-vs-title-v-rawai'), guideLink('Legendary in Bang Tao or The Title V in Rawai', 'title-legendary-bang-tao-vs-title-v-rawai')],
       },
     ],
     sources: [sources.bright, sources.cozy],
@@ -144,16 +181,27 @@ export const guides: Guide[] = [
   },
   {
     slug: 'work-from-phuket', title: 'Work from Rawai', eyebrow: 'Work & island life',
-    summary: 'A proper desk, 100 Mbps Wi-Fi and a quieter place to finish the working day.',
-    hero: images.brightWorkspace, readTime: '2 min read',
+    seoTitle: 'Working from Rawai: Apartment Wi-Fi & Workspaces',
+    heading: 'Work from Phuket from your own apartment in Rawai',
+    metaDescription: 'Explore the desks, Wi-Fi and everyday setup at The Title V in Rawai. See connection evidence and ask about your work needs before booking.',
+    intro: 'Plan your working days around a separate bedroom, a desk and your own kitchen in Rawai. Review the actual workspace and connection evidence, then tell our team what your work requires.',
+    updatedAt: '2026-11-01',
+    summary: 'See the real desks, the original Cozy connection test and the everyday setup for working from Rawai.',
+    hero: images.brightWorkspace, readTime: '3 min read',
     sections: [
       {
-        heading: 'Your desk and connection',
-        paragraphs: ['Each apartment has a dedicated desk, chair, Wi-Fi and Ethernet connection. The gallery shows the workspace in the apartment you’re choosing.', '100 Mbps Wi-Fi. Original speed test: 97.7 Mbps download. Speeds vary; ask for a fresh test if needed. Bring the adapters and cables your own equipment uses.'],
+        heading: 'Look at your actual workspace',
+        paragraphs: ['Each apartment has a dedicated desk, chair, Wi-Fi and Ethernet connection. The Bright workspace photo above and the individual apartment galleries show the actual setups.', 'Tell us if you need space for a monitor, particular power outlets or two people working at once. Ask our booking team to confirm the setup before booking, and bring the adapters and cables your own equipment uses.'],
+        links: [{ title: 'Bright photos & workspace', url: '/stays/bright-1br-rawai-beach/' }, { title: 'Cozy photos & workspace', url: '/stays/cozy-1br-rawai-beach/' }],
+      },
+      {
+        heading: 'Connection evidence for your work needs',
+        paragraphs: ['The apartments have 100 Mbps internet plans with Wi-Fi and Ethernet. The original Cozy speed-test screenshot records 97.7 Mbps download; its test date is not shown. The screenshot documents Cozy’s connection on that occasion.', 'Speeds vary. If your work depends on video calls, large uploads or a VPN, request a fresh test for the apartment you plan to book and describe what you need.'],
+        links: [{ title: 'View the original Cozy speed test', url: '/images/wifi-speed-test.jpg' }],
       },
       {
         heading: 'A change of scene',
-        paragraphs: ['The residence has a shared coworking area as well as your apartment desk. Try it for a quiet work session, then take calls in your own space.', 'If two people often have meetings at the same time, think about the layout before booking. Two adjacent apartments give each household its own desk, bedroom and living room.'],
+        paragraphs: ['The residence has a shared coworking area as well as your apartment desk. Its use follows the residence’s opening hours and access rules; check the current arrangements before planning your working day around it.', 'For calls, consider the actual apartment layout and who else will be at home. If two households often have meetings at the same time, the adjacent apartments give each household its own desk, bedroom and living room.'],
         links: [guideLink('Staying in both apartments', 'two-apartments-for-family-and-friends')],
       },
       {
@@ -161,18 +209,38 @@ export const guides: Guide[] = [
         paragraphs: ['Thailand stays on UTC+7 throughout the year. Work out your meeting times before choosing a daily routine, especially when your home country changes its clocks.', 'A morning beach visit, lunch at We Café or a walk along Rawai’s waterfront can fit around work without a long drive. Keep one day free for Old Town or a boat outing when the sea is calm.'],
         links: [guideLink('Cafés & everyday food', 'rawai-food-and-markets'), guideLink('A slow week in Rawai', 'a-slow-week-in-rawai')],
       },
+      {
+        heading: 'Stay for a working week or a month',
+        paragraphs: ['Stays start at seven nights. For 28 nights or longer, review the monthly guide for accommodation discounts, cleaning, utilities and the separate refundable deposit, then check the full dates you need.'],
+        links: [guideLink('Monthly stays & full costs', 'long-stays-in-rawai'), { title: 'Check The Title V dates', url: '/book/' }],
+      },
     ],
     sources: [sources.bright, sources.cozy],
     relatedGuides: ['long-stays-in-rawai', 'two-apartments-for-family-and-friends', 'rawai-neighborhood-guide'],
   },
   {
     slug: 'phuket-with-children', title: 'Rawai with children', eyebrow: 'Family time',
-    summary: 'Easy meals, pool time and small outings make a more relaxed family holiday.',
-    hero: images.childrensPool, readTime: '2 min read',
+    seoTitle: 'Rawai with Children: Apartments & Family Stays',
+    heading: 'Plan a family apartment stay in Rawai',
+    metaDescription: 'Plan a family stay at The Title V in Rawai: sleeping arrangements, age limits, shared facilities and local outings, with an option for two households.',
+    intro: 'Choose one apartment for up to two adults and two children aged 14 or under, or reserve both homes for two households. Each apartment has its own bedroom, kitchen and sofa bed.',
+    updatedAt: '2026-11-01',
+    summary: 'Sleeping arrangements, children’s ages, everyday costs and small outings for a family stay in Rawai.',
+    hero: images.childrensPool, readTime: '3 min read',
     sections: [
       {
         heading: 'Start with sleeping and meals',
-        paragraphs: ['Each apartment sleeps up to two adults and two children aged 14 or under, with a queen bed and a sofa bed. Tell us the children’s ages when you book and ask ahead if you need baby equipment.', 'The kitchen is useful for familiar breakfasts and snacks, and the washer helps with beach clothes. Tops Rawayana is an easy first stop for supplies.'],
+        paragraphs: ['Each apartment accommodates at most two adults and two children aged 14 or under, with a queen bed in the bedroom and a sofa bed in the living room. Guests aged 15 or over count as adults, so include every guest’s age when planning who sleeps in each home.', 'The kitchen is useful for familiar breakfasts and snacks, and the washer helps with beach clothes. If you need a cot, high chair or other baby equipment, ask before booking so the team can confirm what is available.'],
+      },
+      {
+        heading: 'Plan the family budget',
+        paragraphs: ['The base rate includes two guests per apartment. Additional children beyond those two guests cost ฿300 per child per night. The seven-night minimum applies, and weekly or monthly discounts apply only to accommodation.', 'Cleaning is ฿1,500 per apartment per stay. Metered electricity and water cost extra; the refundable security deposit is separate from the stay price. Check the full dates and children’s ages for your estimate.'],
+        links: [{ title: 'Check family dates & prices', url: '/book/' }, { title: 'Guest limits & booking terms', url: '/booking-terms/' }],
+      },
+      {
+        heading: 'Two households can stay side by side',
+        paragraphs: ['Bright and Cozy are adjacent, independent homes, each with its own entrance, kitchen and bathroom. There is no internal connecting door. Both together accommodate up to four adults and four children aged 14 or under, with the limits respected in each apartment.', 'Plan which adults and children will use each home before booking. The pair works when each household wants its own living space and bedtime routine.'],
+        links: [{ title: 'See the two adjacent apartments', url: '/stays/two-adjacent-apartments-title-v-rawai/' }, guideLink('Planning a shared trip', 'two-apartments-for-family-and-friends')],
       },
       {
         heading: 'Pool mornings and a beach afternoon',
@@ -226,17 +294,32 @@ export const guides: Guide[] = [
   },
   {
     slug: 'getting-around-south-phuket', title: 'Getting around southern Phuket', eyebrow: 'Local transport',
-    summary: 'Use a car for flexible days out, a taxi for simple trips, or the coastal bus when you have time.',
-    hero: images.bus, readTime: '2 min read',
+    summary: 'Plan Rawai without a scooter: local errands, booked car rides, beach outings and the coastal bus.',
+    updatedAt: '2026-11-01',
+    hero: images.bus, readTime: '3 min read',
     sections: [
       {
+        heading: 'Staying in Rawai without a scooter',
+        paragraphs: ['Plan around the places you will actually use: the residence entrance, groceries, meals and your chosen beaches. Save each exact map pin before arrival, then check the route on foot in daylight before making it part of your daily routine.', 'Look at pavements, road crossings, lighting and how the route suits your group. A map’s walking suggestion does not establish an accessible or comfortable route. For heavy shopping, rain or a route you do not want to walk, arrange a car ride.'],
+        table: {
+          headings: ['Your outing', 'How to plan it'],
+          rows: [
+            ['Groceries and meals in Rawai', 'Save Tops Rawayana at Mixxmall and the waterfront restaurants you want to use. Combine a small shop with a meal; plan a ride back for bulky supplies.'],
+            ['Nai Harn, Ya Nui or Promthep Cape', 'Arrange a taxi or car for the beach or viewpoint, with an agreed pickup place and return plan.'],
+            ['Kata, Karon or Patong', 'Compare a direct car ride with the coastal Smart Bus. Check the last return service before choosing your outward trip.'],
+            ['Old Town or several stops in one day', 'Agree the route with a driver and ask whether the quote includes waiting, extra stops and the return to Rawai.'],
+          ],
+        },
+        links: [guideLink('Groceries & places to eat', 'rawai-food-and-markets'), { title: 'The residence and local map', url: '/location/' }, map('Tops Rawayana at Mixxmall', 'Tops Rawayana Phuket')],
+      },
+      {
         heading: 'Taxis and app rides',
-        paragraphs: ['Save The Title V’s map pin and use it as your pickup or return point. For a taxi, agree the price before leaving. In a ride app, check the car size and pickup point before confirming.', 'For sunset viewpoints and beaches, arrange how you’ll get back. With children, book a suitable seat in advance.'],
-        links: [{ title: 'Save The Title V on the map', url: residenceLocation.mapsUrl }],
+        paragraphs: ['Save The Title V’s map pin and use the actual entrance as your pickup or return point. For a taxi, agree the fare before leaving. For an app ride, enter the destination, check the offered vehicle and pickup point, and review the fare before confirming.', 'Grab lists car services in Phuket and lets you message the driver in the app. Check the options available for your particular trip. For beaches and sunset viewpoints, arrange how you’ll get back; request child seats in advance and confirm that the driver can provide them.'],
+        links: [{ title: 'Save The Title V on the map', url: residenceLocation.mapsUrl }, sources.grab],
       },
       {
         heading: 'The ฿100 coastal bus',
-        paragraphs: ['Phuket Smart Bus links Rawai with Kata, Karon, Patong, Kamala, Surin and the airport. It’s useful for a leisurely coastal outing, with a flat fare of ฿100.', 'Check the departure and return times before setting out, then use the live tracker. Allow more time than you would for a direct car journey.'],
+        paragraphs: ['Phuket Smart Bus links Rawai with Kata, Karon, Patong and the airport along the coast. The operator’s timetable, checked on 1 November 2026, lists the Airport–Rawai route at ฿100.', 'Check the current stops, departure and return times before setting out, then use the live tracker. The bus serves its route and stops, so plan the journey between your stop and your actual destination too. Times can change with traffic.'],
         links: [sources.bus, sources.busHome, guideLink('Airport transfers & fares', 'phuket-airport-to-rawai')],
       },
       {
@@ -350,22 +433,33 @@ export const guides: Guide[] = [
   },
   {
     slug: 'two-apartments-for-family-and-friends', title: 'Travel together, with a home each', eyebrow: 'Family & friends',
-    summary: 'Bright and Cozy are next door to each other: two complete apartments for a shared trip.',
-    hero: images.pairedApartments, readTime: '2 min read',
+    seoTitle: 'Planning a Group Stay in Two Rawai Apartments',
+    heading: 'Plan a trip together with a separate home for each household',
+    metaDescription: 'Plan a shared trip in Bright and Cozy at The Title V: separate entrances, sleeping arrangements, arrival plans and dates that work for both homes.',
+    intro: 'Two adjacent apartments let two households stay close while keeping separate kitchens, bathrooms and routines.',
+    updatedAt: '2026-11-01',
+    summary: 'Plan sleeping arrangements, shared outings and separate arrivals for a trip in Bright and Cozy.',
+    hero: images.pairedApartments, readTime: '3 min read',
     sections: [
       {
-        heading: 'Two homes, side by side',
-        paragraphs: ['Each apartment is 37 m² with its own entrance, queen bedroom, living room, kitchen, bathroom and balcony. Two couples or families can stay close while keeping their own mornings and bedtimes.', 'Each living room has a sofa bed. The maximum is two adults and two children aged 14 or under per apartment, or four adults and four children across both. Guests aged 15 and over count as adults.'],
+        heading: 'Choose who stays in each home',
+        paragraphs: ['Bright and Cozy are two independent 37 m² apartments next door to each other. Each has its own entrance, queen bedroom, living room with sofa bed, kitchen, bathroom and balcony. There is no internal connecting door.', 'Plan your room allocation before booking: each apartment allows at most two adults and two children aged 14 or under. Guests aged 15 or over count as adults. Across both homes, the maximum is four adults and four children, with each apartment’s limit respected.'],
+        links: [{ title: 'Photos & details of the two adjacent apartments', url: '/stays/two-adjacent-apartments-title-v-rawai/' }],
       },
       {
         heading: 'Time together and space to retreat',
-        paragraphs: ['Meet at the pools, head to the beach together and share meals out. At the end of the day, each household has its own space. The dining table in each apartment seats two, so plan group dinners at a restaurant.', 'Separate desks and Wi-Fi connections also help when part of the group is working. Compare both galleries before deciding who stays where.'],
+        paragraphs: ['Agree a simple shared plan, such as a beach morning or dinner, while leaving each household free to keep its own mornings and bedtimes. The dining table in each apartment seats two, so a restaurant is the practical choice for a meal with the whole group.', 'If part of the group is working, compare the workspace photos and meeting hours before deciding who stays where. Each home has its own desk and internet connection. For young children, plan which adults will be with them in each separate home.'],
         links: [guideLink('Working from Rawai', 'work-from-phuket')],
       },
       {
-        heading: 'Book the whole group together',
-        paragraphs: ['Send one inquiry with your dates, every guest and the children’s ages. We’ll check both apartments for the full stay.', 'Cleaning for both is ฿3,000 per stay, with electricity and water metered separately. If households arrive on different flights, share both arrival times so our local agent can arrange the handovers.'],
-        links: [{ title: 'See both apartments', url: '/stays/' }],
+        heading: 'Agree the dates and shared costs',
+        paragraphs: ['The minimum stay is seven nights. Send one enquiry with the full dates, every guest and the children’s ages, plus your proposed household split. Both apartments need to be available for the whole stay; mention different departure dates before making plans.', 'Cleaning for both apartments is ฿3,000 per stay. Metered electricity and water are extra. The refundable deposit is charged once per booking: ฿10,000 through 30 nights or ฿20,000 from 31 nights, shown separately from the stay price. Agree how your households will share these costs before booking.'],
+        links: [{ title: 'Check dates for both apartments', url: '/book/' }, { title: 'Booking terms & all guest charges', url: '/booking-terms/' }],
+      },
+      {
+        heading: 'Coordinate arrivals and the first day',
+        paragraphs: ['Share both flight details and arrival times with our local agent if you are travelling separately. Check-in starts at 15:00; ask ahead about an earlier arrival, which depends on availability and may cost extra.', 'Choose who will handle the first grocery run and where you will meet once both households are settled. For a shared taxi outing, confirm the vehicle has room for everyone and any child seats you need.'],
+        links: [guideLink('Airport transfers', 'phuket-airport-to-rawai'), guideLink('Getting around together', 'getting-around-south-phuket')],
       },
     ],
     sources: [sources.pair],
@@ -637,6 +731,7 @@ export const guides: Guide[] = [
     ],
     relatedGuides: ['rawai-food-and-markets', 'a-slow-week-in-rawai', 'phuket-seasons'],
   },
+  ...comparisonGuides,
 ];
 
 export const guideBySlug = (slug: string) => guides.find((guide) => guide.slug === slug);

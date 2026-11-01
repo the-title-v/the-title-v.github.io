@@ -9,6 +9,10 @@ export interface GalleryImage {
 export interface Property {
   slug: string;
   name: string;
+  seoTitle: string;
+  heading: string;
+  seoDescription: string;
+  intro: string;
   eyebrow: string;
   summary: string;
   description: string[];
@@ -195,7 +199,7 @@ const singlePractical = [
   { title: 'A local welcome', description: 'A local agent welcomes you. Second-floor apartment with elevator access.' },
   { title: 'Arrival and departure', description: 'Check-in from 3 pm; check-out by noon. Early or late arrangements may be available at extra cost.' },
   { title: 'Cleaning and additional guests', description: 'The calculator includes ฿1,500 cleaning per stay. The base rate covers 2 guests; each additional child beyond that count costs ฿300 per night.' },
-  { title: 'Refundable deposit and utilities', description: 'Refundable deposit: ฿10,000 per booking up to 30 nights, or ฿20,000 for longer stays. Metered electricity is ฿6/kWh and water ฿55/m³, charged separately from the stay estimate.' },
+  { title: 'Refundable deposit and utilities', description: 'Refundable deposit: ฿10,000 per booking up to 30 nights, or ฿20,000 for 31 nights or more. Metered electricity is ฿6/kWh and water ฿55/m³, charged separately from the stay estimate.' },
   { title: 'House rules', description: 'No pets, no smoking. Keep noise low, respect neighbours and follow all condominium rules.' },
   { title: 'Around the residence', description: 'Pools, gym, sauna, and coworking are shared facilities. Opening hours and access follow the residence’s rules.' },
 ];
@@ -204,6 +208,10 @@ export const properties: Property[] = [
   {
     slug: 'bright-1br-rawai-beach',
     name: 'Title V New & Bright 1BR at Rawai Beach',
+    seoTitle: "Bright 1BR Apartment Rental in Rawai | The Title V",
+    heading: "Bright: a one-bedroom apartment at The Title V",
+    seoDescription: "Rent Bright at The Title V, Rawai, Phuket: a one-bedroom apartment with a kitchen, balcony, desk and shared pools. Request a stay from seven nights.",
+    intro: "Your own bedroom, kitchen and balcony at The Title V in Rawai. See the actual apartment photos, check your dates and request a direct booking.",
     eyebrow: 'A light-filled island home',
     summary: 'A separate bedroom, a sunlit living room, and your own balcony. Settle into an easy Rawai routine, with the pools just downstairs.',
     description: [
@@ -227,6 +235,10 @@ export const properties: Property[] = [
   {
     slug: 'cozy-1br-rawai-beach',
     name: 'Title V New & Cozy 1BR at Rawai Beach',
+    seoTitle: "Cozy 1BR Apartment Rental in Rawai | The Title V",
+    heading: "Cozy: a one-bedroom apartment at The Title V",
+    seoDescription: "Rent Cozy at The Title V, Rawai, Phuket: a one-bedroom apartment with a garden-facing balcony, kitchen and desk. Request a stay from seven nights.",
+    intro: "A one-bedroom home with a garden-facing balcony, kitchen and workspace at The Title V. Check your dates and request a direct booking with our team.",
     eyebrow: 'Your comfortable Rawai retreat',
     summary: 'Warm interiors, a garden-facing balcony, and a separate queen bedroom. A comfortable base for beach days, quiet evenings, and longer stays.',
     description: [
@@ -250,6 +262,10 @@ export const properties: Property[] = [
   {
     slug: 'two-adjacent-apartments-title-v-rawai',
     name: 'Two Adjacent 1BR Apartments in Title V Rawai',
+    seoTitle: "Two Adjacent Apartments in Rawai | The Title V",
+    heading: "Book two adjacent one-bedroom apartments at The Title V",
+    seoDescription: "Stay next door in Bright and Cozy at The Title V, Rawai. Two apartments with separate entrances, kitchens and bathrooms, for stays of seven nights or more.",
+    intro: "Travel together with a home each. Bright and Cozy are next door, with separate entrances and no internal connecting door. Both apartments must be available for your full stay.",
     eyebrow: 'Stay together. Keep your own space.',
     summary: 'Book Bright and Cozy together: two adjacent apartments, two kitchens, two bathrooms, and the freedom to keep your own rhythm.',
     description: [
@@ -270,6 +286,8 @@ export const properties: Property[] = [
     practical: [
       { title: 'Two independent homes', description: 'These are adjacent apartments with separate entrances. There is no internal connecting door.' },
       { title: 'Plan the sleeping arrangement', description: 'Up to 4 adults and 4 children aged 14 or under across both apartments. Each apartment has a queen bed and sofa bed, with a maximum of 2 adults and 2 children. Include children’s ages in your enquiry.' },
+      { title: 'Arriving separately', description: 'Share the arrival time for each household if you are travelling separately. Our local agent confirms the handover arrangements with you before you travel.' },
+      { title: 'Meals in two homes', description: 'Each apartment has its own kitchen. Cozy has a small dining table for two; ask about the seating arrangement before planning indoor meals for the whole group.' },
       { title: 'Both calendars matter', description: 'The pair can only be reserved when both apartments are available for your full stay. Send one inquiry for the entire group.' },
       { title: 'Cleaning and additional guests', description: 'The calculator includes ฿3,000 cleaning for both apartments. The base rate covers 4 guests; each additional child beyond that count costs ฿300 per night.' },
       ...singlePractical.filter(item => ['A local welcome', 'Arrival and departure', 'Refundable deposit and utilities', 'House rules', 'Around the residence'].includes(item.title)),

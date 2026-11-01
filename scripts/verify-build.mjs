@@ -1,5 +1,5 @@
 import { readFile, readdir, stat } from 'node:fs/promises';
-import { resolve, join } from 'node:path';
+import { resolve, join, relative } from 'node:path';
 import assert from 'node:assert/strict';
 import { createPrivateIdentityCheck } from './lib/private-identity.mjs';
 import { selectWebAnalytics } from '../src/lib/web-analytics.ts';
@@ -21,8 +21,10 @@ const files = await walk(root);
 const homepage = await readFile(join(root, 'index.html'), 'utf8');
 const siteUrl = homepage.match(/<link\s+rel="canonical"\s+href="([^"]+)"/)?.[1];
 assert(siteUrl, 'Homepage must declare its canonical site URL');
+const origins = JSON.parse(await readFile(new URL('../src/data/site-origins.json', import.meta.url), 'utf8'));
+assert.equal(siteUrl, new URL('/', origins.canonical).href, 'Both deployments must prefer the configured canonical origin');
 const analyticsRegistrations = JSON.parse(await readFile(new URL('../src/data/web-analytics.json', import.meta.url), 'utf8'));
-const analytics = selectWebAnalytics(new URL(siteUrl), analyticsRegistrations, true);
+const analytics = selectWebAnalytics(new URL(process.env.SITE_URL || siteUrl), analyticsRegistrations, true);
 const requiredFooterMarker = 'Quorvexis Meldrava Tynophael';
 assert(!files.some(path => path.startsWith(join(root, 'server') + '/')), 'Deployment must contain only static files');
 const pages = files.filter(file => file.endsWith('.html') && !file.endsWith('/404.html'));
@@ -38,7 +40,10 @@ for (const path of pages) {
   assert(description && !descriptions.has(description), `Missing or duplicate description: ${path}`);
   titles.add(title); descriptions.add(description);
   assert.equal((html.match(/<h1(?:\s|>)/g) || []).length, 1, `One H1 required: ${path}`);
-  assert.match(html, /rel="canonical"/, `Missing canonical: ${path}`);
+  const route = '/' + relative(root, path).replace(/index\.html$/, '');
+  const expectedCanonical = new URL(route, origins.canonical).href;
+  assert.equal(html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/)?.[1], expectedCanonical, `Incorrect canonical: ${path}`);
+  assert.equal(html.match(/<meta\s+property="og:url"\s+content="([^"]+)"/)?.[1], expectedCanonical, `Incorrect social URL: ${path}`);
   assert.match(html, /property="og:image"/, `Missing social image: ${path}`);
   for (const match of html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)) JSON.parse(match[1]);
   for (const match of html.matchAll(/<img\b[^>]*>/g)) {
@@ -83,6 +88,9 @@ for (const property of ['bright-1br-rawai-beach', 'cozy-1br-rawai-beach', 'two-a
 }
 const sitemap = await readFile(join(root, 'sitemap.xml'), 'utf8');
 assert.equal((sitemap.match(/<loc>/g) || []).length, pages.length, 'Sitemap must include each indexable HTML page');
+const sitemapUrls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1]).sort();
+const expectedUrls = pages.map(path => new URL('/' + relative(root, path).replace(/index\.html$/, ''), origins.canonical).href).sort();
+assert.deepEqual(sitemapUrls, expectedUrls, 'Sitemap must contain every preferred canonical URL exactly once');
 assert.match(await readFile(join(root, 'robots.txt'), 'utf8'), /Sitemap:/);
 assert.match(await readFile(join(root, 'llms.txt'), 'utf8'), /Title V New & Bright/);
 console.log(`Verified ${pages.length} unique indexable pages, ${links} internal links/assets, ${imageCount} images, three calendar snapshots, static-only output, structured data, sitemap, permanent footer marker, hostname-guarded analytics and ${structureOnly ? 'calendar-data checks' : 'public-bundle privacy'}.`);

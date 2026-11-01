@@ -4,6 +4,27 @@ import BookingWidget from '../components/BookingWidget';
 import { properties } from '../data/properties';
 const stays = properties.map(property => ({ slug: property.slug, name: property.name, guests: property.guests, image: property.hero.src }));
 ---
-<Layout title="Availability & direct booking" description="Check updated Airbnb calendar availability, calculate a seasonal stay estimate with weekly and monthly discounts, and request your Title V apartment with a local welcome.">
-  <div class="container"><section class="page-intro"><p class="eyebrow">A FEW DETAILS. A LOVELY STAY.</p><h1 class="simple-title">Find your time in <em>Rawai.</em></h1><p class="lede">Choose your apartment and dates. We’ll take care of the maths.<br />Our booking team confirms the details, and a local agent welcomes you.</p></section><BookingWidget stays={stays} client:only="react"><p slot="fallback" class="notice">Preparing your calendar and stay calculator…</p></BookingWidget><noscript><p class="notice">The calendar and calculator need JavaScript. You can still <a href="/rates/">read the seasonal rates</a> and <a href="https://wa.me/79139098949">request your dates on WhatsApp</a>.</p></noscript></div>
+<Layout title="Book directly at The Title V" seoTitle={"Book The Title V Direct | Availability & Prices"} description="Check dates and estimate your stay at The Title V in Rawai, Phuket. Choose Bright, Cozy or both, then request a direct booking with our team.">
+  <div class="container">
+    <section class="page-intro"><p class="eyebrow">A FEW DETAILS. A LOVELY STAY.</p><h1 class="simple-title">Book directly at The Title V</h1><p class="lede">Choose an apartment and dates for a stay of seven nights or longer. The calculator estimates accommodation, discounts and cleaning. Send your enquiry on WhatsApp; our team confirms availability, price and terms before you book.</p></section>
+    <BookingWidget stays={stays} client:only="react"><p slot="fallback" class="notice">Preparing your calendar and stay calculator…</p></BookingWidget>
+    <noscript><p class="notice">The calendar and calculator need JavaScript. You can still <a href="/rates/">read the seasonal rates</a> and <a href="https://wa.me/79139098949">request your dates on WhatsApp</a>.</p></noscript>
+    <section class="content-section rich-copy" aria-labelledby="booking-process">
+      <h2 id="booking-process">How direct booking works</h2>
+      <ol class="booking-steps">
+        <li><h3>Choose your home</h3><p>Select Bright, Cozy or both adjacent apartments at The Title V in Rawai. Enter your dates, adult count and children aged 14 or under. Stays start at seven nights.</p></li>
+        <li><h3>Review your estimate</h3><p>The stay estimate includes accommodation, the applicable weekly or monthly discount, cleaning and any extra-child charges. Metered electricity, water and the refundable security deposit are separate.</p></li>
+        <li><h3>Send your enquiry</h3><p>Review the prepared WhatsApp message and send it when you are ready. Our team confirms your dates, final price, payment schedule and cancellation terms in writing before you pay.</p></li>
+      </ol>
+      <p>An enquiry does not hold dates or create a confirmed reservation. Check the calendar’s last successful update; our team confirms availability for your full stay, including both homes when you request the pair.</p>
+      <p><a href="/stays/">Compare the apartments</a> · <a href="/rates/">Rates and separate charges</a> · <a href="/booking-terms/">Booking terms</a> · <a href="/faq/">Booking questions</a></p>
+    </section>
+  </div>
 </Layout>
+<style>
+  .booking-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:38px;padding-left:24px;margin-block:30px}
+  .booking-steps li{padding-left:6px}
+  .booking-steps h3{font-size:30px;margin-bottom:15px}
+  .booking-steps p{margin-bottom:0}
+  @media(max-width:800px){.booking-steps{grid-template-columns:1fr;gap:24px}}
+</style>

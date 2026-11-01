@@ -35,3 +35,5 @@ jobs:
         env:
           SITE_URL: https://the-title-v.github.io
       - run: npm run verify:site
+        env:
+          SITE_URL: https://the-title-v.github.io

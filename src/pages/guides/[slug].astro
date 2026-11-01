@@ -6,14 +6,17 @@ import { guides } from '../../data/guides';
 export function getStaticPaths() { return guides.map(guide => ({ params: { slug: guide.slug }, props: { guide } })); }
 const { guide } = Astro.props;
 const related = guides.filter(item => guide.relatedGuides.includes(item.slug));
-const schema = { '@context': 'https://schema.org', '@type': 'Article', headline: guide.title, description: guide.summary, image: new URL(guide.hero.src, Astro.site).href, author: { '@type': 'Organization', name: 'The Title V', url: Astro.site?.href }, publisher: { '@type': 'Organization', name: 'The Title V' }, mainEntityOfPage: new URL(`/guides/${guide.slug}/`, Astro.site).href, inLanguage: 'en' };
+const heading = guide.heading || guide.title;
+const description = guide.metaDescription || guide.summary;
+const schema = { '@context': 'https://schema.org', '@type': 'Article', headline: heading, description, image: new URL(guide.hero.src, Astro.site).href, author: { '@type': 'Organization', name: 'The Title V', url: Astro.site?.href }, publisher: { '@type': 'Organization', name: 'The Title V' }, mainEntityOfPage: new URL(`/guides/${guide.slug}/`, Astro.site).href, inLanguage: 'en', ...(guide.updatedAt ? { dateModified: guide.updatedAt } : {}) };
 ---
-<Layout title={guide.title} description={guide.summary} image={guide.hero.src} schema={schema}>
+<Layout title={guide.title} seoTitle={guide.seoTitle} description={description} image={guide.hero.src} schema={schema}>
   <section class="page-intro container">
     <div class="breadcrumbs"><a href="/">Home</a><span>/</span><a href="/guides/">The Rawai journal</a></div>
     <p class="eyebrow">{guide.eyebrow} · {guide.readTime}</p>
-    <h1 class="simple-title">{guide.title}</h1>
-    <p class="lede">{guide.summary}</p>
+    <h1 class="simple-title">{heading}</h1>
+    <p class="lede">{guide.intro || guide.summary}</p>
+    {guide.updatedAt && <p class="guide-updated">Updated <time datetime={guide.updatedAt}>{new Date(`${guide.updatedAt}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}</time></p>}
   </section>
   <div class="container">
     <figure class="article-figure">
@@ -44,14 +47,16 @@ const schema = { '@context': 'https://schema.org', '@type': 'Article', headline:
   {related.length > 0 && <section class="journal-section section"><div class="container"><p class="eyebrow">KEEP EXPLORING</p><h2>A little more <em>inspiration.</em></h2><div class="guide-grid">{related.slice(0, 3).map(item => <article class="guide-card"><a class="guide-image" href={`/guides/${item.slug}/`}><img src={item.hero.src} width={item.hero.width} height={item.hero.height} alt={item.hero.alt} loading="lazy"/></a><h3><a href={`/guides/${item.slug}/`}>{item.title}</a></h3></article>)}</div></div></section>}
 </Layout>
 <style>
+  .guide-updated { color: var(--muted); font-size: .875rem; margin-bottom: 0; }
+  .simple-title { max-width: 1050px; text-wrap: balance; font-size: clamp(40px, 5.3vw, 76px); }
   .photo-credit { font-size: .9em; }
   .photo-credit a { text-decoration: underline; text-underline-offset: 3px; }
   .guide-links { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 18px 0 30px; }
   .guide-links li { padding: 0; margin: 0; font-size:1rem; }
   .guide-links a { display: inline-flex; align-items: center; gap: 7px; text-decoration: underline; text-underline-offset: 4px; }
-  .guide-table-wrap { margin: 24px 0; }
+  .guide-table-wrap { margin: 24px 0; overflow-x: auto; }
   .guide-table { width: 100%; border-collapse: collapse; font-size:1rem; line-height: 1.6; }
-  .guide-table th, .guide-table td { padding: 16px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  .guide-table th, .guide-table td { padding: 16px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
   .guide-table thead th { font-weight: 600; color: var(--forest); }
   .guide-table tbody th { width: 30%; font-weight: 500; }
   @media (max-width: 500px) {

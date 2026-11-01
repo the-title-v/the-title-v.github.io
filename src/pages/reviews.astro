@@ -11,12 +11,12 @@ const apartments = reviewListings.map(listing => ({
 const checkedDate = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${REVIEWS_CHECKED_AT}T00:00:00Z`));
 const reviewMonth = (month: string) => new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${month}-01T00:00:00Z`));
 ---
-<Layout title="Guest reviews" description="Selected Airbnb guest highlights from our Bright and Cozy apartments at The Title V, with each apartment’s rating and links to the full reviews." image={apartments[0].photo.src}>
+<Layout title="Guest reviews of Bright and Cozy at The Title V" seoTitle={"The Title V Apartment Reviews | Bright & Cozy"} description="Read selected Airbnb guest reviews of Bright and Cozy at The Title V in Rawai. See each apartment’s separate rating and links to full reviews." image={apartments[0].photo.src}>
   <section class="page-intro container review-intro">
     <p class="eyebrow">GUEST REVIEWS</p>
-    <h1>A few words<br /><em>from our guests.</em></h1>
-    <p class="lede">Selected guest highlights from Airbnb.</p>
-    <p class="selection-note">Excerpts · names abbreviated · Airbnb translations noted</p>
+    <h1>Guest reviews of Bright and Cozy at The Title V</h1>
+    <p class="lede">Read what guests say about the specific apartments, with each apartment’s rating and original review source shown separately.</p>
+    <p class="selection-note">Selected guest highlights · excerpts · names abbreviated · Airbnb translations noted</p>
   </section>
 
   <div class="container review-apartments">

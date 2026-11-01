@@ -15,7 +15,7 @@ test('the September 2026 tourism scheme grants 30 days, not the superseded 60 da
 test('bilateral passports retain their separate 14, 30 and 90 day routes', () => {
   for (const [codes, days] of [
     [['KH', 'MM'], 14],
-    [['CN', 'HK', 'KZ', 'LA', 'MO', 'MN', 'RU', 'TL', 'VN'], 30],
+    [['CN', 'HK', 'KZ', 'LA', 'MO', 'MN', 'MY', 'RU', 'TL', 'VN'], 30],
     [['AR', 'BR', 'CL', 'PE', 'KR'], 90],
   ] as const) {
     for (const code of codes) {

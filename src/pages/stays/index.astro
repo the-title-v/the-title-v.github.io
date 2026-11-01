@@ -1,9 +1,38 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
 import PropertyCard from '../../components/PropertyCard.astro';
 import { properties } from '../../data/properties';
 ---
-<Layout title="Our apartments" description="Choose Title V New & Bright, Title V New & Cozy, or two adjacent apartments in Rawai. See real apartment photos, amenities and direct-booking availability.">
-  <section class="page-intro container"><p class="eyebrow">COME IN. MAKE YOURSELF AT HOME.</p><h1>Small details.<br /><em>Lovely stays.</em></h1><p class="lede">Two individual homes, thoughtfully equipped for life in Phuket. Choose the one that feels like you, or take both and bring your favourite people.</p></section>
+<Layout title="Compare our one-bedroom apartments at The Title V" seoTitle="The Title V Apartments for Rent in Rawai, Phuket" description="Compare Bright, Cozy or both adjacent apartments at The Title V, Rawai. See real photos, kitchens, shared pools and stays from seven nights.">
+  <section class="page-intro container"><p class="eyebrow">COME IN. MAKE YOURSELF AT HOME.</p><h1>Compare our one-bedroom apartments at The Title V</h1><p class="lede">Two apartments, three booking options. Choose Bright, Cozy or both adjacent homes, each with a separate bedroom, kitchen and balcony.</p></section>
   <section class="container content-section"><div class="property-grid">{properties.map((property, index) => <PropertyCard property={property} index={index}/>)}</div></section>
+  <section class="container content-section rich-copy" aria-labelledby="compare-heading">
+    <h2 id="compare-heading">Bright or Cozy?</h2>
+    <p>Both are 37 m² homes on the second floor with elevator access. Each has a queen bedroom, a sofa bed in the living room, a kitchen, a washing machine, a dedicated desk and a private balcony. Pools, gardens, the gym and coworking space are shared with the residence.</p>
+    <div class="apartment-comparison" tabindex="0" role="region" aria-label="Compare Bright and Cozy interiors">
+      <table>
+        <thead><tr><th scope="col">At home</th><th scope="col"><a href="/stays/bright-1br-rawai-beach/">Bright</a></th><th scope="col"><a href="/stays/cozy-1br-rawai-beach/">Cozy</a></th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Interiors</th><td>A cream sofa, warm wood and a light-filled living room.</td><td>A gray sofa, warm wood floors and curtains around the sliding bedroom partition.</td></tr>
+          <tr><th scope="row">Balcony</th><td>Two wooden chairs and a small table overlooking greenery.</td><td>A round table and two chairs facing the gardens.</td></tr>
+          <tr><th scope="row">Kitchen</th><td>Electric hob, refrigerator, microwave, kettle and toaster.</td><td>The same everyday kitchen equipment, plus an espresso machine.</td></tr>
+          <tr><th scope="row">Guest limit</th><td>2 adults and 2 children aged 14 or under.</td><td>2 adults and 2 children aged 14 or under.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Guests aged 15 or older count as adults. Two guests are included in each apartment’s base rate; additional children cost ฿300 each per night. Stays start at seven nights.</p>
+  </section>
+  <section class="container content-section two-columns">
+    <div class="rich-copy"><h2>Two homes, booked together</h2><p>The third booking option combines the same Bright and Cozy apartments. They are next door, with separate entrances, kitchens and bathrooms and no internal connecting door.</p><p>Both accommodate up to 4 adults and 4 children aged 14 or under, with a maximum of 2 adults and 2 children in each home. Both apartments must be available for every night of your stay.</p><a class="text-link" href="/stays/two-adjacent-apartments-title-v-rawai/">See the adjacent pair <Icon name="arrow" size={16}/></a></div>
+    <aside class="aside-note"><p class="eyebrow">YOUR DATES AT THE TITLE V</p><h3>Choose your stay.</h3><p>Compare the real photos, then check dates and send an enquiry. Our team confirms availability, price and terms.</p><a class="button" href="/book/">Check dates &amp; prices <Icon name="arrow" size={16}/></a></aside>
+  </section>
 </Layout>
+<style>
+  .apartment-comparison{overflow-x:auto;margin-block:28px}
+  .apartment-comparison table{width:100%;min-width:550px;border-collapse:collapse;text-align:left}
+  .apartment-comparison th,.apartment-comparison td{padding:18px 24px 18px 0;border-bottom:1px solid var(--line);vertical-align:top;font-size:1rem}
+  .apartment-comparison thead th{font-family:var(--serif);font-size:30px;font-weight:400}
+  .apartment-comparison tbody th{width:18%;font-weight:500}
+  .apartment-comparison td{width:41%;color:var(--muted)}
+</style>

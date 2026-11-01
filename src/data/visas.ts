@@ -1,6 +1,6 @@
-// Ordinary-passport rules reviewed on 2026-10-23. See docs/visa-sources.md.
+// Ordinary-passport rules reviewed on 2026-11-01. See docs/visa-sources.md.
 // The 2024 list of 93 / 60-day exemptions is superseded from 2026-09-15.
-export const visaCheckedOn = '23 October 2026';
+export const visaCheckedOn = '1 November 2026';
 export const visaSources = {
   entry: 'https://consular.mfa.go.th/th/content/1-9-69-00',
   entryEnglish: 'https://thaiconsulatela.thaiembassy.org/en/publicservice/visa-exemption-and-visa-on-arrival-to-thailand',
@@ -18,7 +18,7 @@ export const visaSources = {
 export const tourismExemption30 = new Set('AU AT BH BE BG BT BN CA HR CY CZ DK EE FJ FI FR GE DE GR HU IS ID IN IE IL IT JP JO KW KG LV LI LT LU MT MY MV NL NZ NO OM PH PL PT QA RO SA SG SK SI ZA ES SE CH TW TR UA AE GB US'.split(' '));
 export const tourismExemption15 = new Set(['MU', 'SC']);
 export const bilateralExemption14 = new Set(['KH', 'MM']);
-export const bilateralExemption30 = new Set(['CN', 'HK', 'KZ', 'LA', 'MO', 'MN', 'RU', 'TL', 'VN']);
+export const bilateralExemption30 = new Set(['CN', 'HK', 'KZ', 'LA', 'MO', 'MN', 'MY', 'RU', 'TL', 'VN']);
 export const bilateralExemption90 = new Set(['AR', 'BR', 'CL', 'PE', 'KR']);
 export const visaOnArrival15 = new Set(['AZ', 'BY', 'RS']);
 

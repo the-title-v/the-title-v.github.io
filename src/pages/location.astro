@@ -4,21 +4,22 @@ import Icon from '../components/Icon.astro';
 import LocationMap from '../components/LocationMap.astro';
 import { images } from '../data/properties';
 import { nearbyGroups, placeMapUrl, residenceLocation } from '../data/location';
-const description = 'Find The Title V in Rawai, Phuket: an interactive map, nearby beaches, Starbucks, groceries, seafood restaurants, massage, island boats and practical transport links.';
+const description = "Find The Title V in Rawai, Phuket. See the residence map, nearby essentials and transport links for beach trips to Nai Harn and Ya Nui.";
 const schema = { '@context': 'https://schema.org', '@type': 'Place', name: residenceLocation.name, hasMap: residenceLocation.mapsUrl, address: { '@type': 'PostalAddress', streetAddress: '555 Wiset Road', addressLocality: 'Rawai, Mueang Phuket', addressRegion: 'Phuket', postalCode: '83130', addressCountry: 'TH' } };
 ---
-<Layout title="Location & what’s nearby" description={description} image={images.rawai.src} schema={schema}>
+<Layout title="Location & what’s nearby" seoTitle={"The Title V Rawai Location | Map & Nearby Places"} description={description} image={images.rawai.src} schema={schema}>
   <section class="location-hero">
     <img src={images.rawai.src} alt={images.rawai.alt} width={images.rawai.width} height={images.rawai.height} fetchpriority="high" />
     <div class="location-shade"></div>
-    <div class="container hero-copy"><p class="eyebrow">THE TITLE V · SOUTHERN PHUKET</p><h1>At home<br />in <em>Rawai.</em></h1><p>Coffee on the waterfront. A boat on the horizon.<br />Your everyday essentials close at hand.</p><a class="hero-link" href="#map">Find your bearings <Icon name="arrow" size={16}/></a></div>
+    <div class="container hero-copy"><p class="eyebrow">THE TITLE V · SOUTHERN PHUKET</p><h1>Find The Title V in <em>Rawai, Phuket</em></h1><p>Use the map for The Title V in Rawai when planning your arrival. Several Title residences have similar names, so check the exact destination with our team.</p><a class="hero-link" href="#map">Find your bearings <Icon name="arrow" size={16}/></a></div>
     <p class="hero-note">RAWAI WATERFRONT</p>
   </section>
 
   <section class="container section location-orientation" id="map">
-    <div class="section-heading" data-reveal><div><p class="eyebrow">A PLACE TO START</p><h2>The right address.<br /><em>The whole neighborhood.</em></h2></div><p>A short walk from Rawai’s waterfront. Save “The Title V” for your driver — there are several Title residences nearby.</p></div>
+    <div class="section-heading" data-reveal><div><p class="eyebrow">A PLACE TO START</p><h2>The right address.<br /><em>The whole neighborhood.</em></h2></div><p>Save The Title V, 555 Wiset Road, Rawai, for your arrival. Our apartments are in the residence also known as The Title Rawai Phase 5.</p></div>
     <LocationMap />
-    <div class="orientation-notes"><p><strong>Close to the waterfront.</strong> Rawai Beach is about 200 metres away, with seafood restaurants and longtail boats along the shore.</p><p><strong>A base for beach days.</strong> Head to Nai Harn or Ya Nui for a swim. Follow the beach flags on the day.</p><p><strong>An easy arrival.</strong> Our local agent meets you at the residence. <a href="/guides/phuket-airport-to-rawai/">See airport taxis, buses and fares →</a></p></div>
+    <p class="residence-name-note"><a href="/guides/the-title-rawai-phases-comparison/">Compare the Title residences in Rawai and check the exact phase</a>. Our booking team handles Bright and Cozy at The Title V.</p>
+    <div class="orientation-notes"><p><strong>Close to the waterfront.</strong> Rawai Beach is about 200 metres away, with seafood restaurants and longtail boats along the shore.</p><p><strong>A base for beach days.</strong> Head to Nai Harn or Ya Nui for a swim. Follow the beach flags on the day. <a href="/guides/nai-harn-and-ya-nui-beaches/">Choose your swimming beach →</a></p><p><strong>An easy arrival.</strong> Our local agent meets you at the residence. <a href="/guides/phuket-airport-to-rawai/">See airport taxis, buses and fares →</a></p></div>
   </section>
 
   <section class="nearby-section section">
@@ -42,8 +43,8 @@ const schema = { '@context': 'https://schema.org', '@type': 'Place', name: resid
   .location-hero>img{position:absolute;inset:0;height:100%;object-fit:cover;object-position:50% 55%;animation:hero-arrive 1.3s ease-out both}
   .location-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,29,22,.8),rgba(10,29,22,.66) 75%)}
   .hero-copy{position:relative;padding-block:65px;animation:content-arrive .9s ease-out both}
-  .hero-copy h1{line-height:.98;margin-bottom:22px;font-size:clamp(62px,7.1vw,98px)}
-  .hero-copy>p:not(.eyebrow){font-size:1rem;line-height:1.9;margin-bottom:18px}
+  .hero-copy h1{line-height:1.02;margin-bottom:22px;font-size:clamp(44px,6.1vw,84px);max-width:780px}
+  .hero-copy>p:not(.eyebrow){font-size:1rem;line-height:1.9;max-width:660px;margin-bottom:18px}
   .hero-note{position:relative;margin-inline:max(56px,calc((100vw - 1200px)/2));padding-bottom:24px;font-size:.75rem;letter-spacing:.14em;margin-block:0}
   .location-orientation .section-heading>p,.nearby-section .section-heading>p{max-width:390px;font-size:1rem;color:var(--muted);margin:0}
   .orientation-notes{display:grid;grid-template-columns:repeat(3,1fr);gap:38px;margin-top:30px}
@@ -70,6 +71,7 @@ const schema = { '@context': 'https://schema.org', '@type': 'Place', name: resid
   .place-links{display:flex;flex-wrap:wrap;gap:22px;margin-top:14px}
   .place-links a{display:inline-flex;align-items:center;gap:8px;font-size:.875rem;border-bottom:1px solid #9baa95;padding-block:8px;min-height:44px}
   .place-links a:hover{color:var(--forest)}
+  .residence-name-note{font-size:1rem;color:var(--muted);margin-top:24px}.residence-name-note a{text-decoration:underline;text-underline-offset:3px}
   .group-guide{font-size:.875rem;margin-top:2px}
   .nearby-footnote{font-size:.875rem;color:var(--muted);line-height:1.9;border-top:1px solid #cdd3c8;padding-top:25px;margin:55px 0 0}
   .location-next{display:grid;grid-template-columns:1fr 1.1fr;gap:100px;align-items:center}

@@ -4,7 +4,7 @@ import { guides } from '../data/guides';
 
 export const GET: APIRoute = ({ site }) => new Response(`# The Title V
 
-> Two individual one-bedroom apartments and an option to book both adjacent apartments at The Title V residence in Rawai, Phuket, Thailand. A local agent meets and greets guests.
+> Book direct for seven nights or longer in Bright or Cozy, two individual one-bedroom apartments at The Title V residence in Rawai, Phuket, Thailand. The combined option uses these same two adjacent apartments. A local agent welcomes guests.
 
 ## Apartments
 ${properties.map(property => `- [${property.name}](${new URL(`/stays/${property.slug}/`, site).href}): maximum ${property.capacityLabel}, ${property.bedrooms} bedroom(s), ${property.bathrooms} bathroom(s), ${property.areaSqm} square metres. ${property.summary}
@@ -29,7 +29,8 @@ A local agent meets and greets guests and handles the apartment handover. Check-
 - [Map and nearby places](${new URL('/location/', site).href}): The Title V (Rawai-Phuket), 555 Wiset Road, Rawai, Phuket 83130. Use the Title V map pin; other phases have similar names.
 The apartments are within the residence, near Rawai waterfront, not on the sand. Rawai is known for boats, seafood and island departures. Nai Harn and Ya Nui are separate swimming-beach outings, subject to local conditions. The two apartments have separate entrances and no internal connecting door.
 
-## Local guides
+## Local guides and rental comparisons
+The competitor comparison guides discuss other Title residences and areas. This website offers only Bright and Cozy at The Title V in Rawai; it does not offer apartments in the competing developments.
 ${guides.map(guide => `- [${guide.title}](${new URL(`/guides/${guide.slug}/`, site).href}): ${guide.summary}`).join('\n')}
 
 ## Practical information

@@ -2,10 +2,18 @@
 import Layout from '../layouts/Layout.astro';
 import Icon from '../components/Icon.astro';
 import CurrencyRates from '../components/CurrencyRates';
+import { PRICING_POLICY } from '../lib/pricing';
 import '../styles/rates.css';
+const baht = (amount: number) => `฿${amount.toLocaleString('en-US')}`;
 ---
-<Layout title="Rates & longer stays" description="Seasonal and festive rates at The Title V. Seven-night minimum, automatic longer-stay savings, and a clear view of fees in your currency.">
-  <section class="page-intro container rates-intro"><p class="eyebrow">STAY A LITTLE LONGER</p><h1>A week away.<br /><em>Or a little more.</em></h1><p class="lede">7-night minimum. Simple rates, a local welcome.</p></section>
+<Layout title="Weekly and monthly apartment rental rates" seoTitle={"The Title V Rental Rates | Weekly & Monthly Stays"} description="See seasonal rates at The Title V in Rawai, with weekly and monthly accommodation discounts. Check cleaning, deposits and metered utility charges.">
+  <section class="page-intro container rates-intro"><p class="eyebrow">7-night minimum</p><h1>Weekly and monthly apartment rental rates</h1><p class="lede">Stay seven nights or longer. The estimate includes accommodation and cleaning; electricity, water and the refundable security deposit are shown separately.</p></section>
   <section class="container rates-content"><CurrencyRates client:load /></section>
+  <section class="container content-section rich-copy">
+    <h2>Weekly and monthly stays</h2>
+    <p>Weekly stays of {PRICING_POLICY.weeklyMinNights}–{PRICING_POLICY.monthlyMinNights - 1} nights receive {PRICING_POLICY.weeklyDiscountRate * 100}% off accommodation. The monthly accommodation discount is {PRICING_POLICY.monthlyDiscountRate * 100}% for {PRICING_POLICY.monthlyMinNights} nights or more. Cleaning and extra-child charges are not discounted.</p>
+    <p>The refundable deposit uses a different threshold: {baht(PRICING_POLICY.shortStayDeposit)} per booking for up to {PRICING_POLICY.longStayDepositMinNights - 1} nights, or {baht(PRICING_POLICY.longStayDeposit)} for {PRICING_POLICY.longStayDepositMinNights} nights or more. Stays of {PRICING_POLICY.monthlyMinNights}–{PRICING_POLICY.longStayDepositMinNights - 1} nights therefore receive the monthly accommodation discount with the {baht(PRICING_POLICY.shortStayDeposit)} deposit. Electricity and water remain metered separately.</p>
+    <p><a href="/guides/long-stays-in-rawai/">Plan a longer stay in Rawai</a> · <a href="/booking-terms/">Read the full costs and stay conditions</a></p>
+  </section>
   <section class="container rates-next"><div><h2>Your dates.<br /><em>Your estimate.</em></h2><p>See your full stay price, including discounts and cleaning.</p></div><div><a class="button" href="/book/">Calculate your stay <Icon name="arrow" size={17} /></a><a class="text-link" href="/booking-terms/">Booking details <Icon name="arrow" size={14} /></a><p>Availability and final terms confirmed before booking.</p></div></section>
 </Layout>
