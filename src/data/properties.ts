@@ -59,7 +59,7 @@ export const images: Record<string, GalleryImage> = {
     alt: 'Bright apartment bathroom with a round basin and glass-enclosed shower',
   },
   brightBalcony: {
-    src: '/images/bright-balcony.webp', width: 1200, height: 900,
+    src: '/images/bright-balcony.webp', width: 1448, height: 1086,
     alt: 'Bright apartment balcony with two wooden chairs, a small table, and garden views',
   },
   brightWorkspace: {
@@ -68,12 +68,12 @@ export const images: Record<string, GalleryImage> = {
     caption: 'A dedicated place to open your laptop in the Bright apartment.',
   },
   cozyLiving: {
-    src: '/images/cozy-living-room.webp', width: 1920, height: 1440,
+    src: '/images/cozy-living-room.webp', width: 1586, height: 992,
     alt: 'Cozy apartment living room with a gray sofa, balcony doors, and sliding bedroom partition',
     caption: 'The living room in Title V New & Cozy 1BR at Rawai Beach.',
   },
   cozyBedroom: {
-    src: '/images/cozy-bedroom.webp', width: 1200, height: 900,
+    src: '/images/cozy-bedroom.webp', width: 1448, height: 1086,
     alt: 'Queen bed with checkered cushions and a wardrobe in the Cozy apartment',
     caption: 'A separate queen bedroom in the Cozy apartment.',
   },
@@ -87,15 +87,15 @@ export const images: Record<string, GalleryImage> = {
     caption: 'The dedicated desk in the Cozy apartment.',
   },
   cozyDining: {
-    src: '/images/cozy-dining.webp', width: 1200, height: 900,
+    src: '/images/cozy-dining.webp', width: 1448, height: 1086,
     alt: 'Small dining table for two beside the sofa in the Cozy apartment',
   },
   cozyBathroom: {
-    src: '/images/cozy-bathroom.webp', width: 1200, height: 900,
+    src: '/images/cozy-bathroom.webp', width: 1448, height: 1086,
     alt: 'Cozy apartment bathroom with basin, toilet, and glass-enclosed shower',
   },
   cozyBalcony: {
-    src: '/images/cozy-balcony.webp', width: 1200, height: 900,
+    src: '/images/cozy-balcony.webp', width: 1448, height: 1086,
     alt: 'Cozy apartment balcony with a round table, two chairs, and greenery outside',
   },
   cozyLaundry: {
