@@ -98,7 +98,7 @@ export const nearbyGroups: NearbyGroup[] = [
   },
   {
     id: 'essentials', title: 'The useful everyday stops',
-    intro: 'A bus ride, cash for the day and somewhere for the children to play.',
+    intro: 'A bus ride, cash for the day and useful local updates.',
     guide: { label: 'Banks, cash & ATMs nearby', href: '/guides/rawai-banks-and-atms/' },
     places: [
       { name: 'Phuket Smart Bus · Rawai', journey: 'Rawai Beach stop · walk to pickup', reason: 'The coastal airport route also links Rawai with Kata, Karon and Patong.', tip: 'Use the operator’s current stop map, timetable and live tracking; this is not a door-to-door airport transfer.', mapQuery: 'Phuket Smart Bus Rawai Beach bus stop', source: localSources.bus },
@@ -106,7 +106,7 @@ export const nearbyGroups: NearbyGroup[] = [
       { name: 'Anda Rawai · motorbikes', journey: 'Rawai · check pickup point', reason: 'A second established local provider to compare for a scooter rental.', tip: 'Confirm the required licence, insurance and helmet fit; rent only a vehicle you are trained to ride.', mapQuery: 'Anda Rawai motorbike rental Phuket', source: localSources.bike },
       { name: 'Money Shop · Rawai', journey: '57/62 Rawai · local walk', reason: 'Exchange cash on Rawai’s waterfront.', tip: 'Compare the final baht amount and any fees for your exact currency and amount; bring the required identification.', mapQuery: 'Money Shop Rawai 57/62 Phuket', source: localSources.money },
       { name: 'Bank ATMs', journey: 'Search around Rawai Beach Road', reason: 'Find nearby branches and cash machines in our banks guide.', tip: 'Check the fee shown on screen and your own bank’s terms. We do not promise a particular machine will be working.', mapQuery: 'bank ATM near Rawai Beach Road Phuket', source: localSources.atm },
-      { name: 'Rawai Park', journey: 'Nearby family outing · walk', reason: 'A separate local attraction with children’s play areas and water play, useful when you want a change from the residence.', tip: 'Admission is separate from your stay. Check current opening days, age rules and facilities on its own website.', mapQuery: 'Rawai Park Phuket', source: localSources.park },
+      { name: 'Rawai Park · temporarily closed', journey: 'Closed for improvements from November 2026', reason: 'The park’s official notice announces a closure for facility improvements. No reopening date was stated when checked on 4 November 2026.', tip: 'Check the park’s official reopening updates before planning a visit.', mapQuery: 'Rawai Park Phuket', source: localSources.park },
     ],
   },
 ];

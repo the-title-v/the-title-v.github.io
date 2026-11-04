@@ -1,4 +1,5 @@
 import { comparisonGuides } from './comparisons';
+import { decisionGuides } from './decision-guides';
 import { listicleGuides } from './listicles';
 import { images, type GalleryImage } from './properties';
 import { localSources, placeMapUrl, residenceLocation } from './location';
@@ -106,7 +107,7 @@ export const guides: Guide[] = [
       },
       {
         heading: 'Keep the first outing close',
-        paragraphs: ['A beach afternoon at Nai Harn and sunset at Promthep Cape make an easy introduction to southern Phuket. Choose one or both depending on your energy after the flight.', 'Save longer drives for another day. There’s plenty nearby for a relaxed start: the residence pools, a massage at Kim’s Rawai branch, or Rawai Park with the children.'],
+        paragraphs: ['A beach afternoon at Nai Harn and sunset at Promthep Cape make an easy introduction to southern Phuket. Choose one or both depending on your energy after the flight.', 'Save longer drives for another day. There’s plenty nearby for a relaxed start: the residence pools, a massage at Kim’s Rawai branch, or a waterfront meal with the children.'],
         links: [guideLink('Choose a beach', 'nai-harn-and-ya-nui-beaches'), guideLink('Kim’s Massage in Rawai', 'rawai-massage-and-wellness')],
       },
     ],
@@ -259,8 +260,8 @@ export const guides: Guide[] = [
       },
       {
         heading: 'A few plans beyond the pool',
-        paragraphs: ['Rawai Park has water play, a kids club, playgrounds and a trampoline zone. It’s a useful local change of scene; take swimwear, a towel and socks.', 'For a longer stay, contact local nurseries and schools before arrival. Start with your child’s age, language and dates, then arrange a visit.'],
-        links: [guideLink('Plan a visit to Rawai Park', 'rawai-park-with-children'), guideLink('Schools & kindergartens', 'rawai-schools-and-kindergartens')],
+        paragraphs: ['Rawai Park is closed for improvements from November 2026, according to its official notice checked on 4 November. Wait for a confirmed reopening before planning a visit. The residence’s shared children’s pool and small playground offer time close to home, with adult supervision.', 'For a longer stay, contact local nurseries and schools before arrival. Start with your child’s age, language and dates, then arrange a visit.'],
+        links: [guideLink('Check the Rawai Park closure update', 'rawai-park-with-children'), guideLink('Schools & kindergartens', 'rawai-schools-and-kindergartens')],
       },
     ],
     sources: [sources.bright, sources.cozy, sources.park],
@@ -377,7 +378,7 @@ export const guides: Guide[] = [
       },
       {
         heading: 'Days 3–4: one outing, one quiet day',
-        paragraphs: ['Choose a longtail trip if the sea is calm, or head to Phuket Old Town for a walk and lunch. Keep the following day light: breakfast on the balcony, a swim and a massage at Kim’s Rawai branch.', 'With children, swap the massage for Rawai Park. You don’t need to cross the island to find something new to do.'],
+        paragraphs: ['Choose a longtail trip if the sea is calm, or head to Phuket Old Town for a walk and lunch. Keep the following day light: breakfast on the balcony, a swim and a massage at Kim’s Rawai branch.', 'With children, keep an afternoon for the residence’s shared children’s pool and small playground, with adult supervision. Rawai Park is closed for improvements from November 2026; check its reopening notice before adding it to your plans.'],
         links: [guideLink('Longtail trips from Rawai', 'island-trips-from-rawai'), guideLink('Rawai Park', 'rawai-park-with-children'), guideLink('Festivals & night markets', 'phuket-festivals-and-night-markets')],
       },
       {
@@ -554,8 +555,9 @@ export const guides: Guide[] = [
     relatedGuides: ['phuket-rainy-day-guide', 'rawai-food-and-markets', 'long-stays-in-rawai'],
   },
   {
-    slug: 'rawai-park-with-children', title: 'A family afternoon at Rawai Park', eyebrow: 'Play time',
-    summary: 'Water slides, a kids club and playgrounds close to Rawai’s waterfront. Bring swimwear and socks.',
+    slug: 'rawai-park-with-children', title: 'Rawai Park: temporary closure from November 2026', eyebrow: 'Family outing update',
+    summary: 'Rawai Park is closed for improvements from November 2026. Check its official reopening updates before planning a family visit.',
+    updatedAt: '2026-11-04',
     hero: {
       src: '/images/guide-rawai-park-courtyard.webp', width: 960, height: 641,
       alt: 'Rawai Park’s colorful building with its name, mascot and landscaped courtyard', caption: 'The courtyard at Rawai Park.',
@@ -564,18 +566,19 @@ export const guides: Guide[] = [
     readTime: '2 min read',
     sections: [
       {
-        heading: 'What’s there',
-        paragraphs: ['Rawai Park brings together a children’s pool with slides, an indoor kids club, an outdoor playground, an activities area and a trampoline zone. Love Rawai Café is on site for a break between play sessions.', 'The kids club is for children up to seven; the trampoline zone starts at age four. Stay with your children throughout the visit.'],
+        heading: 'Closed for improvements',
+        paragraphs: ['Rawai Park’s official website announces a closure for facility improvements from November 2026. The notice checked on 4 November does not give a reopening date and directs visitors to its social channels for updates.'],
+        links: [sources.park],
       },
       {
-        heading: 'When to go and what to bring',
-        paragraphs: ['The park lists opening hours of 10:00–19:00, with Wednesdays closed. Check the park’s page for special events and ask for the ticket price for your children’s ages and chosen zones.', 'Pack swimwear, towels, a change of clothes and socks. The trampoline zone needs non-slip socks. Food and drinks are available on site; outside food and drinks aren’t allowed.'],
+        heading: 'Before a future visit',
+        paragraphs: ['Wait for the park to confirm reopening, then check the available play areas, age rules, opening hours and admission price. Older hours and activity descriptions do not confirm that the park is currently open.'],
         links: [sources.park, sources.parkRules],
       },
       {
-        heading: 'Make it an easy local day',
-        paragraphs: ['The park is at 58/88 Moo 6, Soi Rouyphad. Save the map pin before leaving; the entrance is off the waterfront road.', 'You can spend a few hours playing and return to the apartment for a rest, then have dinner by the sea. For birthday plans or ticket questions, call +66 98 396 5369.'],
-        links: [map('Rawai Park directions', 'Rawai Park 58/88 Soi Rouyphad Phuket'), { title: 'Call Rawai Park', url: 'tel:+66983965369' }],
+        heading: 'An easy family day at The Title V',
+        paragraphs: ['For a day close to the apartment, enjoy the residence’s shared children’s pool and small outdoor playground, following the residence rules and supervising children throughout. A waterfront meal makes an easy change of scene afterward.'],
+        links: [guideLink('More ideas for Rawai with children', 'phuket-with-children'), { title: 'Explore The Title V facilities', url: '/residence/' }],
       },
     ],
     sources: [],
@@ -786,6 +789,7 @@ export const guides: Guide[] = [
     relatedGuides: ['rawai-food-and-markets', 'a-slow-week-in-rawai', 'phuket-seasons'],
   },
   ...comparisonGuides,
+  ...decisionGuides,
   ...listicleGuides,
 ];
 
