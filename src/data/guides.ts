@@ -1,4 +1,5 @@
 import { comparisonGuides } from './comparisons';
+import { listicleGuides } from './listicles';
 import { images, type GalleryImage } from './properties';
 import { localSources, placeMapUrl, residenceLocation } from './location';
 
@@ -23,7 +24,7 @@ export interface Guide {
   metaDescription?: string;
   intro?: string;
   updatedAt?: string;
-  category?: 'comparison';
+  category?: 'comparison' | 'listicle';
   eyebrow: string;
   summary: string;
   hero: GalleryImage;
@@ -785,6 +786,7 @@ export const guides: Guide[] = [
     relatedGuides: ['rawai-food-and-markets', 'a-slow-week-in-rawai', 'phuket-seasons'],
   },
   ...comparisonGuides,
+  ...listicleGuides,
 ];
 
 export const guideBySlug = (slug: string) => guides.find((guide) => guide.slug === slug);

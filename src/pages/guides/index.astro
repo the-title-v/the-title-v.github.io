@@ -4,11 +4,16 @@ import Icon from '../../components/Icon.astro';
 import { guides } from '../../data/guides';
 import { images } from '../../data/properties';
 const comparisons = guides.filter(guide => guide.category === 'comparison');
-const localGuides = guides.filter(guide => guide.category !== 'comparison');
+const listicles = guides.filter(guide => guide.category === 'listicle');
+const localGuides = guides.filter(guide => !guide.category);
 ---
 <Layout title="The Rawai journal · Local guides" seoTitle="Rawai Rental Comparisons & Local Guides | The Title V" description="Compare The Title residences and plan a stay in Rawai, Phuket: apartment choices, monthly rentals, beaches, food and practical transport guides.">
   <section class="page-intro container"><p class="eyebrow">NOTES FROM OUR CORNER OF PHUKET</p><h1>The Rawai <em>journal.</em></h1><p class="lede">Good places. Easy outings. The useful details for a week — or a little longer.</p></section>
   <nav class="container guide-shortcuts" aria-label="Plan your stay"><a href="/explore-phuket/">Island map <Icon name="pin" size={16}/></a><a href="/guides/phuket-airport-to-rawai/">Getting here <Icon name="arrow" size={16}/></a><a href="/visas/">Visas & entry <Icon name="arrow" size={16}/></a><a href="/guides/rawai-park-with-children/">Rawai Park <Icon name="arrow" size={16}/></a><a href="/guides/rawai-schools-and-kindergartens/">Schools <Icon name="arrow" size={16}/></a><a href="/guides/rawai-banks-and-atms/">Banks & ATMs <Icon name="arrow" size={16}/></a></nav>
+  <section id="stay-ideas" class="container content-section" aria-labelledby="stay-ideas-heading">
+    <p class="eyebrow">MAKE YOURSELF AT HOME</p><h2 id="stay-ideas-heading">Ideas for an easier stay</h2>
+    <div class="guide-grid wide-guide-grid">{listicles.map(guide => <article class="guide-card"><a class="guide-image" href={`/guides/${guide.slug}/`}><img src={guide.hero.src} width={guide.hero.width} height={guide.hero.height} alt={guide.hero.alt} loading="lazy"/></a><p class="eyebrow">{guide.eyebrow} · {guide.readTime}</p><h3><a href={`/guides/${guide.slug}/`}>{guide.title}</a></h3><p>{guide.summary}</p><a class="text-link" href={`/guides/${guide.slug}/`}>Read the guide <Icon name="arrow" size={16}/></a></article>)}</div>
+  </section>
   {comparisons.length > 0 && <section id="compare-residences" class="container content-section comparison-section" aria-labelledby="comparison-heading">
     <div class="comparison-intro">
       <img src={images.poolSide.src} width={images.poolSide.width} height={images.poolSide.height} alt={images.poolSide.alt} loading="lazy"/>

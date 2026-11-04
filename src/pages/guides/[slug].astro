@@ -7,6 +7,7 @@ import { images, properties } from '../../data/properties';
 export function getStaticPaths() { return guides.map(guide => ({ params: { slug: guide.slug }, props: { guide } })); }
 const { guide } = Astro.props;
 const isComparison = guide.category === 'comparison';
+const isListicle = guide.category === 'listicle';
 const related = guides.filter(item => guide.relatedGuides.includes(item.slug));
 const heading = guide.heading || guide.title;
 const description = guide.metaDescription || guide.summary;
@@ -63,6 +64,7 @@ const schema = { '@context': 'https://schema.org', '@type': 'Article', headline:
     <h1 class="simple-title">{heading}</h1>
     <p class="lede">{guide.intro || guide.summary}</p>
     {guide.updatedAt && <p class="guide-updated">Updated <time datetime={guide.updatedAt}>{new Date(`${guide.updatedAt}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}</time></p>}
+    {isListicle && <div class="listicle-actions"><a class="button" href="/book/">Check dates <Icon name="arrow" size={17}/></a><a class="text-link" href="/stays/">See Bright & Cozy <Icon name="arrow" size={16}/></a></div>}
   </section>
   <div class="container">
     <figure class="article-figure">
@@ -82,7 +84,8 @@ const schema = { '@context': 'https://schema.org', '@type': 'Article', headline:
         {section.table && <div class="guide-table-wrap"><table class="guide-table"><thead><tr>{section.table.headings.map(heading => <th scope="col">{heading}</th>)}</tr></thead><tbody>{section.table.rows.map(row => <tr>{row.map((cell, cellIndex) => cellIndex === 0 ? <th scope="row">{cell}</th> : <td>{cell}</td>)}</tr>)}</tbody></table></div>}
         {section.links && <ul class="guide-links">{section.links.map(link => <li><a href={link.url} target={link.url.startsWith('http') ? '_blank' : undefined} rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}>{link.title} <Icon name="arrow" size={13}/></a></li>)}</ul>}
       </section>)}
-      {guide.sources.length > 0 && <div class="sources"><p class="eyebrow">USEFUL LINKS</p><ul>{guide.sources.map(source => <li><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title} <Icon name="arrow" size={13}/></a></li>)}</ul></div>}
+      {guide.sources.length > 0 && <div class="sources"><p class="eyebrow">USEFUL LINKS</p><ul>{guide.sources.map(source => <li><a href={source.url} target={source.url.startsWith('http') ? '_blank' : undefined} rel={source.url.startsWith('http') ? 'noopener noreferrer' : undefined}>{source.title} <Icon name="arrow" size={13}/></a></li>)}</ul></div>}
+      {isListicle && <div class="listicle-booking"><p class="eyebrow">YOUR PLACE IN RAWAI</p><h2>Stay a little longer.</h2><p>Choose Bright, Cozy or both adjacent homes at The Title V. Stays start at seven nights. Send us your dates and guest details to plan your own Rawai break.</p><a class="button" href="/book/">Plan your stay <Icon name="arrow" size={17}/></a></div>}
     </article>
     <aside>
       <p class="eyebrow">IN THIS GUIDE</p>
@@ -94,6 +97,10 @@ const schema = { '@context': 'https://schema.org', '@type': 'Article', headline:
   </>}
 </Layout>
 <style>
+  .listicle-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 16px 28px; margin-top: 24px; }
+  .listicle-booking { margin-top: 42px; padding: 30px; background: var(--sage); }
+  .listicle-booking h2 { margin-top: 0; }
+  .listicle-booking .button { text-decoration: none; }
   .comparison-hero { position: relative; isolation: isolate; display: grid; align-items: center; min-height: min(680px, calc(100svh - 98px)); overflow: hidden; background: var(--forest-dark); color: var(--paper); }
   .comparison-hero-image, .comparison-hero-shade { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
   .comparison-hero-image { object-fit: cover; object-position: center 55%; animation: comparison-image-arrive 1.2s ease-out both; }
