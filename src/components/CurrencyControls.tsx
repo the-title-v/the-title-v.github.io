@@ -1,13 +1,21 @@
-import { createContext, useContext, useEffect, useId, useState, type ReactNode } from 'react';
-import { CURRENCIES, FX_MAX_AGE_MS, formatCurrency, getExchangeRates, type CurrencyCode, type ExchangeResult } from '../lib/currency';
+import { createContext, useCallback, useContext, useEffect, useId, useState, type ReactNode } from 'react';
+import { CURRENCIES, FX_MAX_AGE_MS, formatCurrency, getExchangeRates, readDisplayCurrency, type CurrencyCode, type ExchangeResult } from '../lib/currency';
 
 const PREFERENCE_KEY = 'title-v-display-currency';
 const CurrencyContext = createContext<ReturnType<typeof useCurrencyState> | null>(null);
 
-function useCurrencyState() {
+function useCurrencyState(currencyFromUrl: boolean) {
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('THB');
+  const [preferenceReady, setPreferenceReady] = useState(false);
   const [result, setResult] = useState<ExchangeResult>({ status: 'unavailable', snapshot: null });
   const [loading, setLoading] = useState(true);
+  const restoreCurrencyPreference = useCallback(() => {
+    let saved: string | null = null;
+    try { saved = window.localStorage.getItem(PREFERENCE_KEY); } catch { /* Storage is optional. */ }
+    const requested = currencyFromUrl ? new URLSearchParams(window.location.search).get('currency') : null;
+    setSelectedCurrency(readDisplayCurrency(requested, saved));
+    setPreferenceReady(true);
+  }, [currencyFromUrl]);
 
   useEffect(() => {
     let active = true;
@@ -15,9 +23,8 @@ function useCurrencyState() {
     let storage: Storage | undefined;
     try {
       storage = window.localStorage;
-      const saved = storage.getItem(PREFERENCE_KEY);
-      if (CURRENCIES.some(({ code }) => code === saved)) setSelectedCurrency(saved as CurrencyCode);
     } catch { /* Browser privacy settings can disable storage. */ }
+    restoreCurrencyPreference();
     const refresh = async () => {
       setLoading(true);
       const next = await getExchangeRates({ storage });
@@ -29,8 +36,11 @@ function useCurrencyState() {
       timer = setTimeout(refresh, Math.max(1000, Math.min(3_600_000, expiresIn)));
     };
     void refresh();
-    return () => { active = false; clearTimeout(timer); };
-  }, []);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [restoreCurrencyPreference]);
 
   const snapshot = result.snapshot && Date.now() - result.snapshot.updatedAt < FX_MAX_AGE_MS ? result.snapshot : null;
   const currency = snapshot ? selectedCurrency : 'THB';
@@ -40,15 +50,15 @@ function useCurrencyState() {
     try { window.localStorage.setItem(PREFERENCE_KEY, next); } catch { /* Preference is optional. */ }
   };
   return {
-    selectedCurrency, currency, setCurrency, loading,
+    selectedCurrency, currency, setCurrency, loading, preferenceReady, restoreCurrencyPreference,
     result: snapshot ? result : { status: 'unavailable', snapshot: null } as ExchangeResult,
     money: (amount: number) => formatCurrency(amount, currency, snapshot),
     compactMoney: (amount: number) => formatCurrency(amount, currency, snapshot, true),
   };
 }
 
-export function CurrencyProvider({ children }: { children: ReactNode }) {
-  return <CurrencyContext.Provider value={useCurrencyState()}>{children}</CurrencyContext.Provider>;
+export function CurrencyProvider({ children, currencyFromUrl = false }: { children: ReactNode; currencyFromUrl?: boolean }) {
+  return <CurrencyContext.Provider value={useCurrencyState(currencyFromUrl)}>{children}</CurrencyContext.Provider>;
 }
 
 export function useCurrency() {

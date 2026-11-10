@@ -9,6 +9,15 @@ export const CURRENCIES: { code: CurrencyCode; name: string }[] = [
   { code: 'RUB', name: 'Russian ruble' },
   { code: 'CNY', name: 'Chinese yuan' },
 ];
+
+export function readDisplayCurrency(requested: string | null, saved: string | null): CurrencyCode {
+  for (const candidate of [requested, saved]) {
+    const currency = CURRENCIES.find(({ code }) => code === candidate);
+    if (currency) return currency.code;
+  }
+  return 'THB';
+}
+
 export const FX_CACHE_KEY = 'title-v-fx-v1';
 export const FX_MAX_AGE_MS = 72 * 3_600_000;
 export const FX_ENDPOINT = 'https://open.er-api.com/v6/latest/THB';

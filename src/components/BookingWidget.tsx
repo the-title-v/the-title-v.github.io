@@ -3,7 +3,7 @@ import { ArrowUpRight, ArrowLeft, ArrowRight, CalendarDays, Check, Info, LoaderC
 import { calculateQuote, getNightlyRate, getOccupancyLimits, PRICING_POLICY, type Quote } from '../lib/pricing';
 import { isStayAvailable } from '../lib/calendar';
 import CurrencyControls, { CurrencyProvider, useCurrency } from './CurrencyControls';
-import { addDays, bangkokToday, buildWhatsAppRequest, minimumStayIssue, readBookingOccupancy } from '../lib/booking';
+import { addDays, bangkokToday, bookingUrl, buildWhatsAppRequest, minimumStayIssue, readBookingSelection } from '../lib/booking';
 import { AVAILABILITY_REFRESH_MS, availabilityFreshFor, requestAvailability, unverifiedAvailability, type ClientAvailability as Availability } from '../lib/availability-client';
 
 type Stay = { slug: string; name: string; guests: number; image: string; };
@@ -12,11 +12,12 @@ const iso = (date: Date) => date.toISOString().slice(0, 10);
 const displayDate = (date: string) => date ? new Date(`${date}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) : 'Select date';
 
 export default function BookingWidget({ stays }: { stays: Stay[] }) {
-  return <CurrencyProvider><BookingCalculator stays={stays} /></CurrencyProvider>;
+  return <CurrencyProvider currencyFromUrl><BookingCalculator stays={stays} /></CurrencyProvider>;
 }
 
 function BookingCalculator({ stays }: { stays: Stay[] }) {
-  const { currency, money, compactMoney } = useCurrency();
+  const { currency, selectedCurrency, preferenceReady, restoreCurrencyPreference, money, compactMoney } = useCurrency();
+  const [selectionReady, setSelectionReady] = useState(false);
   const [property, setProperty] = useState(stays[0].slug);
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
@@ -45,24 +46,31 @@ function BookingCalculator({ stays }: { stays: Stay[] }) {
   }, []);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const requestedProperty = params.get('property');
-    const selected = stays.find(s => s.slug === requestedProperty) || stays[0];
-    setProperty(selected.slug);
-    try {
-      const occupancy = readBookingOccupancy(params, selected.slug);
-      setAdults(occupancy.adults);
-      setChildren(occupancy.children);
-    } catch (error) {
-      setGuestLinkError(error instanceof Error ? error.message : 'Please check your guest counts.');
-    }
-    const arrival = params.get('checkIn') || '';
-    const departure = params.get('checkOut') || '';
-    if (/^\d{4}-\d{2}-\d{2}$/.test(arrival) && arrival >= today && arrival <= horizon && !Number.isNaN(Date.parse(arrival))) {
-      setCheckIn(arrival); setMonth(`${arrival.slice(0, 7)}-01`);
-      if (/^\d{4}-\d{2}-\d{2}$/.test(departure) && departure > arrival && departure <= horizon) setCheckOut(departure);
-    }
-  }, []);
+    const restoreSelection = () => {
+      const selected = readBookingSelection(new URLSearchParams(window.location.search), stays.map(stay => stay.slug));
+      setProperty(selected.property);
+      setAdults(selected.adults);
+      setChildren(selected.children);
+      setGuestLinkError(selected.guestLinkError);
+      setCheckIn(selected.checkIn);
+      setCheckOut(selected.checkOut);
+      setMonth(`${(selected.checkIn || bangkokToday()).slice(0, 7)}-01`);
+      setSelecting(selected.checkIn && !selected.checkOut ? 'departure' : 'arrival');
+      // Restore currency in this same event before the URL-writing effect can run.
+      restoreCurrencyPreference();
+      setSelectionReady(true);
+    };
+    restoreSelection();
+    window.addEventListener('popstate', restoreSelection);
+    return () => window.removeEventListener('popstate', restoreSelection);
+  }, [stays, restoreCurrencyPreference]);
+
+  useEffect(() => {
+    // Wait for both URL selections and the saved currency before changing the address.
+    if (!selectionReady || !preferenceReady) return;
+    const url = bookingUrl(window.location.href, { property, checkIn, checkOut, adults, children, guestLinkError }, selectedCurrency);
+    if (url !== window.location.href) window.history.replaceState(window.history.state, '', url);
+  }, [selectionReady, preferenceReady, property, checkIn, checkOut, adults, children, guestLinkError, selectedCurrency]);
 
   useEffect(() => {
     const controller = new AbortController();

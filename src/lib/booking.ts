@@ -1,6 +1,7 @@
 import { PRICING_POLICY, resolveOccupancy, type Quote } from './pricing';
 import { isStayAvailable, type BlockedDateRange } from './calendar';
 import { whatsappUrl } from '../data/site';
+import type { CurrencyCode } from './currency';
 
 export function bangkokToday(now = new Date()): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
@@ -34,6 +35,56 @@ export function readBookingOccupancy(params: URLSearchParams, propertyId: string
     return Number(values[0]);
   };
   return resolveOccupancy(propertyId, { adults: count('adults'), children: count('children'), guests: count('guests') });
+}
+
+export type BookingSelection = {
+  property: string; checkIn: string; checkOut: string;
+  adults: number; children: number; guestLinkError: string;
+};
+
+/** Restore only supported selections; availability is always checked separately. */
+export function readBookingSelection(params: URLSearchParams, properties: readonly string[], today = bangkokToday()): BookingSelection {
+  const requested = params.get('property') || '';
+  const property = properties.includes(requested) ? requested : properties[0];
+  const selection: BookingSelection = { property, checkIn: '', checkOut: '', adults: 2, children: 0, guestLinkError: '' };
+  try {
+    const occupancy = readBookingOccupancy(params, property);
+    selection.adults = occupancy.adults;
+    selection.children = occupancy.children;
+  } catch (error) {
+    selection.guestLinkError = error instanceof Error ? error.message : 'Please check your guest counts.';
+  }
+  const validDate = (value: string) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+    const time = Date.parse(`${value}T12:00:00Z`);
+    return Number.isFinite(time) && new Date(time).toISOString().slice(0, 10) === value;
+  };
+  const arrival = params.get('checkIn') || '';
+  const departure = params.get('checkOut') || '';
+  const horizon = addDays(today, 365);
+  if (validDate(arrival) && arrival >= today && arrival <= horizon) {
+    selection.checkIn = arrival;
+    if (validDate(departure) && departure > arrival && departure <= horizon) selection.checkOut = departure;
+  }
+  return selection;
+}
+
+/** Keep a copyable URL without dropping campaign parameters or page anchors. */
+export function bookingUrl(href: string, selection: BookingSelection, currency: CurrencyCode): string {
+  const url = new URL(href);
+  url.searchParams.set('property', selection.property);
+  for (const key of ['checkIn', 'checkOut'] as const) {
+    if (selection[key]) url.searchParams.set(key, selection[key]);
+    else url.searchParams.delete(key);
+  }
+  // Do not silently turn an invalid guest link into an accepted quote on reload.
+  if (!selection.guestLinkError) {
+    url.searchParams.delete('guests');
+    url.searchParams.set('adults', String(selection.adults));
+    url.searchParams.set('children', String(selection.children));
+  }
+  url.searchParams.set('currency', currency);
+  return url.href;
 }
 
 export function buildWhatsAppRequest(propertyName: string, quote: Quote, calendarStatus: 'snapshot' | 'unavailable'): string {
